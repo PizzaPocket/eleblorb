@@ -268,9 +268,9 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_nq2b6"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[node name="MoyCell_03_03_Part_24" type="Node3D" unique_id=578507341]
+[node name="MoyCell_03_03_Part_24" type="Node3D" unique_id=639835334]
 
-[node name="ClockRoomArrival_01_north_Down" type="StaticBody3D" parent="." unique_id=1540305641]
+[node name="ClockRoomArrival_01_north_Down" type="StaticBody3D" parent="." unique_id=629730843]
 transform = Transform3D(0, 0, -1, -0.49987933, 0.8660951, 0, 0.8660951, 0.49987933, 0, -555.4, -20.7, -12.485)
 script = ExtResource("1_mrdmt")
 travel_direction = Vector3(0, -0.49987933, 0.8660951)
@@ -283,251 +283,251 @@ metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:ClockRoomArrival_01_north"
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12350" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1921145645]
+[node name="@CollisionShape3D@12350" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=158188054]
 shape = SubResource("BoxShape3D_8d48a")
 
-[node name="@MeshInstance3D@12351" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=827175653]
+[node name="@MeshInstance3D@12351" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1490462796]
 material_override = SubResource("StandardMaterial3D_mdhyx")
 mesh = SubResource("BoxMesh_pyaiw")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=662605195]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=778851535]
 material_override = SubResource("StandardMaterial3D_otfrr")
 mesh = SubResource("ArrayMesh_lb8ga")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1664470771]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1046257401]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 0.0
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1869789302]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=352446756]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 0.6848992622282433
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=459359737]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1384235982]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 1.3697985244564865
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1587381286]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=601671198]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 2.05469778668473
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1959207545]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=134105478]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 2.739597048912973
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=378352473]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1942944373]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 3.4244963111412163
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1712438939]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=218850552]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 4.10939557336946
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=197050744]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=504083707]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 4.794294835597703
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1926035772]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1976175666]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 5.479194097825946
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1965599903]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=295158162]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 6.164093360054189
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1670668580]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=99979733]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 6.848992622282433
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=2032583176]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=718340388]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 7.533891884510676
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=768078839]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1798471191]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 8.21879114673892
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1837056589]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=342650450]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 8.903690408967163
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=742769724]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=548467098]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 9.588589671195406
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1721895941]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=538692381]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 10.27348893342365
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1472550908]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1552758961]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 10.958388195651892
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=267376637]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=2078927394]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 11.643287457880136
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=801517053]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=2136158138]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 12.328186720108379
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1557915941]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1389604290]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 13.013085982336623
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1987988031]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1531378560]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 13.697985244564865
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1325576145]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=820309913]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 14.38288450679311
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=849825819]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1946344621]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 15.067783769021352
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=178789564]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1228876503]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 15.752683031249596
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=355127468]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=253077630]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 16.43758229347784
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1688044059]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=945104553]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 17.12248155570608
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1200999011]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1678088319]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 17.807380817934327
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1805156569]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1333991625]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 18.49228008016257
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1121385380]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1068856536]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 19.17717934239081
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=423625583]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=53473143]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 19.862078604619054
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=398431969]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1009530519]
 material_override = SubResource("StandardMaterial3D_500fi")
 mesh = SubResource("BoxMesh_ut15a")
 metadata/belt_distance = 20.5469778668473
 
-[node name="@CollisionShape3D@12352" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1710326825]
+[node name="@CollisionShape3D@12352" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1537899374]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_5pucj")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=763581763]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1378405992]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_78vn8")
 mesh = SubResource("BoxMesh_h2a0c")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1705603303]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=2037517210]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_bwm8e")
 mesh = SubResource("BoxMesh_hvov8")
 metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=513574531]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1300888619]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_bwm8e")
 mesh = SubResource("BoxMesh_yim1i")
 metadata/handrail_distance = 6.9016664028167725
 
-[node name="@CollisionShape3D@12354" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=360060570]
+[node name="@CollisionShape3D@12354" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=2110632388]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
 shape = SubResource("BoxShape3D_airfk")
 
-[node name="@MeshInstance3D@12355" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1599455968]
+[node name="@MeshInstance3D@12355" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=285816061]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_l00nj")
 mesh = SubResource("BoxMesh_2i7ka")
 
-[node name="@CollisionShape3D@12356" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1976229937]
+[node name="@CollisionShape3D@12356" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1904094564]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
 shape = SubResource("BoxShape3D_hc5xp")
 
-[node name="@MeshInstance3D@12357" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=366974890]
+[node name="@MeshInstance3D@12357" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=910571010]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_fpsmb")
 mesh = SubResource("BoxMesh_xt5hk")
 
-[node name="@CollisionShape3D@12358" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1728741902]
+[node name="@CollisionShape3D@12358" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=572909767]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_hb70q")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=971358303]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=55278124]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_78vn8")
 mesh = SubResource("BoxMesh_8k75x")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=581773276]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=937298971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_yky5s")
 mesh = SubResource("BoxMesh_6n575")
 metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1852470105]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1542335533]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_yky5s")
 mesh = SubResource("BoxMesh_wlmjo")
 metadata/handrail_distance = 6.9016664028167725
 
-[node name="@CollisionShape3D@12360" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1250730674]
+[node name="@CollisionShape3D@12360" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1422362548]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
 shape = SubResource("BoxShape3D_yy6p0")
 
-[node name="@MeshInstance3D@12361" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=120222632]
+[node name="@MeshInstance3D@12361" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1364765875]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_b1m1h")
 mesh = SubResource("BoxMesh_hk88r")
 
-[node name="@CollisionShape3D@12362" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=892634995]
+[node name="@CollisionShape3D@12362" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Down" unique_id=1333758317]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
 shape = SubResource("BoxShape3D_jbsgf")
 
-[node name="@MeshInstance3D@12363" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=1995632633]
+[node name="@MeshInstance3D@12363" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Down" unique_id=998899204]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_56ns6")
 mesh = SubResource("BoxMesh_o4qtv")
 
-[node name="ClockRoomArrival_01_north_Landing_0" type="StaticBody3D" parent="." unique_id=1979366250]
+[node name="ClockRoomArrival_01_north_Landing_0" type="StaticBody3D" parent="." unique_id=587076829]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556, -23.15, -8.5)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:ClockRoomArrival_01_north"
@@ -535,14 +535,14 @@ metadata/reach_link_id = "Escalator:ClockRoomArrival_01_north"
 metadata/reach_target = true
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12364" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Landing_0" unique_id=1343472715]
+[node name="@CollisionShape3D@12364" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Landing_0" unique_id=1166287483]
 shape = SubResource("BoxShape3D_7qipl")
 
-[node name="@MeshInstance3D@12365" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Landing_0" unique_id=1301850833]
+[node name="@MeshInstance3D@12365" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Landing_0" unique_id=212032229]
 material_override = SubResource("StandardMaterial3D_3p2qf")
 mesh = SubResource("BoxMesh_h756p")
 
-[node name="ClockRoomArrival_01_north_Landing_1" type="StaticBody3D" parent="." unique_id=2127587889]
+[node name="ClockRoomArrival_01_north_Landing_1" type="StaticBody3D" parent="." unique_id=1675147751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556, -18.55, -16.47)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:ClockRoomArrival_01_north"
@@ -550,47 +550,47 @@ metadata/reach_link_id = "Escalator:ClockRoomArrival_01_north"
 metadata/reach_target = true
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12366" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Landing_1" unique_id=2029641792]
+[node name="@CollisionShape3D@12366" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Landing_1" unique_id=732768703]
 shape = SubResource("BoxShape3D_xocwc")
 
-[node name="@MeshInstance3D@12367" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Landing_1" unique_id=633282544]
+[node name="@MeshInstance3D@12367" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Landing_1" unique_id=375370331]
 material_override = SubResource("StandardMaterial3D_47bxu")
 mesh = SubResource("BoxMesh_l3scn")
 
-[node name="@StaticBody3D@12370" type="StaticBody3D" parent="." unique_id=97280961]
+[node name="@StaticBody3D@12370" type="StaticBody3D" parent="." unique_id=391099378]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -554.2, -17.3, -13.695)
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12368" type="CollisionShape3D" parent="@StaticBody3D@12370" unique_id=889445480]
+[node name="@CollisionShape3D@12368" type="CollisionShape3D" parent="@StaticBody3D@12370" unique_id=1798362767]
 shape = SubResource("BoxShape3D_sitnf")
 
-[node name="@MeshInstance3D@12369" type="MeshInstance3D" parent="@StaticBody3D@12370" unique_id=409776769]
+[node name="@MeshInstance3D@12369" type="MeshInstance3D" parent="@StaticBody3D@12370" unique_id=1283603147]
 material_override = SubResource("StandardMaterial3D_8ho82")
 mesh = SubResource("BoxMesh_rvmt2")
 
-[node name="@StaticBody3D@12373" type="StaticBody3D" parent="." unique_id=464331667]
+[node name="@StaticBody3D@12373" type="StaticBody3D" parent="." unique_id=469688809]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -556, -17.3, -10.92)
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12371" type="CollisionShape3D" parent="@StaticBody3D@12373" unique_id=1988633482]
+[node name="@CollisionShape3D@12371" type="CollisionShape3D" parent="@StaticBody3D@12373" unique_id=629850430]
 shape = SubResource("BoxShape3D_d7uwm")
 
-[node name="@MeshInstance3D@12372" type="MeshInstance3D" parent="@StaticBody3D@12373" unique_id=1247326430]
+[node name="@MeshInstance3D@12372" type="MeshInstance3D" parent="@StaticBody3D@12373" unique_id=1787260705]
 material_override = SubResource("StandardMaterial3D_xwkr7")
 mesh = SubResource("BoxMesh_tfafs")
 
-[node name="@StaticBody3D@12376" type="StaticBody3D" parent="." unique_id=389459513]
+[node name="@StaticBody3D@12376" type="StaticBody3D" parent="." unique_id=1144387453]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -557.8, -17.3, -13.695)
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12374" type="CollisionShape3D" parent="@StaticBody3D@12376" unique_id=1397712568]
+[node name="@CollisionShape3D@12374" type="CollisionShape3D" parent="@StaticBody3D@12376" unique_id=413896262]
 shape = SubResource("BoxShape3D_abtft")
 
-[node name="@MeshInstance3D@12375" type="MeshInstance3D" parent="@StaticBody3D@12376" unique_id=44996190]
+[node name="@MeshInstance3D@12375" type="MeshInstance3D" parent="@StaticBody3D@12376" unique_id=686652512]
 material_override = SubResource("StandardMaterial3D_3qobu")
 mesh = SubResource("BoxMesh_0rr0m")
 
-[node name="ClockRoomArrival_02_south_Up" type="StaticBody3D" parent="." unique_id=319603533]
+[node name="ClockRoomArrival_02_south_Up" type="StaticBody3D" parent="." unique_id=850958937]
 transform = Transform3D(0, 0, -1, 0.49987933, 0.8660951, 0, 0.8660951, -0.49987933, 0, -563.4, -20.7, 12.485)
 script = ExtResource("1_mrdmt")
 travel_direction = Vector3(0, 0.49987933, 0.8660951)
@@ -603,246 +603,246 @@ metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:ClockRoomArrival_02_south"
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12377" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1771312415]
+[node name="@CollisionShape3D@12377" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1259911923]
 shape = SubResource("BoxShape3D_fh35l")
 
-[node name="@MeshInstance3D@12378" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=839816452]
+[node name="@MeshInstance3D@12378" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2031782382]
 material_override = SubResource("StandardMaterial3D_fd7el")
 mesh = SubResource("BoxMesh_rvjmo")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1246745940]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1831220760]
 material_override = SubResource("StandardMaterial3D_li3un")
 mesh = SubResource("ArrayMesh_jrb0p")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=714511176]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=392450090]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 0.0
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1497171796]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1603808745]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 0.6848992622282433
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1508012841]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1925474949]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 1.3697985244564865
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1275874039]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=602319166]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 2.05469778668473
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1563701301]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1459650552]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 2.739597048912973
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1113700720]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1131504110]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 3.4244963111412163
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=248974090]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1968245037]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 4.10939557336946
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1840458159]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=26565966]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 4.794294835597703
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=345954790]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1721548662]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 5.479194097825946
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1402880425]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1710172992]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 6.164093360054189
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1038489061]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=921405115]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 6.848992622282433
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=432165183]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1911249696]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 7.533891884510676
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2124696642]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2079577818]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 8.21879114673892
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1198017176]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=906204829]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 8.903690408967163
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=132511271]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=713888772]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 9.588589671195406
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=388632064]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1338934370]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 10.27348893342365
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1079319188]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=277917144]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 10.958388195651892
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1392705562]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1171571901]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 11.643287457880136
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1753034938]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1069668929]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 12.328186720108379
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=589809830]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=254832155]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 13.013085982336623
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=16229332]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2006890409]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 13.697985244564865
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1029631562]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1760421451]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 14.38288450679311
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1838497291]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=930026419]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 15.067783769021352
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1784565214]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1107767084]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 15.752683031249596
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1261812453]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=144111547]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 16.43758229347784
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1396946076]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=362150861]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 17.12248155570608
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1187213771]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=415588327]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 17.807380817934327
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2089792446]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1298779208]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 18.49228008016257
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2039304752]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=628221309]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 19.17717934239081
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=418741301]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1472865372]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 19.862078604619054
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1965633713]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=988512325]
 material_override = SubResource("StandardMaterial3D_fv7e4")
 mesh = SubResource("BoxMesh_1lvth")
 metadata/belt_distance = 20.5469778668473
 
-[node name="@CollisionShape3D@12379" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1535167840]
+[node name="@CollisionShape3D@12379" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=2137949909]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_0fvjx")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=718967622]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1502636242]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_qg5cm")
 mesh = SubResource("BoxMesh_k7cxd")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1923288458]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1628775752]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_4wpy5")
 mesh = SubResource("BoxMesh_w06kq")
 metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=908965098]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=923656922]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_4wpy5")
 mesh = SubResource("BoxMesh_5cfdf")
 metadata/handrail_distance = 6.9016664028167725
 
-[node name="@CollisionShape3D@12381" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1037191186]
+[node name="@CollisionShape3D@12381" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1331089385]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
 shape = SubResource("BoxShape3D_emy6h")
 
-[node name="@MeshInstance3D@12382" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1181601426]
+[node name="@MeshInstance3D@12382" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1112553293]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_asxxu")
 mesh = SubResource("BoxMesh_fvnfn")
 
-[node name="@CollisionShape3D@12383" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=2086495904]
+[node name="@CollisionShape3D@12383" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=908286040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
 shape = SubResource("BoxShape3D_j47sy")
 
-[node name="@MeshInstance3D@12384" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=537628815]
+[node name="@MeshInstance3D@12384" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2061912476]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_6ahm0")
 mesh = SubResource("BoxMesh_0ujd7")
 
-[node name="@CollisionShape3D@12385" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1208307881]
+[node name="@CollisionShape3D@12385" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=533690171]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_1nv4f")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1352574278]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=530355797]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_qg5cm")
 mesh = SubResource("BoxMesh_d5kvx")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1810573776]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=71068067]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_ve7t4")
 mesh = SubResource("BoxMesh_bhpjo")
 metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=2126966213]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=34149483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_ve7t4")
 mesh = SubResource("BoxMesh_ia58p")
 metadata/handrail_distance = 6.9016664028167725
 
-[node name="@CollisionShape3D@12387" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1091633625]
+[node name="@CollisionShape3D@12387" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=499935482]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
 shape = SubResource("BoxShape3D_j683j")
 
-[node name="@MeshInstance3D@12388" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=202188794]
+[node name="@MeshInstance3D@12388" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1405326299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_vx6xv")
 mesh = SubResource("BoxMesh_m5t6j")
 
-[node name="@CollisionShape3D@12389" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=1523430039]
+[node name="@CollisionShape3D@12389" type="CollisionShape3D" parent="ClockRoomArrival_02_south_Up" unique_id=645430584]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
 shape = SubResource("BoxShape3D_43c0c")
 
-[node name="@MeshInstance3D@12390" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1617051322]
+[node name="@MeshInstance3D@12390" type="MeshInstance3D" parent="ClockRoomArrival_02_south_Up" unique_id=1953116431]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_d6d2o")
 mesh = SubResource("BoxMesh_nq2b6")

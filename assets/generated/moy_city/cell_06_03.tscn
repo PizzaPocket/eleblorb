@@ -456,447 +456,447 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_biga1"]
 size = Vector3(5.8920655, 0.18, 3)
 
-[node name="MoyCell_06_03" type="Node3D" unique_id=511043496]
+[node name="MoyCell_06_03" type="Node3D" unique_id=1414240003]
 
-[node name="Street_Meridian North" type="StaticBody3D" parent="." unique_id=804152262]
+[node name="Street_Meridian North" type="StaticBody3D" parent="." unique_id=1199211575]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -411.5, -60.05, -34)
 metadata/walk_run_id = "Street_Meridian North"
 
-[node name="@CollisionShape3D@319" type="CollisionShape3D" parent="Street_Meridian North" unique_id=983380159]
+[node name="@CollisionShape3D@319" type="CollisionShape3D" parent="Street_Meridian North" unique_id=1487446864]
 shape = SubResource("BoxShape3D_llrm3")
 
-[node name="@MeshInstance3D@320" type="MeshInstance3D" parent="Street_Meridian North" unique_id=356987576]
+[node name="@MeshInstance3D@320" type="MeshInstance3D" parent="Street_Meridian North" unique_id=379286165]
 material_override = SubResource("StandardMaterial3D_pv75g")
 mesh = SubResource("BoxMesh_avrnc")
 
-[node name="Lot_117" type="StaticBody3D" parent="." unique_id=537176952]
+[node name="Lot_117" type="StaticBody3D" parent="." unique_id=565921191]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -379.5, -13.2, -48)
 metadata/walk_run_id = "Lot_117"
 
-[node name="@CollisionShape3D@619" type="CollisionShape3D" parent="Lot_117" unique_id=1817195693]
+[node name="@CollisionShape3D@619" type="CollisionShape3D" parent="Lot_117" unique_id=1128379028]
 shape = SubResource("BoxShape3D_dokfe")
 
-[node name="@MeshInstance3D@620" type="MeshInstance3D" parent="Lot_117" unique_id=1581711122]
+[node name="@MeshInstance3D@620" type="MeshInstance3D" parent="Lot_117" unique_id=1275280655]
 material_override = SubResource("StandardMaterial3D_u8fbf")
 mesh = SubResource("BoxMesh_uerbu")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_117" unique_id=1491753228]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_117" unique_id=2033678804]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 46.725, 0)
 material_override = SubResource("StandardMaterial3D_io3fu")
 mesh = SubResource("BoxMesh_uc27y")
 
-[node name="RimWall_62" type="StaticBody3D" parent="." unique_id=125590541]
+[node name="RimWall_62" type="StaticBody3D" parent="." unique_id=1465653540]
 transform = Transform3D(0.14673096, 0, -0.98917645, 0, 1, 0, 0.98917645, 0, 0.14673096, -353.01715, -54, -30.703007)
 metadata/walk_run_id = "RimWall"
 
-[node name="@CollisionShape3D@6355" type="CollisionShape3D" parent="RimWall_62" unique_id=1118668210]
+[node name="@CollisionShape3D@6355" type="CollisionShape3D" parent="RimWall_62" unique_id=519766117]
 shape = SubResource("BoxShape3D_6f4ev")
 
-[node name="@MeshInstance3D@6356" type="MeshInstance3D" parent="RimWall_62" unique_id=1962132040]
+[node name="@MeshInstance3D@6356" type="MeshInstance3D" parent="RimWall_62" unique_id=498869350]
 material_override = SubResource("StandardMaterial3D_xp387")
 mesh = SubResource("BoxMesh_qd25l")
 
-[node name="MeridianPierStem_07" type="StaticBody3D" parent="." unique_id=1195596065]
+[node name="MeridianPierStem_07" type="StaticBody3D" parent="." unique_id=1644401904]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -392, -46, 0)
 
-[node name="@MeshInstance3D@7540" type="MeshInstance3D" parent="MeridianPierStem_07" unique_id=414802684]
+[node name="@MeshInstance3D@7540" type="MeshInstance3D" parent="MeridianPierStem_07" unique_id=395470786]
 material_override = SubResource("StandardMaterial3D_0d2ob")
 mesh = SubResource("CylinderMesh_r0f2p")
 
-[node name="@CollisionShape3D@7541" type="CollisionShape3D" parent="MeridianPierStem_07" unique_id=1289020637]
+[node name="@CollisionShape3D@7541" type="CollisionShape3D" parent="MeridianPierStem_07" unique_id=270748246]
 shape = SubResource("CylinderShape3D_7uemj")
 
-[node name="MeridianPierYArm_07_0" type="StaticBody3D" parent="." unique_id=1288649420]
+[node name="MeridianPierYArm_07_0" type="StaticBody3D" parent="." unique_id=475297085]
 transform = Transform3D(0, 0, 1, 0.9603462, 0.27881023, 0, -0.27881023, 0.9603462, 0, -392, -29.85, -1.35)
 
-[node name="@CollisionShape3D@7542" type="CollisionShape3D" parent="MeridianPierYArm_07_0" unique_id=387453332]
+[node name="@CollisionShape3D@7542" type="CollisionShape3D" parent="MeridianPierYArm_07_0" unique_id=719427346]
 shape = SubResource("BoxShape3D_4jw4m")
 
-[node name="@MeshInstance3D@7543" type="MeshInstance3D" parent="MeridianPierYArm_07_0" unique_id=525949451]
+[node name="@MeshInstance3D@7543" type="MeshInstance3D" parent="MeridianPierYArm_07_0" unique_id=1014930386]
 material_override = SubResource("StandardMaterial3D_vxp7d")
 mesh = SubResource("BoxMesh_cgndm")
 
-[node name="MeridianBoxGirder_07_0" type="StaticBody3D" parent="." unique_id=1528473938]
+[node name="MeridianBoxGirder_07_0" type="StaticBody3D" parent="." unique_id=1421116879]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -392, -25.2, -1.7)
 
-[node name="@CollisionShape3D@7544" type="CollisionShape3D" parent="MeridianBoxGirder_07_0" unique_id=1963187541]
+[node name="@CollisionShape3D@7544" type="CollisionShape3D" parent="MeridianBoxGirder_07_0" unique_id=1134439338]
 shape = SubResource("BoxShape3D_t2paa")
 
-[node name="@MeshInstance3D@7545" type="MeshInstance3D" parent="MeridianBoxGirder_07_0" unique_id=1848103038]
+[node name="@MeshInstance3D@7545" type="MeshInstance3D" parent="MeridianBoxGirder_07_0" unique_id=715963103]
 material_override = SubResource("StandardMaterial3D_coegc")
 mesh = SubResource("BoxMesh_ytb8u")
 
-[node name="MeridianPierYArm_07_1" type="StaticBody3D" parent="." unique_id=1986906985]
+[node name="MeridianPierYArm_07_1" type="StaticBody3D" parent="." unique_id=1827237957]
 transform = Transform3D(0, 0, -1, 0.9603462, 0.27881023, 0, 0.27881023, -0.9603462, 0, -392, -29.85, 1.35)
 
-[node name="@CollisionShape3D@7546" type="CollisionShape3D" parent="MeridianPierYArm_07_1" unique_id=68813592]
+[node name="@CollisionShape3D@7546" type="CollisionShape3D" parent="MeridianPierYArm_07_1" unique_id=854805992]
 shape = SubResource("BoxShape3D_4t8od")
 
-[node name="@MeshInstance3D@7547" type="MeshInstance3D" parent="MeridianPierYArm_07_1" unique_id=721043378]
+[node name="@MeshInstance3D@7547" type="MeshInstance3D" parent="MeridianPierYArm_07_1" unique_id=253631415]
 material_override = SubResource("StandardMaterial3D_l1ebq")
 mesh = SubResource("BoxMesh_jrqkx")
 
-[node name="MeridianBoxGirder_07_1" type="StaticBody3D" parent="." unique_id=1279144709]
+[node name="MeridianBoxGirder_07_1" type="StaticBody3D" parent="." unique_id=1632282419]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -392, -25.2, 1.7)
 
-[node name="@CollisionShape3D@7548" type="CollisionShape3D" parent="MeridianBoxGirder_07_1" unique_id=1138350068]
+[node name="@CollisionShape3D@7548" type="CollisionShape3D" parent="MeridianBoxGirder_07_1" unique_id=618113216]
 shape = SubResource("BoxShape3D_a5otn")
 
-[node name="@MeshInstance3D@7549" type="MeshInstance3D" parent="MeridianBoxGirder_07_1" unique_id=939424388]
+[node name="@MeshInstance3D@7549" type="MeshInstance3D" parent="MeridianBoxGirder_07_1" unique_id=1215043664]
 material_override = SubResource("StandardMaterial3D_g1n0g")
 mesh = SubResource("BoxMesh_ho5b4")
 
-[node name="MeridianVineSleeve_07_0" type="MultiMeshInstance3D" parent="." unique_id=366778379]
+[node name="MeridianVineSleeve_07_0" type="MultiMeshInstance3D" parent="." unique_id=320032178]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -390.75, -45, 0)
 custom_aabb = AABB(-1.1, -13.1, -0.12, 2.2, 26.2, 0.24)
 multimesh = SubResource("MultiMesh_7bvt1")
 
-[node name="MeridianVineSleeve_07_1" type="MultiMeshInstance3D" parent="." unique_id=302424006]
+[node name="MeridianVineSleeve_07_1" type="MultiMeshInstance3D" parent="." unique_id=1188679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -392, -45, 1.25)
 custom_aabb = AABB(-1.1, -13.1, -0.12, 2.2, 26.2, 0.24)
 multimesh = SubResource("MultiMesh_rncsy")
 
-[node name="MeridianVineSleeve_07_2" type="MultiMeshInstance3D" parent="." unique_id=2063698676]
+[node name="MeridianVineSleeve_07_2" type="MultiMeshInstance3D" parent="." unique_id=1815526267]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -393.25, -45, 1.5308085e-16)
 custom_aabb = AABB(-1.1, -13.1, -0.12, 2.2, 26.2, 0.24)
 multimesh = SubResource("MultiMesh_oc7f7")
 
-[node name="MeridianVineSleeve_07_3" type="MultiMeshInstance3D" parent="." unique_id=905102585]
+[node name="MeridianVineSleeve_07_3" type="MultiMeshInstance3D" parent="." unique_id=855753749]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -392, -45, -1.25)
 custom_aabb = AABB(-1.1, -13.1, -0.12, 2.2, 26.2, 0.24)
 multimesh = SubResource("MultiMesh_poeyh")
 
-[node name="WallLine_Track_223" type="StaticBody3D" parent="." unique_id=1562711011]
+[node name="WallLine_Track_223" type="StaticBody3D" parent="." unique_id=931955977]
 transform = Transform3D(0.21606383, 0, -0.9763792, 0, 1, 0, 0.9763792, 0, 0.21606383, -355.47498, -46.8, -45.345)
 metadata/walk_run_id = "WallLine_Track"
 
-[node name="@CollisionShape3D@9856" type="CollisionShape3D" parent="WallLine_Track_223" unique_id=1993304635]
+[node name="@CollisionShape3D@9856" type="CollisionShape3D" parent="WallLine_Track_223" unique_id=1220236142]
 shape = SubResource("BoxShape3D_pw3ai")
 
-[node name="@MeshInstance3D@9857" type="MeshInstance3D" parent="WallLine_Track_223" unique_id=931912070]
+[node name="@MeshInstance3D@9857" type="MeshInstance3D" parent="WallLine_Track_223" unique_id=1983282299]
 material_override = SubResource("StandardMaterial3D_om7rd")
 mesh = SubResource("BoxMesh_a21st")
 
-[node name="WallLine_Rail_223_0_-1" type="StaticBody3D" parent="." unique_id=1178709177]
+[node name="WallLine_Rail_223_0_-1" type="StaticBody3D" parent="." unique_id=804138924]
 transform = Transform3D(0.21645012, 0, -0.9762937, 0, 1, 0, 0.9762937, 0, 0.21645012, -356.92163, -46.7, -45.024254)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9858" type="CollisionShape3D" parent="WallLine_Rail_223_0_-1" unique_id=2056823914]
+[node name="@CollisionShape3D@9858" type="CollisionShape3D" parent="WallLine_Rail_223_0_-1" unique_id=710883994]
 shape = SubResource("BoxShape3D_e1eqm")
 
-[node name="@MeshInstance3D@9859" type="MeshInstance3D" parent="WallLine_Rail_223_0_-1" unique_id=1298853803]
+[node name="@MeshInstance3D@9859" type="MeshInstance3D" parent="WallLine_Rail_223_0_-1" unique_id=15930607]
 material_override = SubResource("StandardMaterial3D_atb60")
 mesh = SubResource("BoxMesh_ynwyg")
 
-[node name="WallLine_Rail_223_0_1" type="StaticBody3D" parent="." unique_id=6621796]
+[node name="WallLine_Rail_223_0_1" type="StaticBody3D" parent="." unique_id=1770734070]
 transform = Transform3D(0.21645012, 0, -0.9762937, 0, 1, 0, 0.9762937, 0, 0.21645012, -358.32263, -46.7, -44.713646)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9860" type="CollisionShape3D" parent="WallLine_Rail_223_0_1" unique_id=728859640]
+[node name="@CollisionShape3D@9860" type="CollisionShape3D" parent="WallLine_Rail_223_0_1" unique_id=1622208026]
 shape = SubResource("BoxShape3D_jafap")
 
-[node name="@MeshInstance3D@9861" type="MeshInstance3D" parent="WallLine_Rail_223_0_1" unique_id=1690165999]
+[node name="@MeshInstance3D@9861" type="MeshInstance3D" parent="WallLine_Rail_223_0_1" unique_id=1542939798]
 material_override = SubResource("StandardMaterial3D_t7nnk")
 mesh = SubResource("BoxMesh_a7a8l")
 
-[node name="WallLine_Rail_223_1_-1" type="StaticBody3D" parent="." unique_id=299249634]
+[node name="WallLine_Rail_223_1_-1" type="StaticBody3D" parent="." unique_id=1015306040]
 transform = Transform3D(0.21645093, 0, -0.9762935, 0, 1, 0, 0.9762935, 0, 0.21645093, -353.6024, -46.7, -45.76017)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9862" type="CollisionShape3D" parent="WallLine_Rail_223_1_-1" unique_id=1099796377]
+[node name="@CollisionShape3D@9862" type="CollisionShape3D" parent="WallLine_Rail_223_1_-1" unique_id=1587418229]
 shape = SubResource("BoxShape3D_30dhu")
 
-[node name="@MeshInstance3D@9863" type="MeshInstance3D" parent="WallLine_Rail_223_1_-1" unique_id=1617110014]
+[node name="@MeshInstance3D@9863" type="MeshInstance3D" parent="WallLine_Rail_223_1_-1" unique_id=1650731381]
 material_override = SubResource("StandardMaterial3D_venth")
 mesh = SubResource("BoxMesh_2hd8t")
 
-[node name="WallLine_Rail_223_1_1" type="StaticBody3D" parent="." unique_id=1158685480]
+[node name="WallLine_Rail_223_1_1" type="StaticBody3D" parent="." unique_id=1600437854]
 transform = Transform3D(0.21645093, 0, -0.9762935, 0, 1, 0, 0.9762935, 0, 0.21645093, -355.0034, -46.7, -45.449562)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9864" type="CollisionShape3D" parent="WallLine_Rail_223_1_1" unique_id=1634427711]
+[node name="@CollisionShape3D@9864" type="CollisionShape3D" parent="WallLine_Rail_223_1_1" unique_id=602686400]
 shape = SubResource("BoxShape3D_fwgd3")
 
-[node name="@MeshInstance3D@9865" type="MeshInstance3D" parent="WallLine_Rail_223_1_1" unique_id=376285025]
+[node name="@MeshInstance3D@9865" type="MeshInstance3D" parent="WallLine_Rail_223_1_1" unique_id=947442957]
 material_override = SubResource("StandardMaterial3D_11fx6")
 mesh = SubResource("BoxMesh_j4shg")
 
-[node name="WallLine_Track_224" type="StaticBody3D" parent="." unique_id=150103480]
+[node name="WallLine_Track_224" type="StaticBody3D" parent="." unique_id=984293343]
 transform = Transform3D(0.19925953, 0, -0.97994673, 0, 1, 0, 0.97994673, 0, 0.19925953, -354.715, -46.8, -41.765)
 metadata/walk_run_id = "WallLine_Track"
 
-[node name="@CollisionShape3D@9866" type="CollisionShape3D" parent="WallLine_Track_224" unique_id=2084128818]
+[node name="@CollisionShape3D@9866" type="CollisionShape3D" parent="WallLine_Track_224" unique_id=67376234]
 shape = SubResource("BoxShape3D_n830l")
 
-[node name="@MeshInstance3D@9867" type="MeshInstance3D" parent="WallLine_Track_224" unique_id=2017071017]
+[node name="@MeshInstance3D@9867" type="MeshInstance3D" parent="WallLine_Track_224" unique_id=548611051]
 material_override = SubResource("StandardMaterial3D_fc2d1")
 mesh = SubResource("BoxMesh_oy8xt")
 
-[node name="WallLine_Rail_224_0_-1" type="StaticBody3D" parent="." unique_id=1180973040]
+[node name="WallLine_Rail_224_0_-1" type="StaticBody3D" parent="." unique_id=598196935]
 transform = Transform3D(0.199369, 0, -0.9799245, 0, 1, 0, 0.9799245, 0, 0.199369, -356.16614, -46.7, -41.469772)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9868" type="CollisionShape3D" parent="WallLine_Rail_224_0_-1" unique_id=1090131734]
+[node name="@CollisionShape3D@9868" type="CollisionShape3D" parent="WallLine_Rail_224_0_-1" unique_id=1239644467]
 shape = SubResource("BoxShape3D_vyvo7")
 
-[node name="@MeshInstance3D@9869" type="MeshInstance3D" parent="WallLine_Rail_224_0_-1" unique_id=2091279552]
+[node name="@MeshInstance3D@9869" type="MeshInstance3D" parent="WallLine_Rail_224_0_-1" unique_id=112735718]
 material_override = SubResource("StandardMaterial3D_lkv0h")
 mesh = SubResource("BoxMesh_sw762")
 
-[node name="WallLine_Rail_224_0_1" type="StaticBody3D" parent="." unique_id=1161023416]
+[node name="WallLine_Rail_224_0_1" type="StaticBody3D" parent="." unique_id=211818626]
 transform = Transform3D(0.199369, 0, -0.9799245, 0, 1, 0, 0.9799245, 0, 0.199369, -357.57233, -46.7, -41.183678)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9870" type="CollisionShape3D" parent="WallLine_Rail_224_0_1" unique_id=404105707]
+[node name="@CollisionShape3D@9870" type="CollisionShape3D" parent="WallLine_Rail_224_0_1" unique_id=2061616989]
 shape = SubResource("BoxShape3D_d2rpu")
 
-[node name="@MeshInstance3D@9871" type="MeshInstance3D" parent="WallLine_Rail_224_0_1" unique_id=609248089]
+[node name="@MeshInstance3D@9871" type="MeshInstance3D" parent="WallLine_Rail_224_0_1" unique_id=730586352]
 material_override = SubResource("StandardMaterial3D_oa1ca")
 mesh = SubResource("BoxMesh_6vot8")
 
-[node name="WallLine_Rail_224_1_-1" type="StaticBody3D" parent="." unique_id=261947824]
+[node name="WallLine_Rail_224_1_-1" type="StaticBody3D" parent="." unique_id=2014702969]
 transform = Transform3D(0.19936562, 0, -0.97992516, 0, 1, 0, 0.97992516, 0, 0.19936562, -352.83453, -46.7, -42.14758)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9872" type="CollisionShape3D" parent="WallLine_Rail_224_1_-1" unique_id=34106729]
+[node name="@CollisionShape3D@9872" type="CollisionShape3D" parent="WallLine_Rail_224_1_-1" unique_id=1400207584]
 shape = SubResource("BoxShape3D_j8gjh")
 
-[node name="@MeshInstance3D@9873" type="MeshInstance3D" parent="WallLine_Rail_224_1_-1" unique_id=2100038136]
+[node name="@MeshInstance3D@9873" type="MeshInstance3D" parent="WallLine_Rail_224_1_-1" unique_id=1190746120]
 material_override = SubResource("StandardMaterial3D_rpee3")
 mesh = SubResource("BoxMesh_8yutp")
 
-[node name="WallLine_Rail_224_1_1" type="StaticBody3D" parent="." unique_id=2033081160]
+[node name="WallLine_Rail_224_1_1" type="StaticBody3D" parent="." unique_id=391635089]
 transform = Transform3D(0.19936562, 0, -0.97992516, 0, 1, 0, 0.97992516, 0, 0.19936562, -354.24072, -46.7, -41.861492)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9874" type="CollisionShape3D" parent="WallLine_Rail_224_1_1" unique_id=1977241458]
+[node name="@CollisionShape3D@9874" type="CollisionShape3D" parent="WallLine_Rail_224_1_1" unique_id=1362106541]
 shape = SubResource("BoxShape3D_b0a4s")
 
-[node name="@MeshInstance3D@9875" type="MeshInstance3D" parent="WallLine_Rail_224_1_1" unique_id=1250527716]
+[node name="@MeshInstance3D@9875" type="MeshInstance3D" parent="WallLine_Rail_224_1_1" unique_id=1824036602]
 material_override = SubResource("StandardMaterial3D_2mj5r")
 mesh = SubResource("BoxMesh_k4213")
 
-[node name="WallLine_Track_225" type="StaticBody3D" parent="." unique_id=1811717103]
+[node name="WallLine_Track_225" type="StaticBody3D" parent="." unique_id=1010453174]
 transform = Transform3D(0.17370985, 0, -0.9847969, 0, 1, 0, 0.9847969, 0, 0.17370985, -353.715, -46.8, -36.370003)
 metadata/walk_run_id = "WallLine_Track"
 
-[node name="@CollisionShape3D@9876" type="CollisionShape3D" parent="WallLine_Track_225" unique_id=1824975233]
+[node name="@CollisionShape3D@9876" type="CollisionShape3D" parent="WallLine_Track_225" unique_id=2022337304]
 shape = SubResource("BoxShape3D_yqiw8")
 
-[node name="@MeshInstance3D@9877" type="MeshInstance3D" parent="WallLine_Track_225" unique_id=1426900685]
+[node name="@MeshInstance3D@9877" type="MeshInstance3D" parent="WallLine_Track_225" unique_id=335672319]
 material_override = SubResource("StandardMaterial3D_viug1")
 mesh = SubResource("BoxMesh_2ut2a")
 
-[node name="WallLine_Rail_225_0_-1" type="StaticBody3D" parent="." unique_id=1235476571]
+[node name="WallLine_Rail_225_0_-1" type="StaticBody3D" parent="." unique_id=1058971210]
 transform = Transform3D(0.17362873, 0, -0.9848112, 0, 1, 0, 0.9848112, 0, 0.17362873, -355.17322, -46.7, -36.112907)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9878" type="CollisionShape3D" parent="WallLine_Rail_225_0_-1" unique_id=1296724884]
+[node name="@CollisionShape3D@9878" type="CollisionShape3D" parent="WallLine_Rail_225_0_-1" unique_id=564523923]
 shape = SubResource("BoxShape3D_1vjlv")
 
-[node name="@MeshInstance3D@9879" type="MeshInstance3D" parent="WallLine_Rail_225_0_-1" unique_id=2099219495]
+[node name="@MeshInstance3D@9879" type="MeshInstance3D" parent="WallLine_Rail_225_0_-1" unique_id=1885089169]
 material_override = SubResource("StandardMaterial3D_aribf")
 mesh = SubResource("BoxMesh_cws2n")
 
-[node name="WallLine_Rail_225_0_1" type="StaticBody3D" parent="." unique_id=1756214012]
+[node name="WallLine_Rail_225_0_1" type="StaticBody3D" parent="." unique_id=2057333603]
 transform = Transform3D(0.17362873, 0, -0.9848112, 0, 1, 0, 0.9848112, 0, 0.17362873, -356.58643, -46.7, -35.863747)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9880" type="CollisionShape3D" parent="WallLine_Rail_225_0_1" unique_id=102759120]
+[node name="@CollisionShape3D@9880" type="CollisionShape3D" parent="WallLine_Rail_225_0_1" unique_id=1954398548]
 shape = SubResource("BoxShape3D_d40gw")
 
-[node name="@MeshInstance3D@9881" type="MeshInstance3D" parent="WallLine_Rail_225_0_1" unique_id=1618853577]
+[node name="@MeshInstance3D@9881" type="MeshInstance3D" parent="WallLine_Rail_225_0_1" unique_id=1997428065]
 material_override = SubResource("StandardMaterial3D_76egp")
 mesh = SubResource("BoxMesh_ighr5")
 
-[node name="WallLine_Rail_225_1_-1" type="StaticBody3D" parent="." unique_id=175576163]
+[node name="WallLine_Rail_225_1_-1" type="StaticBody3D" parent="." unique_id=877229729]
 transform = Transform3D(0.17363249, 0, -0.98481053, 0, 1, 0, 0.98481053, 0, 0.17363249, -351.82538, -46.7, -36.703163)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9882" type="CollisionShape3D" parent="WallLine_Rail_225_1_-1" unique_id=1811449541]
+[node name="@CollisionShape3D@9882" type="CollisionShape3D" parent="WallLine_Rail_225_1_-1" unique_id=184809085]
 shape = SubResource("BoxShape3D_3i53t")
 
-[node name="@MeshInstance3D@9883" type="MeshInstance3D" parent="WallLine_Rail_225_1_-1" unique_id=787429282]
+[node name="@MeshInstance3D@9883" type="MeshInstance3D" parent="WallLine_Rail_225_1_-1" unique_id=1219976319]
 material_override = SubResource("StandardMaterial3D_fe7id")
 mesh = SubResource("BoxMesh_0slik")
 
-[node name="WallLine_Rail_225_1_1" type="StaticBody3D" parent="." unique_id=652582399]
+[node name="WallLine_Rail_225_1_1" type="StaticBody3D" parent="." unique_id=1821464486]
 transform = Transform3D(0.17363249, 0, -0.98481053, 0, 1, 0, 0.98481053, 0, 0.17363249, -353.2386, -46.7, -36.454002)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9884" type="CollisionShape3D" parent="WallLine_Rail_225_1_1" unique_id=2052219633]
+[node name="@CollisionShape3D@9884" type="CollisionShape3D" parent="WallLine_Rail_225_1_1" unique_id=2024364497]
 shape = SubResource("BoxShape3D_p0kon")
 
-[node name="@MeshInstance3D@9885" type="MeshInstance3D" parent="WallLine_Rail_225_1_1" unique_id=1366775681]
+[node name="@MeshInstance3D@9885" type="MeshInstance3D" parent="WallLine_Rail_225_1_1" unique_id=393954181]
 material_override = SubResource("StandardMaterial3D_ci72l")
 mesh = SubResource("BoxMesh_2yr7m")
 
-[node name="WallLine_Track_226" type="StaticBody3D" parent="." unique_id=1589295723]
+[node name="WallLine_Track_226" type="StaticBody3D" parent="." unique_id=1273113680]
 transform = Transform3D(0.1395048, 0, -0.9902214, 0, 1, 0, 0.9902214, 0, 0.1395048, -352.57, -46.8, -29.150002)
 metadata/walk_run_id = "WallLine_Track"
 
-[node name="@CollisionShape3D@9886" type="CollisionShape3D" parent="WallLine_Track_226" unique_id=2110804722]
+[node name="@CollisionShape3D@9886" type="CollisionShape3D" parent="WallLine_Track_226" unique_id=552612442]
 shape = SubResource("BoxShape3D_l3hav")
 
-[node name="@MeshInstance3D@9887" type="MeshInstance3D" parent="WallLine_Track_226" unique_id=1699786652]
+[node name="@MeshInstance3D@9887" type="MeshInstance3D" parent="WallLine_Track_226" unique_id=1181770456]
 material_override = SubResource("StandardMaterial3D_30a01")
 mesh = SubResource("BoxMesh_qdx18")
 
-[node name="WallLine_Rail_226_0_-1" type="StaticBody3D" parent="." unique_id=1269584229]
+[node name="WallLine_Rail_226_0_-1" type="StaticBody3D" parent="." unique_id=1117059100]
 transform = Transform3D(0.13916306, 0, -0.9902695, 0, 1, 0, 0.9902695, 0, 0.13916306, -354.03784, -46.7, -28.943748)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9888" type="CollisionShape3D" parent="WallLine_Rail_226_0_-1" unique_id=1854951840]
+[node name="@CollisionShape3D@9888" type="CollisionShape3D" parent="WallLine_Rail_226_0_-1" unique_id=1077382610]
 shape = SubResource("BoxShape3D_crwp1")
 
-[node name="@MeshInstance3D@9889" type="MeshInstance3D" parent="WallLine_Rail_226_0_-1" unique_id=283876113]
+[node name="@MeshInstance3D@9889" type="MeshInstance3D" parent="WallLine_Rail_226_0_-1" unique_id=879159048]
 material_override = SubResource("StandardMaterial3D_1sx1c")
 mesh = SubResource("BoxMesh_i6nxt")
 
-[node name="WallLine_Rail_226_0_1" type="StaticBody3D" parent="." unique_id=1885219636]
+[node name="WallLine_Rail_226_0_1" type="StaticBody3D" parent="." unique_id=128082949]
 transform = Transform3D(0.13916306, 0, -0.9902695, 0, 1, 0, 0.9902695, 0, 0.13916306, -355.45886, -46.7, -28.74405)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9890" type="CollisionShape3D" parent="WallLine_Rail_226_0_1" unique_id=1688954475]
+[node name="@CollisionShape3D@9890" type="CollisionShape3D" parent="WallLine_Rail_226_0_1" unique_id=2109132359]
 shape = SubResource("BoxShape3D_644r8")
 
-[node name="@MeshInstance3D@9891" type="MeshInstance3D" parent="WallLine_Rail_226_0_1" unique_id=1229870138]
+[node name="@MeshInstance3D@9891" type="MeshInstance3D" parent="WallLine_Rail_226_0_1" unique_id=575312164]
 material_override = SubResource("StandardMaterial3D_i5ny8")
 mesh = SubResource("BoxMesh_o7kdl")
 
-[node name="WallLine_Rail_226_1_-1" type="StaticBody3D" parent="." unique_id=853138362]
+[node name="WallLine_Rail_226_1_-1" type="StaticBody3D" parent="." unique_id=48442137]
 transform = Transform3D(0.13916272, 0, -0.99026954, 0, 1, 0, 0.99026954, 0, 0.13916272, -350.67145, -46.7, -29.416828)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9892" type="CollisionShape3D" parent="WallLine_Rail_226_1_-1" unique_id=1568893411]
+[node name="@CollisionShape3D@9892" type="CollisionShape3D" parent="WallLine_Rail_226_1_-1" unique_id=466228051]
 shape = SubResource("BoxShape3D_bk1fx")
 
-[node name="@MeshInstance3D@9893" type="MeshInstance3D" parent="WallLine_Rail_226_1_-1" unique_id=635828297]
+[node name="@MeshInstance3D@9893" type="MeshInstance3D" parent="WallLine_Rail_226_1_-1" unique_id=85185388]
 material_override = SubResource("StandardMaterial3D_e0x60")
 mesh = SubResource("BoxMesh_k4npu")
 
-[node name="WallLine_Rail_226_1_1" type="StaticBody3D" parent="." unique_id=1156445572]
+[node name="WallLine_Rail_226_1_1" type="StaticBody3D" parent="." unique_id=1238608005]
 transform = Transform3D(0.13916272, 0, -0.99026954, 0, 1, 0, 0.99026954, 0, 0.13916272, -352.09247, -46.7, -29.217129)
 metadata/walk_run_id = "WallLine_Rail"
 
-[node name="@CollisionShape3D@9894" type="CollisionShape3D" parent="WallLine_Rail_226_1_1" unique_id=294791658]
+[node name="@CollisionShape3D@9894" type="CollisionShape3D" parent="WallLine_Rail_226_1_1" unique_id=110020552]
 shape = SubResource("BoxShape3D_5fns0")
 
-[node name="@MeshInstance3D@9895" type="MeshInstance3D" parent="WallLine_Rail_226_1_1" unique_id=2083050173]
+[node name="@MeshInstance3D@9895" type="MeshInstance3D" parent="WallLine_Rail_226_1_1" unique_id=1129529466]
 material_override = SubResource("StandardMaterial3D_hkmbl")
 mesh = SubResource("BoxMesh_mwxga")
 
-[node name="WallLine_Station_East_Gate_Platform_0_0" type="StaticBody3D" parent="." unique_id=590064090]
+[node name="WallLine_Station_East_Gate_Platform_0_0" type="StaticBody3D" parent="." unique_id=871673250]
 transform = Transform3D(0.057854354, 0, -0.99832505, 0, 1, 0, 0.99832505, 0, 0.057854354, -356.7843, -45.95, -11.77673)
 metadata/reach_target = true
 metadata/station_platform = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@9946" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_0" unique_id=935894467]
+[node name="@CollisionShape3D@9946" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_0" unique_id=232216433]
 shape = SubResource("BoxShape3D_qpxr5")
 
-[node name="@MeshInstance3D@9947" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_0" unique_id=213798013]
+[node name="@MeshInstance3D@9947" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_0" unique_id=966796958]
 material_override = SubResource("StandardMaterial3D_fcdny")
 mesh = SubResource("BoxMesh_y864v")
 
-[node name="WallLine_Station_East_Gate_Canopy_0_0" type="StaticBody3D" parent="." unique_id=887629474]
+[node name="WallLine_Station_East_Gate_Canopy_0_0" type="StaticBody3D" parent="." unique_id=458918596]
 transform = Transform3D(0.057854354, 0, -0.99832505, 0, 1, 0, 0.99832505, 0, 0.057854354, -356.7843, -42.51, -11.77673)
 
-[node name="@CollisionShape3D@9948" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_0" unique_id=966184290]
+[node name="@CollisionShape3D@9948" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_0" unique_id=743369813]
 shape = SubResource("BoxShape3D_v0wla")
 
-[node name="@MeshInstance3D@9949" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_0" unique_id=1495906271]
+[node name="@MeshInstance3D@9949" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_0" unique_id=1413466474]
 material_override = SubResource("StandardMaterial3D_6pj8c")
 mesh = SubResource("BoxMesh_216rw")
 
-[node name="WallLine_Station_East_Gate_Platform_0_1" type="StaticBody3D" parent="." unique_id=699663091]
+[node name="WallLine_Station_East_Gate_Platform_0_1" type="StaticBody3D" parent="." unique_id=1354755503]
 transform = Transform3D(0.02894267, 0, -0.9995811, 0, 1, 0, 0.9995811, 0, 0.02894267, -356.5286, -45.95, -5.890832)
 metadata/reach_target = true
 metadata/station_platform = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@9950" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_1" unique_id=1903750473]
+[node name="@CollisionShape3D@9950" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_1" unique_id=685579094]
 shape = SubResource("BoxShape3D_770pf")
 
-[node name="@MeshInstance3D@9951" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_1" unique_id=1391910510]
+[node name="@MeshInstance3D@9951" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_1" unique_id=1553986937]
 material_override = SubResource("StandardMaterial3D_vfib8")
 mesh = SubResource("BoxMesh_64e7y")
 
-[node name="WallLine_Station_East_Gate_Canopy_0_1" type="StaticBody3D" parent="." unique_id=1490043780]
+[node name="WallLine_Station_East_Gate_Canopy_0_1" type="StaticBody3D" parent="." unique_id=1751835148]
 transform = Transform3D(0.02894267, 0, -0.9995811, 0, 1, 0, 0.9995811, 0, 0.02894267, -356.5286, -42.51, -5.890832)
 
-[node name="@CollisionShape3D@9952" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_1" unique_id=1731398211]
+[node name="@CollisionShape3D@9952" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_1" unique_id=807447514]
 shape = SubResource("BoxShape3D_8dx52")
 
-[node name="@MeshInstance3D@9953" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_1" unique_id=614080830]
+[node name="@MeshInstance3D@9953" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_1" unique_id=1688254601]
 material_override = SubResource("StandardMaterial3D_ccvu6")
 mesh = SubResource("BoxMesh_7ria7")
 
-[node name="WallLine_Station_East_Gate_Platform_0_2" type="StaticBody3D" parent="." unique_id=276188368]
+[node name="WallLine_Station_East_Gate_Platform_0_2" type="StaticBody3D" parent="." unique_id=1125503733]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -356.44333, -45.95, 0)
 metadata/reach_target = true
 metadata/station_platform = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@9954" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_2" unique_id=48972940]
+[node name="@CollisionShape3D@9954" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_2" unique_id=770246842]
 shape = SubResource("BoxShape3D_shrd6")
 
-[node name="@MeshInstance3D@9955" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_2" unique_id=1682846786]
+[node name="@MeshInstance3D@9955" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_2" unique_id=1742021376]
 material_override = SubResource("StandardMaterial3D_m5lxl")
 mesh = SubResource("BoxMesh_6pmwf")
 
-[node name="WallLine_Station_East_Gate_Canopy_0_2" type="StaticBody3D" parent="." unique_id=1392316811]
+[node name="WallLine_Station_East_Gate_Canopy_0_2" type="StaticBody3D" parent="." unique_id=1360999987]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -356.44333, -42.51, 0)
 
-[node name="@CollisionShape3D@9956" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_2" unique_id=1686661193]
+[node name="@CollisionShape3D@9956" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_2" unique_id=1406674197]
 shape = SubResource("BoxShape3D_vl8hq")
 
-[node name="@MeshInstance3D@9957" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_2" unique_id=1919006094]
+[node name="@MeshInstance3D@9957" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_2" unique_id=871848777]
 material_override = SubResource("StandardMaterial3D_fum3v")
 mesh = SubResource("BoxMesh_yuf5f")
 
-[node name="WallLine_Station_East_Gate_Platform_0_3" type="StaticBody3D" parent="." unique_id=833516293]
+[node name="WallLine_Station_East_Gate_Platform_0_3" type="StaticBody3D" parent="." unique_id=1071922507]
 transform = Transform3D(-0.028942639, 0, -0.9995811, 0, 1, 0, 0.9995811, 0, -0.028942639, -356.5286, -45.95, 5.890832)
 metadata/reach_target = true
 metadata/station_platform = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@9958" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_3" unique_id=407666899]
+[node name="@CollisionShape3D@9958" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_3" unique_id=1152587455]
 shape = SubResource("BoxShape3D_56nk6")
 
-[node name="@MeshInstance3D@9959" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_3" unique_id=327545558]
+[node name="@MeshInstance3D@9959" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_3" unique_id=1420289693]
 material_override = SubResource("StandardMaterial3D_kmsww")
 mesh = SubResource("BoxMesh_pmsev")
 
-[node name="WallLine_Station_East_Gate_Canopy_0_3" type="StaticBody3D" parent="." unique_id=1724079136]
+[node name="WallLine_Station_East_Gate_Canopy_0_3" type="StaticBody3D" parent="." unique_id=1003184538]
 transform = Transform3D(-0.028942639, 0, -0.9995811, 0, 1, 0, 0.9995811, 0, -0.028942639, -356.5286, -42.51, 5.890832)
 
-[node name="@CollisionShape3D@9960" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_3" unique_id=136737188]
+[node name="@CollisionShape3D@9960" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_3" unique_id=125781504]
 shape = SubResource("BoxShape3D_hiyew")
 
-[node name="@MeshInstance3D@9961" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_3" unique_id=17142353]
+[node name="@MeshInstance3D@9961" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_3" unique_id=1372750927]
 material_override = SubResource("StandardMaterial3D_arjxc")
 mesh = SubResource("BoxMesh_ayj4k")
 
-[node name="WallLine_Station_East_Gate_Platform_0_4" type="StaticBody3D" parent="." unique_id=874977121]
+[node name="WallLine_Station_East_Gate_Platform_0_4" type="StaticBody3D" parent="." unique_id=1795446795]
 transform = Transform3D(-0.05785432, 0, -0.99832505, 0, 1, 0, 0.99832505, 0, -0.05785432, -356.7843, -45.95, 11.77673)
 metadata/reach_target = true
 metadata/station_platform = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@9962" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_4" unique_id=344374108]
+[node name="@CollisionShape3D@9962" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Platform_0_4" unique_id=1195136671]
 shape = SubResource("BoxShape3D_rsq0b")
 
-[node name="@MeshInstance3D@9963" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_4" unique_id=1346475745]
+[node name="@MeshInstance3D@9963" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Platform_0_4" unique_id=592116640]
 material_override = SubResource("StandardMaterial3D_alecl")
 mesh = SubResource("BoxMesh_3tj36")
 
-[node name="WallLine_Station_East_Gate_Canopy_0_4" type="StaticBody3D" parent="." unique_id=1211378857]
+[node name="WallLine_Station_East_Gate_Canopy_0_4" type="StaticBody3D" parent="." unique_id=822881437]
 transform = Transform3D(-0.05785432, 0, -0.99832505, 0, 1, 0, 0.99832505, 0, -0.05785432, -356.7843, -42.51, 11.77673)
 
-[node name="@CollisionShape3D@9964" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_4" unique_id=477587354]
+[node name="@CollisionShape3D@9964" type="CollisionShape3D" parent="WallLine_Station_East_Gate_Canopy_0_4" unique_id=1386312610]
 shape = SubResource("BoxShape3D_57xu5")
 
-[node name="@MeshInstance3D@9965" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_4" unique_id=339813892]
+[node name="@MeshInstance3D@9965" type="MeshInstance3D" parent="WallLine_Station_East_Gate_Canopy_0_4" unique_id=224639551]
 material_override = SubResource("StandardMaterial3D_5sak0")
 mesh = SubResource("BoxMesh_biga1")
