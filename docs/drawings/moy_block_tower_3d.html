@@ -226,7 +226,7 @@ function mechMats(clip) {
   return { black: mat(0x1b1e24, Object.assign({ roughness: 0.6, metalness: 0.8 }, o)), steel: mat(0x9aa2ac, Object.assign({ roughness: 0.28, metalness: 0.95 }, o)),
     light: mat(new THREE.Color(c[0], c[1], c[2]), Object.assign({ emissive: new THREE.Color(c[4], c[5], c[6]), emissiveIntensity: 1.0 }, o)),
     shell: cutMat(mat(0x1b1e24, Object.assign({ roughness: 0.6, metalness: 0.8, side: THREE.DoubleSide }, o)), -1),
-    glass: cutMat(mat(0xbfe6ff, Object.assign({ roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.4, depthWrite: false, side: THREE.DoubleSide }, o)), 1) };
+    glass: cutMat(mat(0xd8eef8, Object.assign({ roughness: 0.04, metalness: 0.2, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide }, o)), 1) };
 }
 const PARTS = [];   // the parts table, filled once by the first build
 function buildMech(M) {
@@ -284,12 +284,22 @@ const PILOT_IN = 0.94;
 function buildPilot() {
   const g = new THREE.Group(), ps = HS.clone().multiplyScalar(PILOT_IN), pc = HC.clone(), parts = {};
   const body = new THREE.Mesh(figGeo(HERO_HEAD_PART, 1, p => [pc.x + (p[0] * MS - HC.x) * PILOT_IN, pc.y + (p[1] * MS - HC.y) * PILOT_IN, pc.z + (p[2] * MS - HC.z) * PILOT_IN]), figMat(HEAD_BLOB.c));
-  body.renderOrder = 2; g.add(body); parts.body = body;
+  body.material.envMapIntensity = 0.25; body.renderOrder = 2; g.add(body); parts.body = body;   // the scene's reflections would wash its colour out
   const map = p => [pc.x + (p[0] - BB.c[0]) * ps.x / BB.s[0], pc.y + (p[1] - BB.c[1]) * ps.y / BB.s[1], pc.z + (p[2] - BB.c[2]) * ps.z / BB.s[2]];
-  for (const p of HEAD_SLOT) { if (p === HEAD_BLOB) continue; const o = new THREE.Mesh(figGeo(p, 1, map), figMat(p.c)); o.renderOrder = 3; g.add(o);
-    parts[p.name.startsWith("Eye") ? "eye" + p.name.slice(3) : "core"] = o; }
+  // the glowing core (its node name varies by slot)
+  const core = HEAD_SLOT.find(p => p !== HEAD_BLOB && p.c[4] + p.c[5] + p.c[6] > 1.0); parts.core = new THREE.Mesh(figGeo(core, 1, map), figMat(core.c)); parts.core.renderOrder = 3; g.add(parts.core);
+  // its eyes sit on its face, found by a ray against the pilot's own surface: a blorb's eyes, a little larger than the hero's
+  // (his are about 0.03 by 0.04 m), opaque, and coloured by the game's own rule (blorbEyeColour below)
+  body.updateMatrixWorld(); const ray = new THREE.Raycaster();
+  for (const [k, sx] of [["eyeL", -1], ["eyeR", 1]]) {
+    ray.set(new THREE.Vector3(sx * 0.045, pc.y + 0.018, pc.z + 1), new THREE.Vector3(0, 0, -1)); const hit = ray.intersectObject(body)[0];
+    const n = hit.face.normal.clone().transformDirection(body.matrixWorld), e = new THREE.Mesh(eggGeo([0.021, 0.025, 0.01], [2, 2], 12, 16), mat(0x000000, { roughness: 0.35, envMapIntensity: 0.25 }));
+    e.position.copy(hit.point).addScaledVector(n, 0.002); e.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n); e.renderOrder = 4; g.add(e); parts[k] = e; }
   return { g, parts };
 }
+// blorb.gd: eye_color := body_rgb.lightened(0.62) if luminance < 0.24 else body_rgb.darkened(0.25)
+function blorbEyeColour(c) { const col = new THREE.Color(c[0], c[1], c[2]), lum = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  return lum < 0.24 ? col.lerp(new THREE.Color(1, 1, 1), 0.62) : col.multiplyScalar(0.75); }
 function envMap(renderer) {
   const pm = new THREE.PMREMGenerator(renderer), sc = new THREE.Scene();
   sc.add(new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), new THREE.MeshBasicMaterial({ color: 0x5d6168, side: THREE.BackSide })));
@@ -581,20 +591,21 @@ function envMap(renderer) {
     boss: { h: "In the fight", s: "A city blorb filling the helmet, and a full suit of six city blorbs, the head blorb over the helmet: seven to befriend once it falls.", pilot: "city", suit: true, visor: false },
     blorbus: { h: "Blorbus driving", s: "Brain pink behind the visor; the hero's own blorbs as its suit, or none.", pilot: "blorbus", suit: false, visor: false },
   };
-  const cityC = HEAD_BLOB.c, eyeC = HEAD_SLOT.find(p => p.name.startsWith("Eye")).c;
+  const cityC = HEAD_BLOB.c;
   const places = document.getElementById("mplaces"), btns = {};
   let cur = "boss", visorOpen = false, va = 0, kn = 0, jointsOn = false, scaleOn = true;
   const chip = id => document.getElementById(id);
   function setVisor(v) { visorOpen = v; chip("m_visor").setAttribute("aria-pressed", v); }
   function state(id) { const S = STATES[id]; cur = id; pilot.g.visible = !!S.pilot; suit.visible = S.suit; setVisor(S.visor);
-    if (S.pilot) { const body = S.pilot === "city" ? cityC : BLORBUS, k = eyeC[0] / cityC[0];
+    if (S.pilot) { const body = S.pilot === "city" ? cityC : BLORBUS;
       pilot.parts.body.material.color.setRGB(body[0], body[1], body[2]); pilot.parts.body.material.opacity = body[3];
-      for (const e of ["eyeL", "eyeR"]) pilot.parts[e].material.color.setRGB(body[0] * k, body[1] * k, body[2] * k);
+      pilot.parts.body.material.emissive.setRGB(...(S.pilot === "city" ? cityC.slice(4, 7) : [0, 0, 0]));   // a city blorb glows; Blorbus does not
+      for (const e of ["eyeL", "eyeR"]) pilot.parts[e].material.color.copy(blorbEyeColour(body));
       pilot.parts.core.visible = S.pilot === "city"; }
     for (const k in btns) btns[k].setAttribute("aria-current", k === id); }
   for (const id in STATES) { const b = document.createElement("button"); b.className = "place"; b.innerHTML = `<h3>${STATES[id].h}</h3><span>${STATES[id].s}</span>`; b.addEventListener("click", () => { state(id); look(WIDE); }); places.appendChild(b); btns[id] = b; }
   // the head close up, three-quarter from the side, to read the visor's one cut and its hinge
-  const WIDE = [[1.3, 1.65, 4.4], [-0.1, 1.05, 0]], HEADV = [[0.78, HC.y + 0.1, 0.12], [0, HC.y - 0.02, 0]];
+  const WIDE = [[1.3, 1.65, 4.4], [-0.1, 1.05, 0]], HEADV = [[0.5, HC.y + 0.06, 0.55], [0, HC.y - 0.01, 0]];
   function look(v) { camera.position.set(...v[0]); controls.target.set(...v[1]); controls.update(); }
   { const b = document.createElement("button"); b.className = "place"; b.innerHTML = "<h3>The head, close up</h3><span>The visor's one cut from the side; open the visor to see its hinge.</span>";
     b.addEventListener("click", () => { look(HEADV); for (const k in btns) btns[k].setAttribute("aria-current", false); b.setAttribute("aria-current", true); }); places.appendChild(b); btns.head = b; }

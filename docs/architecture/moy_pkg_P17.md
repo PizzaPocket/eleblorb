@@ -165,8 +165,12 @@ pocket, not a floor.
   - the visor **hinges at the crown** and swings up and forward to let a
     blorb climb in, then shuts over it.
 - **the pilot fills the helmet** (user): it takes the shape of the shell's
-  inside (the head's own SuperEgg, just within the shell), with a blorb's
-  own eyes and core on its face. Azure for a city blorb; brain pink (`BLORBUS_BODY_COLOR`) for
+  inside (the head's own SuperEgg, just within the shell), with its core
+  inside and **its eyes on its face**: opaque, about 0.04 by 0.05 m (a
+  little larger than the hero's, user), and coloured as every blorb's are
+  (`blorb.gd`: the body darkened by a quarter, or lightened on a very dark
+  body), so they read through the visor. A city blorb pilot glows; Blorbus
+  does not. Azure for a city blorb; brain pink (`BLORBUS_BODY_COLOR`) for
   Blorbus.
 
 **Rig:**
@@ -355,3 +359,5 @@ the arena from the gallery and from its floor.
   body (the chest plate stays bright steel); its shoulder pads back; its
   light the city blorbs' own colour. Pinestein's lab coat hangs from the
   shoulders, with lapels, a collar and sleeves.
+- 2026-10-18 (user): the pilot's eyes are a blorb's eye colour and a little
+  larger than the hero's.
