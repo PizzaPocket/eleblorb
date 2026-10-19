@@ -38,13 +38,14 @@ first.
 1. **Sneak in.** Climb the vent hoods to the one open louvre.
 2. **Get to the top.** The lift inside goes up to the crown.
 3. **The two and the mech.** **Kask** is the one in charge. **Pinestein**
-   mind-controls the city blorbs from a distance: the one piloting the
-   mech and the six worn as its suit. A thin thread of the city blorbs'
+   mind-controls **Blorbrain**, the electric-pink Psychic blorb he captured
+   and experimented on, as the mech pilot, and the six city blorbs worn
+   as its suit. A thin thread of the city blorbs'
    blue runs from his temples to the mech while he does it.
 4. **The fight.** A prototype boss fight against the mech.
 5. **Win.** Beating the mech breaks Pinestein's control: the thread snaps,
    the visor opens, and the pilot and the six suit blorbs drop as seven
-   wild, joinable city blorbs (as the False Hero's do). The mech kneels,
+   wild, joinable blorbs: Blorbrain and six city blorbs (as the False Hero's do). The mech kneels,
    empty.
 6. **Claim it.** Switched to Blorbus, the hero can **pilot the mech or
    carry it in Blorbus's core**, exactly as with Humongous.
@@ -147,7 +148,9 @@ line** (user, 2026-10-18: the first build had two, a sweep and a chin line):
 **The pilot** fills the helmet: the head's own shape, inset from the shell
 (0.87 in the model) so that it and its eyes stay inside; the game's own
 blorb eyes on its skin, about 0.04 m wide, **lying flat and upright on it** (each set in the skin's own frame: its thin axis on the skin's normal where it sits, its long axis along the skin's up; neither pitched nor rolled), coloured by the blorb rule
-(`blorb.gd`); its core inside. A city blorb glows; Blorbus does not.
+(`blorb.gd`); its core inside. The boss pilot is **Blorbrain**, electric
+pink, distinct from the six blue city suit blorbs and Blorbus's muted brain
+pink. Do not give Blorbrain the synthetic City type just to reuse its glow.
 
 **Rig:** publishes the rig-neutral joints through its own
 `_blorb_suit_pivot_map()`; real joints wherever a power poses one, checked
@@ -164,7 +167,7 @@ no new `EXEMPT` entry.
 ## 6. The fight (a prototype)
 
 Copy the shape of `false_hero_nme.gd`:
-- **the boss:** the mech, piloted by a city blorb and wearing six city
+- **the boss:** the mech, piloted by Blorbrain and wearing six city
   blorbs, driven by an NME controller; a named boss: far more HP than the
   False Hero (start at about 400) and a far larger XP reward (about 300);
 - **it:** walks at the hero, punches in reach, streams city current from
@@ -177,10 +180,16 @@ Copy the shape of `false_hero_nme.gd`:
 - **if the hero faints**, he wakes as the game already rules, and the
   fight resets in full on his return;
 - **the win:** the thread snaps; the visor opens; the pilot and the six
-  suit blorbs drop as seven wild, joinable city blorbs; the mech kneels,
+  suit blorbs drop as seven wild, joinable blorbs: Blorbrain and six city blorbs; the mech kneels,
   empty, and is the player's. Save it (`WorldState`), so it stays won.
 
 ## 7. Carrying or piloting the mech
+
+**Pilot eligibility (user revision): only Psychic blorbs can pilot the mech.**
+Blorbrain is its captive boss pilot; Blorbus remains eligible after the win.
+Ordinary city blorbs can power/wear the suit but cannot pilot. This rule is
+about the pilot, not suit eligibility. Validate both Psychic pilots and reject
+a non-Psychic city blorb; do not add explanatory in-game text.
 
 Copy `humongous_state.gd`: a `MechState` autoload beside `HumongousState`,
 with the same three modes (`released`, `carried`, `merged`), saved.
@@ -266,8 +275,9 @@ data and this brief disagreed.
 - 2026-10-18 (user): the way in is the vent-hood climb; Kask and Pinestein
   work together; BLOCK is human villainy first, the Demon King one subtle
   line from Kask; the climax is a boss fight against a blorb mech whose
-  suit and pilot are city blorbs (the synthetic blorbs, made by
-  Pinestein's experiments; nothing lures them in).
+  suit consists of six synthetic city blorbs; the pilot is now Blorbrain,
+  a captured Psychic blorb experimented on and mind-controlled by Pinestein
+  (user revision, 2026-10-19). Nothing lures the suit blorbs in.
 - 2026-10-18 (user): keep the tower minimal: only the places the story
   enters are built; the rest is solid; the inside loads as its own scene.
 - 2026-10-18 (user): the mech: on the hero's joints × 1.05; thin limbs in
@@ -493,3 +503,26 @@ drivers); the rest is rebuilt from the schedule.
 
 **Report:** `docs/diagnostics/<date>-moy-P17-fixes.md`, with the schedule part by part.
 
+
+## 14. Pilot revision — Blorbrain
+
+User, 2026-10-19. This supersedes earlier references to a city-blorb pilot.
+
+- **Blorbrain** is a new **Psychic** blorb, **electric pink**. Pinestein
+  captured him, has been experimenting on him, and now mind-controls him
+  to pilot the boss mech. He is not one of the synthetic City-type blorbs.
+- Only Psychic blorbs can pilot. Blorbus qualifies; ordinary city blorbs do
+  not. The six City-type suit blorbs and the mech's blue mechanical lights
+  stay as planned. Blorbrain's pink is his body colour, not a mech repaint.
+- Winning frees **Blorbrain plus six city blorbs**, still seven joinable
+  blorbs total. Preserve Blorbrain's name, Psychic type and colour after
+  release/recruitment and across saved state.
+- Show the electric-pink pilot behind the visor in the model and build.
+  Check that his identity survives the fight and that non-Psychic pilots
+  are rejected. Existing post-win Blorbus carry/pilot flow remains valid.
+
+The local tower model now shows Blorbrain in electric pink. Republish it to
+its existing artifact URL when artifact tooling is available; the published
+copy has not been updated by this session.
+
+This is a plan/lore revision; runtime implementation belongs to the P17 build.

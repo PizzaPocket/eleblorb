@@ -250,6 +250,7 @@ const MJ = (k, o = [0, 0, 0], s = 1) => new THREE.Vector3((MC.joints[k][0] * MS 
 const HEADP = BP.head_shell, HC = MJ("head_centre"), HS = new THREE.Vector3(...HEADP.semi);
 // the suit's head blorb: the game's own blorb shaped round a head, with its eyes and core
 const HEAD_SLOT = F.suit.filter(p => bbox(p).c[1] > 1.62), HEAD_BLOB = HEAD_SLOT.reduce((a, p) => (bbox(p).s[0] > bbox(a).s[0] ? p : a)), BB = bbox(HEAD_BLOB);
+const BLORBRAIN = [1.0, 0.0, 0.6, 0.85]; // electric-pink Psychic pilot, user revision 2026-10-19
 const BLORBUS = [0.82, 0.60, 0.62, 0.85];   // BLORBUS_BODY_COLOR in blorb.gd
 const hipY = MJ("hips").y, chestY = MJ("chest").y, S0 = hipY + MC.plates_pad, S1 = chestY - MC.chest_h, SEAM_LO = (S0 + S1) / 2 - MC.seam / 2, SEAM_HI = (S0 + S1) / 2 + MC.seam / 2;
 const TORSO = { pelvis: [null, S0], abdomen_lower: [S0, SEAM_LO], abdomen_upper: [SEAM_HI, S1], chest: [S1, null] };
@@ -315,7 +316,7 @@ const PILOT_FIT = {};
 function buildPilot() {
   const g = new THREE.Group(), parts = {}, ray = new THREE.Raycaster(), Z = new THREE.Vector3(0, 0, -1), pb = BP.pilot_body;
   const shell = new THREE.Mesh(egg(HEADP.semi, HEADP.eps, { rings: 28, segs: 44 })); shell.position.copy(HC); shell.updateMatrixWorld();
-  const body = new THREE.Mesh(egg(pb.semi, pb.eps, { rings: 28, segs: 44 }), figMat(HEAD_BLOB.c)); body.position.copy(HC); body.updateMatrixWorld();
+  const body = new THREE.Mesh(egg(pb.semi, pb.eps, { rings: 28, segs: 44 }), figMat(BLORBRAIN)); body.position.copy(HC); body.updateMatrixWorld();
   const eyes = F.blorb.filter(p => p.name.startsWith("Eye")).map(p => [p, bbox(p)]), fb = F.blorb.filter(p => !p.name.startsWith("Eye")).map(p => bbox(p)).reduce((a, b) => (b.s[0] > a.s[0] ? b : a));
   const pc = HC.clone(), placed = []; let gap = 1e9, fits = true;
   const e = pb.eps[0], sk = pb.semi, grad = (q, s_) => new THREE.Vector3(Math.sign(q.x) * Math.pow(Math.abs(q.x / s_[0]), e - 1) / s_[0], Math.sign(q.y) * Math.pow(Math.abs(q.y / s_[1]), e - 1) / s_[1], Math.sign(q.z) * Math.pow(Math.abs(q.z / s_[2]), e - 1) / s_[2]).normalize();
@@ -337,7 +338,7 @@ function buildPilot() {
   body.material.envMapIntensity = 0.25; body.renderOrder = 2; g.add(body); parts.body = body;   // the scene's reflections would wash its colour out
   for (const [p, geo] of placed) { const b = bbox(p), m = new THREE.Mesh(geo, mat(0x000000, { roughness: 0.35, envMapIntensity: 0.25 })); m.renderOrder = 4; g.add(m); parts["eye" + (b.c[0] < 0 ? "L" : "R")] = m; }
   const ps = new THREE.Vector3(...pb.semi), map = p => [pc.x + (p[0] - BB.c[0]) * ps.x / BB.s[0], pc.y + (p[1] - BB.c[1]) * ps.y / BB.s[1], pc.z + (p[2] - BB.c[2]) * ps.z / BB.s[2]];
-  const core = HEAD_SLOT.find(p => p !== HEAD_BLOB && p.c[4] + p.c[5] + p.c[6] > 1.0); parts.core = new THREE.Mesh(figGeo(core, 1, map), figMat(core.c)); parts.core.renderOrder = 3; g.add(parts.core);
+  const core = HEAD_SLOT.find(p => p !== HEAD_BLOB && p.c[4] + p.c[5] + p.c[6] > 1.0); parts.core = new THREE.Mesh(figGeo(core, 1, map), figMat(core.c)); parts.core.renderOrder = 3; g.add(parts.core); parts.core.visible = false;
   return { g, parts };
 }
 // blorb.gd: eye_color := body_rgb.lightened(0.62) if luminance < 0.24 else body_rgb.darkened(0.25)
@@ -575,7 +576,7 @@ function envMap(renderer) {
   label("solid", "not built, never entered", [-1, 48, -ID / 2], "cut", "dim"); label("solid", "not built", [-1, 120, -ID / 2], "cut", "dim");
   label("the lift", "lobby, way in, crown", [LF.at[0], 60, LF.at[1]], "cut", "", 160);
   label("Kask", "in charge", [STN.kask[0], STN.kask[1] + 2.4, STN.kask[2]], "cut", "", 60); label("Pinestein", "his thread to the mech", [STN.pinestein[0], STN.pinestein[1] + 2.5, STN.pinestein[2]], "cut", "", 60);
-  label("the mech", "a city blorb filling its helmet", [BOSS.x, BOSS.y + 2.8, BOSS.z], "cut", "", 60);
+  label("the mech", "Blorbrain, the captive electric-pink Psychic pilot", [BOSS.x, BOSS.y + 2.8, BOSS.z], "cut", "", 60);
   for (let h = 0; h <= 200; h += 50) label("", `${h} m`, [SHW / 2 + 0.5, h, -SHD / 2 - 0.5], "both", "tick");
 
   // ---- views
@@ -639,9 +640,9 @@ function envMap(renderer) {
   document.getElementById("way").innerHTML = [
     `<b>Sneak in.</b> Up the fire escape on the ${A.storeys}-storey neighbour to the east: six flights of ${FE.rise} m, the sixth landing level with the 30% ring at ${r1.toFixed(0)} m. A ${SCH.hop.leap} m leap to its hood; then a bracket every ${SCH.bracket.step} m up the east face, either side of its middle, to the sill of the one open louvre at ${LV.sill} m.`,
     `<b>Up.</b> The lift rises from the plant floor to the crown, passing every other storey.`,
-    `<b>The two and the mech.</b> Kask, in charge, at the gallery glass; Pinestein beside her, his fingers at his temples, a thread of the city blorbs' blue running from him to the mech: he holds its pilot and its six suit blorbs in his mind.`,
+    `<b>The two and the mech.</b> Kask, in charge, at the gallery glass; Pinestein beside her, his fingers at his temples, a thread of the city blorbs' blue running from him to the mech: he mind-controls Blorbrain, an electric-pink Psychic blorb he captured and experimented on, and its six city suit blorbs.`,
     `<b>The fight.</b> A prototype: the mech walks in, punches, streams city current, leaps.`,
-    `<b>Win.</b> The thread snaps; the visor opens; seven city blorbs drop, free to befriend; the mech kneels, empty, and is yours. As Blorbus, pilot it or carry it in his core, as with Humongous.`,
+    `<b>Win.</b> The thread snaps; the visor opens; Blorbrain and six city blorbs drop, free to befriend; the mech kneels, empty, and is yours. As Blorbus, pilot it or carry it in his core, as with Humongous.`,
     `<b>Out.</b> Kask and Pinestein stay, beaten. The lift takes the hero down to the lobby and out of the one door.`,
   ].map(t => `<li>${t}</li>`).join("");
 })();
@@ -685,22 +686,21 @@ function envMap(renderer) {
   label("Moy's door", "2.2 m clear", doorG, [0, 2.4, 0], "scale");
 
   const STATES = {
-    empty: { h: "Empty", s: "Visor up, kneeling: nothing drives it until a blorb climbs in.", pilot: null, suit: false, visor: true },
-    boss: { h: "In the fight", s: "A city blorb filling the helmet, and a full suit of six city blorbs, the head blorb over the helmet: seven to befriend once it falls.", pilot: "city", suit: true, visor: false },
+    empty: { h: "Empty", s: "Visor up, kneeling: only a Psychic blorb can pilot it.", pilot: null, suit: false, visor: true },
+    boss: { h: "In the fight", s: "Blorbrain, a captured electric-pink Psychic blorb, fills the helmet under Pinestein’s mind control. Six city blorbs form the suit: seven blorbs to befriend once freed.", pilot: "blorbrain", suit: true, visor: false },
     blorbus: { h: "Blorbus driving", s: "Brain pink behind the visor; the hero's own blorbs as its suit, or none.", pilot: "blorbus", suit: false, visor: false },
   };
-  const cityC = HEAD_BLOB.c;
   const places = document.getElementById("mplaces"), btns = {};
   let cur = "boss", visorOpen = false, va = 0, kn = 0, jointsOn = false, scaleOn = true, suitOn = true;
   const chip = id => document.getElementById(id);
   function setVisor(v) { visorOpen = v; chip("m_visor").setAttribute("aria-pressed", v); }
   function setSuit(v) { suitOn = v; suit.visible = v; chip("m_suit").setAttribute("aria-pressed", v); }
   function state(id) { const S = STATES[id]; cur = id; pilot.g.visible = !!S.pilot; setSuit(S.suit); setVisor(S.visor);
-    if (S.pilot) { const body = S.pilot === "city" ? cityC : BLORBUS;
+    if (S.pilot) { const body = S.pilot === "blorbrain" ? BLORBRAIN : BLORBUS;
       pilot.parts.body.material.color.setRGB(body[0], body[1], body[2]); pilot.parts.body.material.opacity = body[3];
-      pilot.parts.body.material.emissive.setRGB(...(S.pilot === "city" ? cityC.slice(4, 7) : [0, 0, 0]));   // a city blorb glows; Blorbus does not
+      pilot.parts.body.material.emissive.setRGB(0, 0, 0);   // Psychic pilots keep their own body colours
       for (const e of ["eyeL", "eyeR"]) pilot.parts[e].material.color.copy(blorbEyeColour(body));
-      pilot.parts.core.visible = S.pilot === "city"; }
+      pilot.parts.core.visible = false; }
     for (const k in btns) btns[k].setAttribute("aria-current", k === id); }
   const WIDE = [[1.3, 1.65, 4.4], [-0.1, 1.05, 0]], HEADV = [[0.5, HC.y + 0.06, 0.55], [0, HC.y - 0.01, 0]], SHOULDER = [[0.9, 1.9, 1.5], [0.2, 1.55, 0]];
   function look(v) { camera.position.set(...v[0]); controls.target.set(...v[1]); controls.update(); }

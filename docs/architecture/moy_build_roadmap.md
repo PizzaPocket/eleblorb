@@ -129,7 +129,7 @@ diagnostic replaces this column.
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
 | P15 | Outside the wall: turbines, the battery, water and recycling works, the launch site, city blorbs | desert | L1 to L2 | L3 | planned | |
 | P16 | Final polish and performance | city | n/a | L4 | planned | |
-| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **ready** (revised 2026-10-18: binding parts and joins schedule, 91 parts, 20 joins, in section 12; the first review's fix list folded into the one build list, section 13; model republished) | `moy_pkg_P17.md` |
+| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **ready** (pilot revised 2026-10-19: Blorbrain, electric-pink Psychic captive; Psychic-only piloting, section 14; binding parts and joins schedule, 91 parts, 20 joins, in section 12; the first review's fix list folded into the one build list, section 13; model republished) | `moy_pkg_P17.md` |
 | P18 | **The Arches**: the old goods store in the wall's arches; the fight club (Tuesday, Friday) and the rave (Saturday night) | the wall by the South Gate | L0 | L3 | planned | |
 
 **Order.**
@@ -161,9 +161,11 @@ diagnostic replaces this column.
 **P17, the BLOCK tower.** One build, handed off whole so it can be played
 through (user, 2026-10-18).
 - **The story, kept simple:** sneak in up the vent hoods; the lift to the
-  crown; Kask in charge and Pinestein mind-controlling the city blorbs; a
+  crown; Kask in charge and Pinestein mind-controlling Blorbrain, his captured electric-pink Psychic
+  test subject and mech pilot, and six city suit blorbs; a
   prototype fight against the blorb mech; the win breaks his control and
-  frees seven city blorbs; Blorbus pilots the mech or carries it in his
+  frees Blorbrain and six city blorbs; only Psychic blorbs can pilot;
+  Blorbus pilots the mech or carries it in his
   core, as with Humongous; the two stay, defeated; out by the lift and the
   one door.
 - **Built:** the tower's outside (it leaves P6's scope), the climb, the way
