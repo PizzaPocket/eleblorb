@@ -12,6 +12,9 @@ const REQUIRED_CROSSROADS_SAMPLES := ["crossroads_spawn", "old_moy_street", "old
 	"downtown_up", "estate_court", "crossing_east_gate", "east_gate_train_hall"]
 const ROUTE_SAMPLE_NAMES := REQUIRED_CROSSROADS_SAMPLES
 const DEFAULT_ROUTE := "crossroads_spawn,old_moy_street,old_moy_rooftop,downtown_up,estate_court,crossing_east_gate,east_gate_train_hall"
+const REQUIRED_CONTROLLED_ROUTE_PROOFS := ["moving_train_ride", "four_gate_entries", "vine_handover",
+	"occupied_support_thresholds", "xiao_hou_zi_entry", "alternate_body_entry", "hotel_annulus_hold",
+	"rapid_reentry", "three_warm_traversals"]
 var _config: Dictionary = {}
 var _raw: Dictionary = {}
 var _output_path := ""
@@ -22,6 +25,8 @@ var _terrain: Node
 var _city: Node
 var _failed := false
 var _contract_test_mode := false
+var _route_proofs: Dictionary = {}
+var _route_proof_measurements: Dictionary = {}
 
 func _ready() -> void:
 	_config = _parse_config(OS.get_cmdline_user_args())
@@ -61,6 +66,7 @@ func _ready() -> void:
 	_config["command_line"] = OS.get_cmdline_args() + OS.get_cmdline_user_args()
 	_config["commit"] = _git_commit()
 	_config["source_hashes"] = _source_hashes()
+	_route_proofs = _load_route_proofs(String(_config.get("route_proof_file", "")))
 	_apply_display_settings()
 	_config["resolution"] = [_config.resolution.x, _config.resolution.y]
 	await get_tree().process_frame
@@ -131,6 +137,17 @@ func _finalize_acceptance(qa_mode: bool, visible: bool, valid_samples: bool) -> 
 		unique_names[name] = true
 	for required_name in REQUIRED_CROSSROADS_SAMPLES:
 		if not got_names.has(required_name): route_complete = false
+	var controlled_route_results: Dictionary = {}
+	var controlled_routes_complete := true
+	for proof_name in REQUIRED_CONTROLLED_ROUTE_PROOFS:
+		var passed := bool(_route_proofs.get(proof_name, false))
+		controlled_route_results[proof_name] = {"passed": passed, "status": "passed" if passed else "unrun_or_failed"}
+		if not passed: controlled_routes_complete = false
+	var travel_p95: Variant = _route_proof_measurements.get("travel_p95_ms")
+	var travel_over_100: Variant = _route_proof_measurements.get("travel_frames_over_100ms")
+	var travel_frame_budget_pass := travel_p95 != null and float(travel_p95) <= 33.3
+	var travel_stall_gate_pass := travel_over_100 != null and int(travel_over_100) < 2
+	if not travel_frame_budget_pass or not travel_stall_gate_pass: controlled_routes_complete = false
 	var cycles: Array = []
 	for transition in _raw.get("transitions", []):
 		if String(transition.get("phase", "")) == "unload_reload": cycles.append(transition)
@@ -147,7 +164,10 @@ func _finalize_acceptance(qa_mode: bool, visible: bool, valid_samples: bool) -> 
 	var stall_gate_pass := severe_stalls.size() < 2
 	var failures: Array[String] = []
 	if not render_valid: failures.append("rendering_evidence_invalid")
-	if not route_complete and not qa_mode: failures.append("required_route_samples_incomplete")
+	if not route_complete and not qa_mode: failures.append("required_stationary_samples_incomplete")
+	if not controlled_routes_complete and not qa_mode: failures.append("required_controlled_route_proofs_missing")
+	if not travel_frame_budget_pass and not qa_mode: failures.append("controlled_travel_p95_missing_or_over_budget")
+	if not travel_stall_gate_pass and not qa_mode: failures.append("controlled_travel_repeated_over_100ms_stalls")
 	if not valid_samples: failures.append("no_completed_samples")
 	if not cycles_complete and not qa_mode: failures.append("unload_cycles_incomplete_or_unsettled")
 	if not frame_budget_pass and not qa_mode: failures.append("required_p95_frame_budget_missed")
@@ -159,8 +179,13 @@ func _finalize_acceptance(qa_mode: bool, visible: bool, valid_samples: bool) -> 
 		"completed_samples": valid_samples,
 		"rendering_evidence_valid": render_valid,
 		"accepted_rendering_evidence": render_valid,
-		"suite_scope": "diagnostic_qa" if qa_mode else ("full" if full_route else "partial"),
+		"suite_scope": "diagnostic_qa" if qa_mode else ("full" if full_route and controlled_routes_complete else ("stationary_only" if full_route else "partial")),
 		"full_route_complete": route_complete,
+		"required_controlled_route_proofs": controlled_route_results,
+		"controlled_routes_complete": controlled_routes_complete,
+		"controlled_travel_performance":{"p95_ms":travel_p95,
+			"p95_budget_ms":33.3,"p95_pass":travel_frame_budget_pass,
+			"frames_over_100ms":travel_over_100,"repeated_stall_pass":travel_stall_gate_pass},
 		"required_samples": REQUIRED_CROSSROADS_SAMPLES,
 		"actual_samples": got_names,
 		"cycles_complete_and_settled": cycles_complete,
@@ -233,7 +258,11 @@ func _run_contract_negative_case(case_name: String) -> void:
 		"missing_route": test_raw.samples.remove_at(test_raw.samples.size()-1)
 		"readiness_timeout": _failed = true
 		"unload_timeout": test_raw.transitions[0].unload_settled = false
+		"incomplete_controlled_routes": _route_proofs.clear()
+		"travel_budget": _route_proof_measurements = {"travel_p95_ms": 35.0, "travel_frames_over_100ms": 0}
 		"success":
+			for proof_name in REQUIRED_CONTROLLED_ROUTE_PROOFS: _route_proofs[proof_name] = true
+			_route_proof_measurements = {"travel_p95_ms": 20.0, "travel_frames_over_100ms": 0}
 			_raw = test_raw
 			_finalize_acceptance(false, true, true)
 			get_tree().quit(0 if _raw.validation.acceptance_passed else 1)
@@ -247,11 +276,38 @@ func _run_contract_negative_case(case_name: String) -> void:
 	print("MOY_PERF_CONTRACT_TEST case=", case_name, " acceptance_passed=", _raw.validation.acceptance_passed, " failures=", _raw.validation.failures)
 	get_tree().quit(1 if not _raw.validation.acceptance_passed else 0)
 
+
+func _load_route_proofs(path: String) -> Dictionary:
+	if path.is_empty(): return {}
+	if not FileAccess.file_exists(path):
+		push_warning("Controlled-route proof file is missing: %s" % path)
+		return {}
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not parsed is Dictionary or int(parsed.get("schema", 0)) != 1:
+		push_warning("Controlled-route proof file is malformed: %s" % path)
+		return {}
+	if String(parsed.get("commit", "")) != String(_config.get("commit", "")):
+		push_warning("Controlled-route proof commit does not match the benchmark source")
+		return {}
+	var source_hashes: Dictionary = parsed.get("source_hashes", {})
+	for source_path in ["res://tools/moy_performance_probe.gd", "res://scripts/city_generator.gd", "res://scripts/moy_ride_train.gd"]:
+		if String(source_hashes.get(source_path, "")) != String(_config.get("source_hashes", {}).get(source_path, "")):
+			push_warning("Controlled-route proof source hash mismatch: %s" % source_path)
+			return {}
+	var coverage: Dictionary = parsed.get("coverage", {})
+	var result: Dictionary = {}
+	for proof_name in REQUIRED_CONTROLLED_ROUTE_PROOFS:
+		result[proof_name] = int(parsed.get("warm_traversals", 0)) >= 3 if proof_name == "three_warm_traversals" else bool(coverage.get(proof_name, false))
+	_route_proof_measurements = {"travel_p95_ms":parsed.get("travel_p95_ms"),
+		"travel_frames_over_100ms":parsed.get("travel_frames_over_100ms")}
+	return result
+
 func _parse_config(args: Array) -> Dictionary:
 	var cfg := {"run_id": "run1", "duration": DEFAULT_DURATION, "warmup": DEFAULT_WARMUP,
 		"resolution": DEFAULT_RESOLUTION, "vsync": DisplayServer.VSYNC_DISABLED,
 		"fps_cap": 0, "seed": 20261019, "game_time_hours": 12.0,
 		"fov": 70.0, "route": DEFAULT_ROUTE}
+	cfg["route_proof_file"] = ""
 	for arg in args:
 		var arg_text := String(arg)
 		if arg_text == "--route":
@@ -264,6 +320,7 @@ func _parse_config(args: Array) -> Dictionary:
 		if pair.size() != 2: continue
 		match pair[0]:
 			"run-id": cfg.run_id = pair[1]
+			"route-proof-file": cfg.route_proof_file = pair[1]
 			"duration": cfg.duration = maxf(30.0, float(pair[1]))
 			"warmup": cfg.warmup = maxf(5.0, float(pair[1]))
 			"resolution":
@@ -402,6 +459,13 @@ func _sample(camera: Camera3D, label: String, position: Vector3, target: Vector3
 	if _player and _terrain and body_position != Vector2.ZERO:
 		var y := float(_terrain.call("get_mesh_height", body_position.x, body_position.y)) + 0.5
 		_player.global_position = Vector3(body_position.x, y, body_position.y)
+		var readiness_frames := 0
+		while readiness_frames < 2400 and not _city_control_ready():
+			await get_tree().process_frame
+			readiness_frames += 1
+		if not _city_control_ready():
+			_fail("local pack/support readiness timed out for view: %s" % label)
+			return
 	var warmup_started := Time.get_ticks_usec()
 	while float(Time.get_ticks_usec() - warmup_started) < float(_config.warmup) * 1000000.0:
 		await get_tree().process_frame
@@ -447,7 +511,6 @@ func _summarize(label: String, frames: PackedFloat64Array, camera_position: Vect
 	var draws := PackedFloat64Array()
 	var triangles := PackedFloat64Array()
 	var static_mem := PackedFloat64Array()
-	var adjusted_static_mem := PackedFloat64Array()
 	var video_mem := PackedFloat64Array()
 	var nodes := PackedFloat64Array()
 	var physics := PackedFloat64Array()
@@ -455,7 +518,6 @@ func _summarize(label: String, frames: PackedFloat64Array, camera_position: Vect
 	var over_100: Array[Dictionary] = []
 	var frame_count := int(frames.size() / FRAME_WIDTH)
 	var buffer_bytes := frames.size() * 8
-	var buffer_mib_per_frame := float(buffer_bytes) / float(maxi(frame_count, 1)) / 1048576.0
 	var elapsed_ms := 0.0
 	for frame_index in frame_count:
 		var base := frame_index * FRAME_WIDTH
@@ -469,7 +531,6 @@ func _summarize(label: String, frames: PackedFloat64Array, camera_position: Vect
 		if is_finite(triangles_value): triangles.append(triangles_value)
 		if is_finite(static_value):
 			static_mem.append(static_value)
-			adjusted_static_mem.append(maxf(0.0, static_value-buffer_mib_per_frame))
 		if is_finite(video_value): video_mem.append(video_value)
 		if is_finite(nodes_value): nodes.append(nodes_value)
 		if is_finite(physics_value): physics.append(physics_value)
@@ -480,7 +541,7 @@ func _summarize(label: String, frames: PackedFloat64Array, camera_position: Vect
 			if ms > 50.0: over_50.append(frame)
 			if ms > 100.0: over_100.append(frame)
 	intervals.sort(); draws.sort(); triangles.sort(); static_mem.sort(); video_mem.sort(); physics.sort()
-	adjusted_static_mem.sort(); nodes.sort()
+	nodes.sort()
 	var result := {"name":label, "phase":phase, "camera":[camera_position.x,camera_position.y,camera_position.z], "target":[target.x,target.y,target.z],
 		"fov":float(_config.fov), "camera_far":1800.0, "frames":frame_count, "duration_s":float(_config.duration),
 		"p50_ms":_percentile(intervals,0.50), "p95_ms":_percentile(intervals,0.95),
@@ -490,12 +551,23 @@ func _summarize(label: String, frames: PackedFloat64Array, camera_position: Vect
 		"draws_distribution":_distribution(draws), "draws_peak":draws[draws.size()-1] if not draws.is_empty() else null,
 		"triangles_distribution":_distribution(triangles), "triangles_peak":triangles[triangles.size()-1] if not triangles.is_empty() else null,
 		"static_mib_distribution_observed":_distribution(static_mem),
-		"static_mib_distribution_observer_adjusted":_distribution(adjusted_static_mem),
+		"static_memory_observer_accounting":{"adjustment_applied":false,
+			"packed_frame_payload_bytes_exact":buffer_bytes,
+			"packed_array_capacity_bytes":null,
+			"retained_telemetry_records":_telemetry_record_counts(),
+			"other_probe_storage":"activation/release telemetry and inventories are retained; observer allocations are not subtracted"},
 		"video_mib_distribution":_distribution(video_mem), "nodes_distribution":_distribution(nodes),
 		"physics_objects_distribution":_distribution(physics), "active_packs":_active_packs(),
 		"requested_packs":_requested_packs(), "retained_resources":_retained_resources(),
-		"raw_frame_buffer_bytes_peak":buffer_bytes}
+		"raw_frame_buffer_payload_bytes_peak":buffer_bytes}
 	return result
+
+
+func _telemetry_record_counts() -> Dictionary:
+	if _city == null: return {"activation_stages":0,"activation_frames":0,"release_stages":0}
+	return {"activation_stages":(_city.get("_moy_stage_records") as Array).size(),
+		"activation_frames":(_city.get("_moy_activation_frame_records") as Array).size(),
+		"release_stages":(_city.get("_moy_release_records") as Array).size()}
 
 func _write_frame_rows(label: String, phase: String, camera: Camera3D, target: Vector3, frames: PackedFloat64Array) -> String:
 	var path := _output_path.trim_suffix(".json") + ".%s.frames.jsonl" % label

@@ -75,6 +75,7 @@ func _finish() -> void:
 	while suit.is_transitioning(): await get_tree().process_frame
 	var city := get_node("WesternCity")
 	city.set_meta("moy_force_hotel_pack", true)
+	city.set_meta("moy_force_all_packs", true)
 	var waited := 0
 	while not bool(city.call("moy_packs_ready")) and waited < 1800:
 		waited += 1

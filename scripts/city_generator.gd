@@ -85,10 +85,10 @@ var _city_zone_active := true
 var _city_skyline_visible := false
 const MOY_PLAN := preload("res://scripts/city_plan.gd")
 const MOY_MANIFEST_PATH := "res://assets/generated/moy_city/manifest.json"
-const MOY_REQUEST_RADIUS := 520.0
-const MOY_REQUEST_RELEASE_RADIUS := 560.0
-const MOY_ACTIVATE_RADIUS := 390.0
-const MOY_RELEASE_RADIUS := 455.0
+const MOY_REQUEST_RADIUS := 320.0
+const MOY_REQUEST_RELEASE_RADIUS := 360.0
+const MOY_ACTIVATE_RADIUS := 170.0
+const MOY_RELEASE_RADIUS := 205.0
 ## Hotel interiors are requested before their 48 m activation edge, leaving
 ## 92 m of lead for a 52 m rope plus travel margin without caching them citywide.
 const MOY_HOTEL_REQUEST_RADIUS := 140.0
@@ -106,6 +106,7 @@ var _moy_active: Dictionary = {}
 var _moy_requested := {}
 var _moy_unload_queue: Array[String] = []
 var _moy_unload_pending: Dictionary = {}
+var _moy_poll_cursor := 0
 var _moy_actors_added := false
 var _moy_silhouette: Node3D
 var _moy_block_tower_inside: Node3D
@@ -114,6 +115,7 @@ var _moy_activation_count := 0
 var _moy_activation_pending_path := ""
 var _moy_performance_telemetry := false
 const MOY_TELEMETRY_RECORD_LIMIT := 8192
+const MOY_STATUS_POLLS_PER_FRAME := 8
 var _moy_stage_records: Array[Dictionary] = []
 var _moy_activation_frame_records: Array[Dictionary] = []
 var _moy_release_records: Array[Dictionary] = []
@@ -186,9 +188,12 @@ func _stream_moy_city() -> void:
 	_stream_block_tower_inside(player)
 	_stream_moy_launch_site(player)
 	if _moy_paths.is_empty(): return
-	var distance := Vector2(player.global_position.x, player.global_position.z).distance_to(CITY_CENTER)
-	var hotel_distance := Vector2(player.global_position.x, player.global_position.z).distance_to(MOY_HOTEL_CENTER)
+	var interest_points := _moy_interest_points(player)
+	var request_points := _moy_prefetch_points(interest_points)
+	var distance := _nearest_interest_distance(interest_points, CITY_CENTER)
+	var hotel_distance := _nearest_interest_distance(interest_points, MOY_HOTEL_CENTER)
 	var force_hotel := bool(get_meta("moy_force_hotel_pack", false))
+	var force_all := bool(get_meta("moy_force_all_packs", false))
 	if distance <= CITY_SKYLINE_WAKE_RADIUS and _moy_silhouette == null and FileAccess.file_exists(MOY_SILHOUETTE_PATH):
 		var silhouette_scene := load(MOY_SILHOUETTE_PATH) as PackedScene
 		if silhouette_scene != null:
@@ -199,22 +204,29 @@ func _stream_moy_city() -> void:
 		_moy_silhouette.visible = distance > MOY_ACTIVATE_RADIUS and distance <= CITY_SKYLINE_SLEEP_RADIUS
 		if distance > CITY_SKYLINE_SLEEP_RADIUS:
 			_moy_silhouette.queue_free(); _moy_silhouette=null
-	if distance <= MOY_REQUEST_RADIUS:
-		for path in _moy_paths:
-			if _moy_hotel_paths.has(path) and not force_hotel and hotel_distance > MOY_HOTEL_REQUEST_RADIUS: continue
-			if _moy_requested.has(path) or _moy_active.has(path): continue
-			var request_started := Time.get_ticks_usec()
-			var err := ResourceLoader.load_threaded_request(path, "", false, ResourceLoader.CACHE_MODE_REUSE)
-			if err == OK or err == ERR_BUSY:
-				_moy_requested[path] = {"requested_usec":request_started,"loaded_usec":0}
-			else: push_warning("Moy pack request failed: %s (%s)" % [path, error_string(err)])
+	for path in _moy_paths:
+		var hotel_pack := _moy_hotel_paths.has(path)
+		if hotel_pack and not force_hotel and hotel_distance > MOY_HOTEL_REQUEST_RADIUS: continue
+		if not hotel_pack and not force_all and _moy_path_distance(request_points, path) > MOY_REQUEST_RADIUS: continue
+		if _moy_requested.has(path) or _moy_active.has(path): continue
+		var request_started := Time.get_ticks_usec()
+		var err := ResourceLoader.load_threaded_request(path, "", false, ResourceLoader.CACHE_MODE_REUSE)
+		if err == OK or err == ERR_BUSY:
+			_moy_requested[path] = {"requested_usec":request_started,"loaded_usec":0}
+		else: push_warning("Moy pack request failed: %s (%s)" % [path, error_string(err)])
 	# Observe actual ResourceLoader completion separately from when a pack becomes
 	# eligible to activate. This poll is opt-in because it adds one status query
 	# per pending pack per frame during the benchmark.
-	if _moy_performance_telemetry or distance >= MOY_REQUEST_RADIUS or hotel_distance >= MOY_HOTEL_REQUEST_RADIUS:
+	if _moy_requested.size() > 0:
 		var poll_started_usec := Time.get_ticks_usec()
-		for requested_path_variant in _moy_requested.keys():
+		var request_keys: Array = _moy_requested.keys()
+		var poll_count := mini(MOY_STATUS_POLLS_PER_FRAME, request_keys.size())
+		for offset in poll_count:
+			var poll_index := posmod(_moy_poll_cursor, request_keys.size())
+			var requested_path_variant = request_keys[poll_index]
+			_moy_poll_cursor = poll_index + 1
 			var requested_path := String(requested_path_variant)
+			if not _moy_requested.has(requested_path): continue
 			var request_record: Dictionary = _moy_requested[requested_path]
 			var load_state := ResourceLoader.load_threaded_get_status(requested_path)
 			if load_state == ResourceLoader.THREAD_LOAD_LOADED and int(request_record.get("loaded_usec", 0)) == 0:
@@ -227,66 +239,71 @@ func _stream_moy_city() -> void:
 			# loaded beyond that path class's release radius, consume the result and
 			# drop the final local handle safely.
 			var release_radius := MOY_HOTEL_REQUEST_RELEASE_RADIUS if _moy_hotel_paths.has(requested_path) else MOY_REQUEST_RELEASE_RADIUS
-			var request_distance := hotel_distance if _moy_hotel_paths.has(requested_path) else distance
+			var request_distance := hotel_distance if _moy_hotel_paths.has(requested_path) else _moy_path_distance(interest_points, requested_path)
 			if request_distance >= release_radius and load_state == ResourceLoader.THREAD_LOAD_LOADED:
 				var discard: Resource = ResourceLoader.load_threaded_get(requested_path)
 				discard = null
 				_moy_requested.erase(requested_path)
 		if _moy_performance_telemetry:
 			set_meta("moy_request_status_poll_us", int(get_meta("moy_request_status_poll_us", 0)) + Time.get_ticks_usec() - poll_started_usec)
-	if distance <= MOY_ACTIVATE_RADIUS:
-		for path in _moy_paths:
-			if _moy_hotel_paths.has(path) and not force_hotel and hotel_distance > MOY_HOTEL_ACTIVATE_RADIUS: continue
-			if _moy_active.has(path): continue
-			var state := ResourceLoader.load_threaded_get_status(path)
-			if state == ResourceLoader.THREAD_LOAD_LOADED:
-				var ready_usec := Time.get_ticks_usec()
-				if _moy_requested.has(path):
-					var request_record: Dictionary = _moy_requested[path]
-					if int(request_record.get("loaded_usec", 0)) == 0:
-						request_record["loaded_usec"] = ready_usec
-						_moy_requested[path] = request_record
-				var get_started := ready_usec
-				var packed := ResourceLoader.load_threaded_get(path) as PackedScene
-				var get_ms := float(Time.get_ticks_usec() - get_started) / 1000.0
-				if packed:
-					var instantiate_started := Time.get_ticks_usec()
-					var instance := packed.instantiate() as Node3D
-					var instantiate_ms := float(Time.get_ticks_usec() - instantiate_started) / 1000.0
-					var registration_started := Time.get_ticks_usec()
-					add_child(instance)
-					var registration_ms := float(Time.get_ticks_usec() - registration_started) / 1000.0
-					_moy_active[path] = instance
-					_moy_activation_count += 1
-					_moy_activation_frame_pending = true
-					_moy_activation_pending_path = path.get_file()
-					var request_record: Dictionary = _moy_requested.get(path, {})
-					var requested_usec := int(request_record.get("requested_usec", ready_usec))
-					var loaded_usec := int(request_record.get("loaded_usec", ready_usec))
-					var stage_record := {"phase":"activate","path":path.get_file(),
-						"request_to_loaded_ms":float(loaded_usec-requested_usec)/1000.0,
-						"loaded_wait_eligibility_ms":float(ready_usec-loaded_usec)/1000.0,
-						"resource_get_sync_ms":get_ms,"instantiate_sync_ms":instantiate_ms,
-						"add_child_sync_ms":registration_ms,"active_packs":_moy_active.size()}
-					if _moy_performance_telemetry:
-						stage_record["collision_objects_after_add_child"] = _count_physics_bodies(instance)
-						if _moy_stage_records.size() < MOY_TELEMETRY_RECORD_LIMIT: _moy_stage_records.append(stage_record)
-					_moy_requested.erase(path)
-					break
-			elif state == ResourceLoader.THREAD_LOAD_FAILED:
-				push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path)
-	elif distance >= MOY_RELEASE_RADIUS and _moy_active.size() > 0:
-		if _moy_unload_queue.is_empty():
-			for path in _moy_active.keys(): _moy_unload_queue.append(String(path))
-		if not _moy_unload_queue.is_empty():
-			var path: String = String(_moy_unload_queue.pop_back())
-			var node: Node3D = _moy_active[path]
-			_moy_active.erase(path)
+	for path in _moy_paths:
+		var hotel_pack := _moy_hotel_paths.has(path)
+		if hotel_pack and not force_hotel and hotel_distance > MOY_HOTEL_ACTIVATE_RADIUS: continue
+		if not hotel_pack and not force_all and _moy_path_distance(interest_points, path) > MOY_ACTIVATE_RADIUS: continue
+		if _moy_active.has(path): continue
+		var state := ResourceLoader.load_threaded_get_status(path)
+		if state == ResourceLoader.THREAD_LOAD_LOADED:
+			var ready_usec := Time.get_ticks_usec()
+			if _moy_requested.has(path):
+				var request_record: Dictionary = _moy_requested[path]
+				if int(request_record.get("loaded_usec", 0)) == 0:
+					request_record["loaded_usec"] = ready_usec
+					_moy_requested[path] = request_record
+			var get_started := ready_usec
+			var packed := ResourceLoader.load_threaded_get(path) as PackedScene
+			var get_ms := float(Time.get_ticks_usec() - get_started) / 1000.0
+			if packed:
+				var instantiate_started := Time.get_ticks_usec()
+				var instance := packed.instantiate() as Node3D
+				var instantiate_ms := float(Time.get_ticks_usec() - instantiate_started) / 1000.0
+				var registration_started := Time.get_ticks_usec()
+				add_child(instance)
+				var registration_ms := float(Time.get_ticks_usec() - registration_started) / 1000.0
+				_moy_active[path] = instance
+				_moy_activation_count += 1
+				_moy_activation_frame_pending = true
+				_moy_activation_pending_path = path.get_file()
+				var request_record: Dictionary = _moy_requested.get(path, {})
+				var requested_usec := int(request_record.get("requested_usec", ready_usec))
+				var loaded_usec := int(request_record.get("loaded_usec", ready_usec))
+				var stage_record := {"phase":"activate","path":path.get_file(),
+					"request_to_loaded_ms":float(loaded_usec-requested_usec)/1000.0,
+					"loaded_wait_eligibility_ms":float(ready_usec-loaded_usec)/1000.0,
+					"resource_get_sync_ms":get_ms,"instantiate_sync_ms":instantiate_ms,
+					"add_child_sync_ms":registration_ms,"active_packs":_moy_active.size()}
+				if _moy_performance_telemetry:
+					stage_record["collision_objects_after_add_child"] = _count_physics_bodies(instance)
+					if _moy_stage_records.size() < MOY_TELEMETRY_RECORD_LIMIT: _moy_stage_records.append(stage_record)
+				_moy_requested.erase(path)
+				break
+		elif state == ResourceLoader.THREAD_LOAD_FAILED:
+			push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path)
+	if not force_all and _moy_active.size() > 0:
+		var release_candidates: Array[String] = []
+		for active_path_variant in _moy_active.keys():
+			var active_path := String(active_path_variant)
+			var active_hotel := _moy_hotel_paths.has(active_path)
+			var release_distance := hotel_distance if active_hotel else _moy_path_distance(interest_points, active_path)
+			var release_threshold := MOY_HOTEL_RELEASE_RADIUS if active_hotel else MOY_RELEASE_RADIUS
+			if release_distance >= release_threshold: release_candidates.append(active_path)
+		if not release_candidates.is_empty():
+			var release_path := release_candidates[0]
+			var node: Node3D = _moy_active[release_path]
+			_moy_active.erase(release_path)
 			var release_started := Time.get_ticks_usec()
-			node.tree_exited.connect(_log_moy_pack_release.bind(path, release_started), CONNECT_ONE_SHOT)
-			_moy_unload_pending[path] = true
+			node.tree_exited.connect(_log_moy_pack_release.bind(release_path, release_started), CONNECT_ONE_SHOT)
+			_moy_unload_pending[release_path] = true
 			node.queue_free()
-			_moy_requested.erase(path)
 	if not force_hotel and hotel_distance >= MOY_HOTEL_RELEASE_RADIUS:
 		for path in _moy_hotel_paths:
 			if _moy_active.has(path):
@@ -296,7 +313,7 @@ func _stream_moy_city() -> void:
 				hotel_node.tree_exited.connect(_log_moy_pack_release.bind(path, hotel_release_started), CONNECT_ONE_SHOT)
 				_moy_unload_pending[path] = true
 				hotel_node.queue_free()
-	if distance <= MOY_ACTIVATE_RADIUS and _moy_required_packs_active() and not _moy_actors_added:
+	if _moy_required_packs_active() and not _moy_actors_added:
 		_add_moy_actors()
 	elif distance >= MOY_RELEASE_RADIUS and _moy_active.is_empty():
 		_remove_moy_actors()
@@ -383,12 +400,93 @@ func moy_packs_ready() -> bool:
 
 
 func _moy_required_packs_active() -> bool:
-	var required_count := _moy_paths.size()
+	var player := get_node_or_null("../Player") as Node3D
+	if player == null: return false
 	var force_hotel := bool(get_meta("moy_force_hotel_pack", false))
-	if not force_hotel:
-		for path in _moy_hotel_paths:
-			if not _moy_active.has(path): required_count -= 1
-	return not _moy_paths.is_empty() and _moy_active.size() >= required_count
+	var force_all := bool(get_meta("moy_force_all_packs", false))
+	var points := _moy_interest_points(player)
+	var required_count := 0
+	for path in _moy_paths:
+		var hotel_pack := _moy_hotel_paths.has(path)
+		var required := force_all or (hotel_pack and force_hotel) or (not hotel_pack and _moy_path_distance(points, path) <= MOY_ACTIVATE_RADIUS)
+		if hotel_pack and not force_hotel:
+			required = _nearest_interest_distance(points, MOY_HOTEL_CENTER) <= MOY_HOTEL_ACTIVATE_RADIUS
+		if not required: continue
+		required_count += 1
+		if not _moy_active.has(path): return false
+	return required_count > 0
+
+
+func _moy_interest_points(player: Node3D) -> Array[Vector2]:
+	var points: Array[Vector2] = [Vector2(player.global_position.x, player.global_position.z)]
+	if player.has_method("get_controlled_body"):
+		var controlled := player.call("get_controlled_body") as Node3D
+		if is_instance_valid(controlled) and controlled != player:
+			points.append(Vector2(controlled.global_position.x, controlled.global_position.z))
+	var vine: Variant = player.get("_vine_swing")
+	if vine != null and bool(vine.get("swinging")):
+		var anchor: Variant = vine.get("anchor")
+		if anchor is Vector3: points.append(Vector2(anchor.x, anchor.z))
+	# Retain actual train-car supports only when a controlled body is riding a
+	# car. Nearby trains contribute request look-ahead separately below; their
+	# distant future route must never widen the active scene set.
+	var train := _nearest_train_to_points(points, 8.0)
+	if train != null:
+		for car in train.get("_car_bodies"):
+			if is_instance_valid(car): points.append(Vector2(car.global_position.x, car.global_position.z))
+	return points
+
+
+func _moy_prefetch_points(active_points: Array[Vector2]) -> Array[Vector2]:
+	var points: Array[Vector2] = active_points.duplicate()
+	var train := _nearest_train_to_points(active_points, 80.0)
+	if train == null: return points
+	for car in train.get("_car_bodies"):
+		if is_instance_valid(car): points.append(Vector2(car.global_position.x, car.global_position.z))
+	var route: Variant = train.get("path")
+	if route is PackedVector3Array and route.size() > 1 and train.has_method("_path_pose"):
+		var ahead: Transform3D = train.call("_path_pose", float(train.get("_distance")) + MOY_REQUEST_RADIUS)
+		var ahead_global: Vector3 = (train as Node3D).to_global(ahead.origin)
+		points.append(Vector2(ahead_global.x, ahead_global.z))
+	return points
+
+
+func _nearest_train_to_points(points: Array[Vector2], threshold: float) -> Node3D:
+	var selected: Node3D = null
+	var nearest := threshold
+	for train_variant in get_tree().get_nodes_in_group("moy_train_consists"):
+		if not train_variant is Node3D: continue
+		var train := train_variant as Node3D
+		for car in train.get("_car_bodies"):
+			if not is_instance_valid(car): continue
+			var car_position := Vector2(car.global_position.x, car.global_position.z)
+			for point in points:
+				var distance_to_car := point.distance_to(car_position)
+				if distance_to_car < nearest:
+					nearest = distance_to_car
+					selected = train
+	return selected
+
+
+func _nearest_interest_distance(points: Array[Vector2], target: Vector2) -> float:
+	var distance := INF
+	for point in points: distance = minf(distance, point.distance_to(target))
+	return distance
+
+
+func _moy_path_distance(points: Array[Vector2], path: String) -> float:
+	if _moy_hotel_paths.has(path): return _nearest_interest_distance(points, MOY_HOTEL_CENTER)
+	var pieces := path.get_file().trim_prefix("cell_").trim_suffix(".tscn").split("_")
+	if pieces.size() < 2 or not String(pieces[0]).is_valid_int() or not String(pieces[1]).is_valid_int():
+		return _nearest_interest_distance(points, CITY_CENTER)
+	var cell_x := int(pieces[0]); var cell_z := int(pieces[1])
+	var center := Vector2(float(cell_x * 64 - 768), float(cell_z * 64 - 208))
+	var nearest := INF
+	for point in points:
+		var dx := maxf(absf(point.x - center.x) - 32.0, 0.0)
+		var dz := maxf(absf(point.y - center.y) - 32.0, 0.0)
+		nearest = minf(nearest, Vector2(dx, dz).length())
+	return nearest
 
 
 func get_active_moy_pack_count() -> int:

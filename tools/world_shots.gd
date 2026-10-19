@@ -28,6 +28,11 @@ func _render_set() -> void:
 	var date := String(args.get("date", Time.get_date_string_from_system()))
 	var views := _package_views(package)
 	var root := (load("res://scenes/main.tscn") as PackedScene).instantiate() as Node3D
+	if package == "P2":
+		var city_before_ready := root.get_node_or_null("WesternCity")
+		if city_before_ready != null:
+			city_before_ready.set_meta("moy_force_all_packs", true)
+			city_before_ready.set_meta("moy_force_hotel_pack", true)
 	get_tree().root.add_child(root)
 	get_tree().current_scene = root
 	await get_tree().process_frame
@@ -46,6 +51,8 @@ func _render_set() -> void:
 	var camera := Camera3D.new()
 	camera.current = true
 	camera.fov = 70.0 if package == "P2" else 52.0
+	camera.near = 0.05
+	camera.far = 1800.0 if package == "P2" else camera.far
 	root.add_child(camera)
 	get_viewport().size = Vector2i(1280, 720)
 	var out_dir := "res://docs/diagnostics/images/%s-%s" % [date, package]
@@ -55,7 +62,8 @@ func _render_set() -> void:
 		"source_hashes": _source_hashes(), "godot_version": Engine.get_version_info(),
 		"renderer": RenderingServer.get_current_rendering_method(),
 		"adapter": RenderingServer.get_video_adapter_name(), "resolution": [1280, 720],
-		"lighting_sets": ["noon", "dusk"], "screenshots": []}
+		"lighting_sets": ["noon", "dusk"], "camera_near": camera.near,
+		"camera_far": camera.far, "screenshots": []}
 	for view_name in views:
 		var view: Dictionary = views[view_name]
 		camera.global_position = view.camera
@@ -78,6 +86,7 @@ func _render_set() -> void:
 			manifest.screenshots.append({"name": view_name, "lighting": lighting,
 				"path": path, "camera": [view.camera.x, view.camera.y, view.camera.z],
 				"target": [view.at.x, view.at.y, view.at.z], "fov": camera.fov,
+				"camera_near": camera.near, "camera_far": camera.far,
 				"controlled_body": [player.global_position.x, player.global_position.y, player.global_position.z] if player else null})
 	var manifest_file := FileAccess.open("%s/shot-manifest.json" % out_dir, FileAccess.WRITE)
 	if manifest_file:
