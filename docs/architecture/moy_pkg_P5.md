@@ -1,6 +1,7 @@
 # Package P5: the North Estate kit and public routes
 
-2026-10-19. Build-session brief. Read `moy_build_roadmap.md` first.
+2026-10-19. **Draft: visual design under review; do not build yet.**
+Read `moy_build_roadmap.md` first. Section 11 supersedes the provisional palette.
 
 - **Area:** the two North Estate precincts, nine housing blocks, their
   courts and covered links, Estate Square, the neighbourhood centre and the
@@ -136,8 +137,9 @@ No rail across either entrance, overlapping floor collision, floating end,
 step, support through the gate below, or cut through an unrelated floor.
 Use the lift to reach it from the ground and return through the other twin.
 
-The green portion is a narrow planted edge beside the traversable strip;
-do not consume the 2 m route with planters. P5 is not a new garden footprint.
+Place the sky garden's planted edges on the twins' connecting landings,
+inside their existing footprints. Keep the bridge polygon's full 2 m width
+clear; do not widen it or consume it with planters. P5 adds no garden footprint.
 
 ## 5. Courts, linkways and Estate Square
 
@@ -265,3 +267,39 @@ Record performance before/after; defer city-wide optimization.
   artifact publishing tools. The local reference can be reviewed and built
   from without claiming the published artifact is updated.
 
+
+## 11. Design review: colour and block identity
+
+User, 2026-10-19: the first model is too boring and uninspired. Research
+colourful real HDB buildings before settling the facade design. The aim is
+a cheery, inspirational estate with original architecture, where visual
+identity can also help residents find their homes. **P5 is not ready for build.**
+
+The current pale-wall/teal-band model and `kit.palette` are provisional, not
+the final visual direction. Keep the locked precinct/site/height data and
+public-route work, but revise the facade grammar before handing it to Luna.
+
+Research questions:
+- How do real estates compose colour at building and precinct scales?
+- How do relief, shading, galleries, gable ends and entrances give colour
+  structure rather than treating it as a uniform coat of paint?
+- Which large patterns distinguish a block across a court and at its own
+  lift lobby, without needing explanatory text?
+
+Initial direction for discussion, not an approved replacement scheme:
+- Distinct dominant palettes and large graphic compositions for each block,
+  coordinated within the two precincts. The twins should read as related
+  but individually identifiable.
+- Repeat each block's identifying shape at its entrance canopy, lift lobby
+  and appropriate facade; keep strong numerals and contrasting light/dark
+  shapes, so recognition does not depend on colour alone.
+- Develop depth with gallery frames, sunshades, end-wall relief and bolder
+  entrance forms; do not merely recolour the repeated massing.
+- Let the inhabited courts and shared routes read at eye height as well as
+  from above. Preserve clear openings, shadows and readable identities at dusk.
+
+Official HDB/National Heritage Board reference access was attempted but denied
+by the cloud network policy. Specific host additions have been saved in the
+environment configuration draft. No fresh photo research is claimed yet.
+Inspect and cite actual references, then present revised model alternatives
+before replacing the provisional kit palette and finalising this brief.
