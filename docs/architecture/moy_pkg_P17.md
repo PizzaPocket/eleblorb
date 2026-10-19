@@ -120,10 +120,11 @@ requires: every power works on it.
   actuator balls at the joints;
 - **one matte black metal** for body, limbs, neck and head shell; **bright
   steel** on the chest plate only;
-- **shoulder shells** (user, 2026-10-18, replacing the first pads): low, rounded shells
-  0.12 × 0.07 × 0.15 (ε 2.4), tilted 18° down toward the arm and cut flat where they lie
-  on the shoulder, **wholly inside the blorb chest** (the plan's check holds them to the
-  chest blorb's ellipsoid at 0.93), so with the suit on only the blorb shows;
+- **shoulder shells** (user, 2026-10-18, replacing the first pads, then reshaped): a rounded
+  shell 0.13 × 0.12 × 0.13 (ε 2.4) that **covers the shoulder joint**, tilted 18° down toward
+  the arm and cut flat just under the joint's centre, so the actuator ball (0.044) and its ring of
+  light lie under it and the arm leaves from beneath; the shell lies inside the blorb chest's
+  surface (held by the plan's check), so with the suit on only the blorb shows;
 - **a robot abdomen**: two stacked armoured plates (ε 5.5 / 5.5);
 - **a neck**: a slim column on the hero's neck joint; no collar;
 - **the hero's own solid hands** (no fingers) **and feet**, at its scale;
@@ -145,7 +146,7 @@ line** (user, 2026-10-18: the first build had two, a sweep and a chin line):
 
 **The pilot** fills the helmet: the head's own shape, inset from the shell
 (0.87 in the model) so that it and its eyes stay inside; the game's own
-blorb eyes on its skin, about 0.04 m wide, coloured by the blorb rule
+blorb eyes on its skin, about 0.04 m wide, **lying flat on it** (each turned to the skin's normal where it sits, not pitched), coloured by the blorb rule
 (`blorb.gd`); its core inside. A city blorb glows; Blorbus does not.
 
 **Rig:** publishes the rig-neutral joints through its own
@@ -291,6 +292,7 @@ data and this brief disagreed.
 - 2026-10-18 (user): the mech's visor is **one line**, not a sweep and a chin line; the shoulder
   pieces are **low rounded shells close to the body, inside the blorb chest**; the model
   page has a **Blorb suit** toggle.
+- 2026-10-18 (user): the shoulder shell is a **cover over the shoulder joint**, not a pad beside it (the joint must not sit on the pad); the pilot's eyes lie flat on its skin, not pitched up.
 - 2026-10-18 (planning, found while scheduling): the climb's balconies were 7.2 m apart
   and the hero jumps 1.36 m, so they become a fire escape of six ramps (31°) with a landing
   each, the last level with the 30% ring, then a bracket every 1.2 m; the base is set back
@@ -439,7 +441,7 @@ one more shape.
   - the torso is a stack (`torso_stack`): pelvis, lower plate, the band of light in the seam,
     upper plate, chest, each cut at the planes it shares (pelvis top = hips + 0.08, the seam
     0.014 about the middle, the chest's foot = chest − 0.15);
-  - **shoulder shells** (see section 5): low, rounded, inside the blorb chest;
+  - **shoulder shells** (see section 5): rounded covers over the shoulder joints, inside the blorb chest;
   - the hero's own hand, foot and head at the mech's scale; **the head is split by the one
     line** (section 5), the visor hinged at the crown; the pilot is the head inset to 0.87;
   - collision is one capsule (r 0.28, h 1.99); the parts are decorative;

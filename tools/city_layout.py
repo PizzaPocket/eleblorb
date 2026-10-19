@@ -3371,9 +3371,9 @@ BT_PARTS+=[
  dict(g='mech',id='chest_plate',what='the bright steel plate on the chest, the only bright metal',shape='egg',semi=(0.13,0.1,0.02),eps=(5.5,5.5),mat='steel_bright',col='decorative',role='plate',on='chest',off=(0,0.01,0.092)),
  dict(g='mech',id='chest_slit',what='a vertical slit of light down the chest plate',shape='egg',semi=(0.008,0.07,0.005),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='band',on='chest',off=(0,0.01,0.113)),
  # arms
- dict(g='mech',id='shoulder_ball',what='the shoulder actuator',shape='egg',semi=(0.05,0.05,0.05),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='arm',off=(0,0,0),mirror=True),
- dict(g='mech',id='shoulder_ring',what='a band of light round the shoulder',shape='egg',semi=(0.054,0.0045,0.054),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='ring',on='arm',off=(0,0,0),axis='x',mirror=True),
- dict(g='mech',id='shoulder_shell',what='the shoulder pad: a low, rounded shell lying close on the shoulder, tilted 18 degrees down toward the arm, cut flat where it lies, wholly inside the blorb chest',shape='clipped',semi=(0.06,0.035,0.075),eps=(2.4,2.4),mat='metal_black',col='decorative',role='shell',join='shoulder_seat',on='arm',off=(-0.0405,0.014,0.0),tilt=18.0,mirror=True),
+ dict(g='mech',id='shoulder_ball',what='the shoulder actuator, under its shell',shape='egg',semi=(0.044,0.044,0.044),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='arm',off=(0,0,0),mirror=True),
+ dict(g='mech',id='shoulder_ring',what='a band of light round the shoulder, seen under the shell\'s edge',shape='egg',semi=(0.048,0.0045,0.048),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='ring',on='arm',off=(0,0,0),axis='x',mirror=True),
+ dict(g='mech',id='shoulder_shell',what='the shoulder shell: a rounded cover over the shoulder joint, tilted 18 degrees down toward the arm, cut flat under the joint\'s centre so the arm leaves from beneath it, and inside the blorb chest\'s surface',shape='clipped',semi=(0.066,0.06,0.066),eps=(2.4,2.4),mat='metal_black',col='decorative',role='shell',join='shoulder_seat',on='arm',off=(-0.02,-0.005,0.0),tilt=18.0,cut=-0.02,mirror=True),
  dict(g='mech',id='upper_arm',what='the upper arm, a tube shoulder to elbow, cut flat at both',shape='clipped',semi=(0.03,'fit',0.03),eps=(3.0,3.0),ext=0.01,mat='metal_black',col='decorative',role='limb',join='socket_cut',tube=(('arm',(0,0,0)),('elbow',(0,0,0))),mirror=True),
  dict(g='mech',id='elbow_ball',what='the elbow actuator',shape='egg',semi=(0.036,0.036,0.036),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='elbow',off=(0,0,0),mirror=True),
  dict(g='mech',id='forearm',what='the forearm, a tube elbow to wrist, cut flat at both',shape='clipped',semi=(0.027,'fit',0.027),eps=(3.0,3.0),ext=0.005,mat='metal_black',col='decorative',role='limb',join='socket_cut',tube=(('elbow',(0,0,0)),('wrist',(0,0,0))),mirror=True),
@@ -3385,7 +3385,7 @@ BT_PARTS+=[
  dict(g='mech',id='head_shell',what='the hero\'s head shape at the mech\'s scale, the black shell: the back half, the jaw and the whole underside of the chin, behind the one line',shape='egg',semi=(0.1323,0.1575,0.126),eps=(2.5,2.5),mat='metal_black',col='decorative',role='head',join='head_split',on='head_centre',off=(0,0,0)),
  dict(g='mech',id='head_visor',what='the glass visor: the same head shape, the front of the one line (crown\'s front half, temples, face, the front of the chin); it hinges at the crown',shape='egg',semi=(0.1323,0.1575,0.126),eps=(2.5,2.5),mat='visor_glass',col='decorative',role='head',join='head_split',on='head_centre',off=(0,0,0)),
  dict(g='mech',id='pilot_body',what='the pilot: the head shape inset to 0.87 inside the shell; a city blorb glows, Blorbus does not',shape='egg',semi=(0.1151,0.137,0.1096),eps=(2.5,2.5),mat='blorb_body',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0,0,0)),
- dict(g='mech',id='pilot_eye',what='one of the game\'s own blorb eyes on the pilot\'s skin, about 0.04 m wide, coloured by blorb.gd\'s rule, front standing inside the shell',shape='egg',semi=(0.02,0.022,0.012),eps=(2.5,2.5),mat='blorb_eye',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0.045,0.018,0.1),mirror=True),
+ dict(g='mech',id='pilot_eye',what='one of the game\'s own blorb eyes on the pilot\'s skin, about 0.04 m wide, lying flat on it (turned to the skin\'s normal), coloured by blorb.gd\'s rule, front standing inside the shell',shape='egg',semi=(0.02,0.022,0.012),eps=(2.5,2.5),mat='blorb_eye',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0.045,0.018,0.1),mirror=True),
  dict(g='mech',id='pilot_core',what='the pilot\'s glowing core (a city blorb\'s only)',shape='egg',semi=(0.03,0.03,0.03),eps=(2.0,2.0),mat='blorb_core',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0,0.02,-0.04)),
 ]
 BT_JOINS=[
@@ -3407,9 +3407,9 @@ BT_JOINS=[
  # the mech
  dict(id='socket_cut',kind='chain',parts=['thigh','shin','upper_arm','forearm'],plane='the plane through each joint\'s centre, square to the limb',rule='a limb tube is cut flat at both joint centres and capped; the actuator ball at the joint (at least 1.05 x the tube\'s radius) covers the cut, so no cap and no gap shows'),
  dict(id='torso_stack',kind='chain',parts=['pelvis','abdomen_lower','abdomen_upper','chest'],plane='the pelvis top (hips + 0.08), the seam\'s two planes (0.014 apart, about the stack\'s middle), the chest\'s foot (chest - 0.15)',rule='each plate is cut flat at the planes it shares with its neighbour; the band of light fills the seam; the stack is flush from the pelvis to the chest'),
- dict(id='shoulder_seat',kind='seated',parts=['shoulder_shell'],plane='the plane under the pad, tilted with it',rule='the shell is cut flat where it lies on the shoulder and capped; it stays wholly inside the blorb chest (the chest blorb\'s ellipsoid at 0.93), so with the suit on only the blorb shows'),
+ dict(id='shoulder_seat',kind='seated',parts=['shoulder_shell'],plane='the plane under the pad, tilted with it',rule='the shell covers the shoulder joint: the actuator ball and its ring of light above the cut plane lie inside the shell (at 0.97 of its surface), and the shell is cut flat and capped at that plane so the arm leaves from under it; it lies inside the blorb chest\'s surface (the chest blorb\'s ellipsoid at 1.01), so with the suit on only the blorb shows'),
  dict(id='head_split',kind='split',parts=['head_shell','head_visor'],parent=(0.1323,0.1575,0.126),centre=1.8333,eps=(2.5,2.5),cuts=[],curve='one smooth curve, no chin line',hinge='the visor at the crown',rule='both are the one head egg; the visor keeps the front of the curve, the shell the rest; the curve is BLOCK_TOWER.mech.head_cut: it runs over the crown\'s front half as a plane, sweeps down and forward below the temples and closes at the chin, a single line all the way round; the shell is closed behind the glass and the visor is cut and capped along the same line'),
- dict(id='pilot_seat',kind='placed',parts=['pilot_body','pilot_eye','pilot_core'],plane='the head\'s centre',rule='the pilot is the head shape inset to 0.87 so that it and its eyes stay inside the shell; the eyes are the game\'s blorb eye meshes, moved onto the pilot\'s skin, each with a millimetre to spare'),
+ dict(id='pilot_seat',kind='placed',parts=['pilot_body','pilot_eye','pilot_core'],plane='the head\'s centre',rule='the pilot is the head shape inset to 0.87 so that it and its eyes stay inside the shell; the eyes are the game\'s blorb eye meshes, moved onto the pilot\'s skin and turned so each lies flat on it (its facing becomes the skin\'s normal where it sits, as it was the free blorb\'s), each with a millimetre to spare'),
 ]
 BLOCK_TOWER['mech']=BT_MECH
 BLOCK_TOWER['parts']=BT_PARTS; BLOCK_TOWER['joins']=BT_JOINS
@@ -3600,18 +3600,29 @@ def _bt_parts_checks():
     off('the lower plate\'s place',hipY+P_['abdomen_lower']['off'][1],s0+ay-0.004,0.0011); off('the upper plate\'s place',hipY+P_['abdomen_upper']['off'][1],s1-ay+0.004,0.0011)
     off('the band of light in the seam',hipY+P_['abdomen_light']['off'][1],(s0+s1)/2,0.0011)
     off('the chest',P_['chest']['semi'][1],M['chest_h'])
-    # the shoulder shell lies close and wholly inside the blorb chest
+    # the shoulder shell covers the joint (ball and ring above its cut inside it) and lies inside the blorb chest's surface
     cb=M['chest_blorb']; bc=tuple(v*MS for v in cb['c']); bs=tuple(v*MS for v in cb['semi']); sh_=P_['shoulder_shell']
     ar=Jn['arm']; ctr=(ar[0]+sh_['off'][0],ar[1]+sh_['off'][1],ar[2]+sh_['off'][2]); tl=_m.radians(sh_['tilt']); worst=0.0
     pw=lambda v,e: (_m.copysign(abs(v)**(2/e),v) if v else 0.0)
+    e=sh_['eps'][0]; a_,b_,c_=sh_['semi']
     for i in range(-20,21):
         for j in range(40):
-            eta=_m.pi/2*i/20; om=2*_m.pi*j/40; e=sh_['eps'][0]; a_,b_,c_=sh_['semi']
-            x=a_*pw(_m.cos(eta),e)*pw(_m.sin(om),e); y=b_*pw(_m.sin(eta),e); z=c_*pw(_m.cos(eta),e)*pw(_m.cos(om),e)
+            eta=_m.pi/2*i/20; om=2*_m.pi*j/40
+            x=a_*pw(_m.cos(eta),e)*pw(_m.sin(om),e); y=max(b_*pw(_m.sin(eta),e),sh_['cut']); z=c_*pw(_m.cos(eta),e)*pw(_m.cos(om),e)
             xr=x*_m.cos(tl)+y*_m.sin(tl); yr=-x*_m.sin(tl)+y*_m.cos(tl)
             q=((ctr[0]+xr-bc[0])/bs[0],(ctr[1]+yr-bc[1])/bs[1],(ctr[2]+z-bc[2])/bs[2]); worst=max(worst,_m.sqrt(dot(q,q)))
-    if worst>0.93: problems.append(('block parts: the shoulder shell leaves the blorb chest',round(worst,3)))
-    if sh_['semi'][1]*2>0.08 or sh_['semi'][0]*2>0.14: problems.append(('block parts: the shoulder shell not low and close',))
+    if worst>1.01: problems.append(('block parts: the shoulder shell leaves the blorb chest',round(worst,3)))
+    rb=P_['shoulder_ball']['semi'][0]; rr=P_['shoulder_ring']['semi'][0]; cover=0.0
+    pts=[(rb*_m.cos(t_)*_m.cos(f_),rb*_m.sin(t_),rb*_m.cos(t_)*_m.sin(f_)) for t_ in [_m.pi*k/20 for k in range(-10,11)] for f_ in [2*_m.pi*k/24 for k in range(24)]]
+    pts+=[(dx,rr*_m.cos(f_),rr*_m.sin(f_)) for f_ in [2*_m.pi*k/48 for k in range(48)] for dx in (-0.0045,0.0045)]
+    for px,py,pz in pts:
+        d=(-sh_['off'][0]+px,-sh_['off'][1]+py,-sh_['off'][2]+pz)
+        lx=d[0]*_m.cos(tl)-d[1]*_m.sin(tl); ly=d[0]*_m.sin(tl)+d[1]*_m.cos(tl)
+        if ly<sh_['cut']: continue
+        cover=max(cover,(abs(lx/a_)**e+abs(ly/b_)**e+abs(pz/c_)**e)**(1/e))
+    if cover>0.97: problems.append(('block parts: the shoulder shell does not cover the joint',round(cover,3)))
+    if rb<1.05*P_['upper_arm']['semi'][0]: problems.append(('block parts: the shoulder ball does not cover the upper arm\'s cut',))
+    if sh_['semi'][0]*2>0.15 or sh_['semi'][1]*2>0.13: problems.append(('block parts: the shoulder shell too big',))
 _bt_parts_checks()
 def _p3():
     from shapely.geometry import LineString, Point, Polygon, box as sbox
