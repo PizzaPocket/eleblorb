@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moy P2 — performance atlas</title>
+<style>
+body{margin:0;background:#111c25;color:#e8eadc;font:16px/1.5 system-ui,sans-serif}header,footer{padding:16px 24px}h1{font-size:24px;margin:0}p{margin:8px 0}nav{display:flex;flex-wrap:wrap;gap:8px}a{color:#9ce0d0}nav a{padding:8px 12px;border:1px solid #708e93;border-radius:6px}nav a:focus,nav a:hover{background:#29424a}iframe{width:100%;height:75vh;border:0;background:#1a2830}footer{max-width:1000px}small{color:#bbc6c6}
+</style>
+<header>
+<h1>Moy P2: performance atlas</h1>
+<p>The locked city model locates the benchmark routes. Rendering measurements come from Godot, on a named machine.</p>
+<nav aria-label="Benchmark areas">
+<a href="moy_city_3d.html?p2=oldhigh#oldhigh" target="city">Old Moy street / swing</a>
+<a href="moy_city_3d.html?p2=oldroofs#oldroofs" target="city">Old Moy roofs</a>
+<a href="moy_city_3d.html?p2=towers#towers" target="city">Downtown looking up</a>
+<a href="moy_city_3d.html?p2=estate#estate" target="city">Estate courts</a>
+<a href="moy_city_3d.html?p2=spirals#spirals" target="city">Crossing</a>
+<a href="moy_city_3d.html?p2=trainhall#trainhall" target="city">Train hall</a>
+<a href="moy_city_3d.html?p2=desert#desert" target="city">Desert approach</a>
+</nav>
+</header>
+<iframe name="city" title="Plan-driven Moy city model" src="moy_city_3d.html#oldhigh"></iframe>
+<footer>
+<p><a href="../architecture/moy_pkg_P2.md">Read the P2 build brief</a> · <a href="moy_city_3d.html" target="_blank" rel="noopener">Open full city model</a></p>
+<p>Required: rendered p95 ≤33.3 ms per view and travel segment, safe collision readiness, no repeated activation stalls over 100 ms, and two complete unload / reload cycles. Aims: 60 FPS, activation work ≤2 ms per frame, approximately 1,500 draws / 500,000 triangles, and ≤250 MiB incremental static memory.</p>
+<p>Record real Crossroads entry, street and roof travel, fast gate approaches, a cross-pack vine handover, and a moving train through a station and turn. A stationary view does not prove a ride. Compare cold and warm runs against the same revision with Moy asleep.</p>
+<small>This atlas reuses the existing city model, its plan data, scale and place views. No geometry is redesigned. Browser frame rates are not game measurements. No performance results have been collected by this page.</small>
+</footer>
+</html>
