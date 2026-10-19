@@ -52,6 +52,14 @@ Eleblorb's design philosophy deliberately avoids heavy-handed player guidance. N
 
 Prefer atmospheric/diegetic flavor or plain state description instead (an NPC's in-character remark, an environmental cue, a reaction to the failed action without explaining why it failed). If a mechanic needs to be discoverable, lean on visual/environmental design or subtler cues rather than direct text hints. When a task calls for new player-facing text, check it against this rule before adding it, and flag it back rather than defaulting to an explanatory tooltip.
 
+## Environmental graphics: no printed text
+
+User clarification: architecture and environmental graphics use no printed
+letters, words or numerals, including building numbers. Identify places with
+colour, pictorial motifs and architectural forms. Internal plan ids and labels
+in design documents are bookkeeping, never a reason to print characters in
+the world. This supersedes older briefs that allowed facade numerals.
+
 ## UI design system
 
 This project keeps a shared UI design system in `scripts/ui_theme.gd` (design tokens — colors, type scale, spacing, panel/button/chip/slot styleboxes — plus a "Design language" section documenting the conventions below) and `scripts/ui_kit.gd` (reusable builder functions consuming those tokens). Every UI surface (Hud, DialogUI, ShopUI, InventoryUI, and any future one) is built through these rather than hand-rolled `Control.new()` + ad hoc styling.

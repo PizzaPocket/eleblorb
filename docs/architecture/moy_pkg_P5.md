@@ -1,7 +1,7 @@
 # Package P5: the North Estate kit and public routes
 
-2026-10-19. **Draft: visual design under review; do not build yet.**
-Read `moy_build_roadmap.md` first. Section 11 supersedes the provisional palette.
+2026-10-19. **Ready: colour model and facade schedule updated. Build after P3/P4 fixes.**
+Read `moy_build_roadmap.md` first. Section 13 supersedes the initial palette and any numeral exceptions.
 
 - **Area:** the two North Estate precincts, nine housing blocks, their
   courts and covered links, Estate Square, the neighbourhood centre and the
@@ -30,7 +30,7 @@ Read `moy_build_roadmap.md` first. Section 11 supersedes the provisional palette
 
 These are Singapore-influenced public housing precincts, not isolated luxury
 towers: pale painted structure, recessed openings, shaded open galleries,
-repeated service bays, laundry rods on outward faces and graphic block numerals.
+repeated service bays, laundry rods on outward faces and distinct unlettered colour/shape identities.
 The courts are shared outdoor rooms framed by broad blocks. Do not dress them
 as Old Moy tower houses or market shophouses.
 
@@ -97,7 +97,7 @@ in the park is a different project.
 - Materials follow `kit.palette`: warm pale wall, cream structure,
   muted teal guard/bands, ochre inset panels and darker roof/service elements.
   Variation is by existing block identity, not random per-floor colours.
-  Block numbers are painted numerals only; no explanatory signs.
+  No printed numbers, letters or words on buildings, signs or environmental graphics. Use colour and pictorial motifs only; ids in the plan are internal bookkeeping.
 - Block 6 and Block 7 retain open street-side shop bays under the housing,
   facing Park Ring/North Street. A shallow sealed shop display may sit behind
   the bay; through void-deck circulation must remain on its court side.
@@ -180,7 +180,7 @@ entrances. P13f provides full stall equipment, detailed seating and service.
 
 ## 7. Binding parts and joins
 
-`ESTATE.kit.parts` has **36 part templates**, `joins` **10 joins**.
+`ESTATE.kit.parts` has **39 part templates**, `joins` **12 joins**.
 W/D/face/run/span are fitted dimensions from the existing site or actual route;
 the schedule defines half-sizes, exponents, collision and explicit join planes.
 Repeat counts come from the block's storeys and fitted face bays, never a
@@ -273,7 +273,7 @@ Record performance before/after; defer city-wide optimization.
 User, 2026-10-19: the first model is too boring and uninspired. Research
 colourful real HDB buildings before settling the facade design. The aim is
 a cheery, inspirational estate with original architecture, where visual
-identity can also help residents find their homes. **P5 is not ready for build.**
+identity can also help residents find their homes. **This initial design review is superseded by section 13.**
 
 The current pale-wall/teal-band model and `kit.palette` are provisional, not
 the final visual direction. Keep the locked precinct/site/height data and
@@ -291,7 +291,7 @@ Initial direction for discussion, not an approved replacement scheme:
   coordinated within the two precincts. The twins should read as related
   but individually identifiable.
 - Repeat each block's identifying shape at its entrance canopy, lift lobby
-  and appropriate facade; keep strong numerals and contrasting light/dark
+  and appropriate facade; keep contrasting light/dark
   shapes, so recognition does not depend on colour alone.
 - Develop depth with gallery frames, sunshades, end-wall relief and bolder
   entrance forms; do not merely recolour the repeated massing.
@@ -310,18 +310,17 @@ User, 2026-10-19: the colourful concept direction is accepted for development.
 Reference: [colour concept](../drawings/references/moy_north_estate_colour_concept.png).
 Coral/cobalt twins share an arch motif; sunflower/cream frames and shaded teal
 galleries distinguish the slab blocks; block identity repeats at entrances
-through colour, motif and numerals. This approves the visual direction, not
+through colour and pictorial motifs, with no printed characters. This approves the visual direction, not
 every depicted dimension or detail. Existing site/height data still wins.
-The block numerals in the concept illustration are illustrative: the build
-must retain the actual numbered building identities from the plan.
+The old concept illustration contains numbers that are explicitly rejected.
+Do not copy them. Plan ids remain internal and must never be printed in-world.
 
 **User clarification:** some elongated forms in the browser model look
 pointed or tipped. Those are approximation/sampling artifacts, **not intended
 SuperEgg profiles**. Do not copy the browser mesh or the illustration's
 geometry into the build. The model is a composition reference; the checked
 parts/joins schedule, this clarification, and the game's own builders govern
-actual geometry. P5 remains in design review until the detailed colour/feature
-schedule is updated.
+actual geometry. The detailed colour/feature schedule is now updated in section 13.
 
 | Element | Intended construction | Ends / joins |
 |---|---|---|
@@ -349,3 +348,80 @@ needle tips/fans or visible gaps. Then inspect the same pieces at gameplay
 distance and confirm their substantial visible volumes have collision.
 Include those isolated proofs and their dimensions/exponents/cut planes in
 the P5 diagnostic. A faithful copy of a pointed browser artifact is a failure.
+
+## 13. Colour model and binding facade schedule
+
+2026-10-19. The interactive North Estate model now renders the accepted
+colour direction from `ESTATE.kit` version 2, rather than leaving it only in
+the concept illustration. This section supersedes the first model's uniform
+pale/teal palette and every earlier permission to print building numerals.
+The original layout, heights, court polygons, bridges and public routes stay
+locked. This is planning/model work; P5 game implementation remains for Luna.
+
+**No lettering or numbers in-world.** Buildings, canopies, signs and lift
+lobbies use no words, letters, printed numbers or number-shaped motifs. Use
+colour, abstract arch/circle/step marks, relief and recognisable entrances.
+The browser page's technical labels and the ids below identify plan records;
+they are not graphics for the game's buildings. The earlier concept image
+is inspiration only; the updated model/data supersede its erroneous numerals
+and guessed block identities.
+
+| Internal plan id | Block identity | Primary / secondary | Large motif and frame family |
+|---|---|---|---|
+| 17 | jade circle | jade / coral | ring on an end-wall field, grouped frames |
+| 18 | coral steps | coral / sunflower | broad stepped graphic, grouped frames |
+| 19 | jade arch | jade / sunflower | tall arch graphic, grouped frames |
+| 20 | coral twin | coral / jade | cream arch on a tall field, paired with 21 |
+| 21 | cobalt twin | cobalt / jade | the same arch grammar, contrasting colour |
+| 22 | sunflower portals | sunflower / jade | repeated tall cream portal frames |
+| 49 | jade portals | jade / sunflower | repeated portal rhythm, distinct from 19's grouped frames |
+| 50 | cobalt steps | cobalt / coral | broad stepped graphic, grouped frames |
+| 53 | sunflower circle | sunflower / jade | ring field, grouped frames |
+
+Exact colours are `kit.identities[].primary/secondary`; cream structure and
+dark glazing are `kit.palette`. Each identity repeats at its real entrance
+through the same colour and pictorial motif, not explanatory signs. The
+twins remain visibly related while individually recognisable. Courtyard
+galleries use secondary colour against the primary housing body.
+
+**Form and placement (`kit.facade`):**
+- Recess backing 0.24 m; physical frame relief is 0.18 m deep and entirely
+  inside the original footprint. Do not enlarge the locked building to fit it.
+- Group frames across four storeys; repeated-portal slabs carry a vertical
+  rhythm fitted to pairs of structural bays. Frame section is 0.28 m. Fit
+  edge bays instead of leaving a thin sliver or overlapping two profiles.
+- The main painted field is 38% of the selected outward face width and 86%
+  of the housing height above the void deck. Motif width is 62% of that
+  field; the arch stroke is 24% of its own width. The selected face is opposite the public court-facing gallery.
+  Coordinate its blind service/identity bay with windows and glazing: no
+  opaque paint board over an actual aperture, and no blocking gallery relief.
+- Entrance portals are 4.4 m wide, 3.01 m high, section 0.24 m, depth 0.24 m,
+  inside the building boundary. Their crown/feet are properly formed, with
+  no threshold crossbar. Pictorial identity repeats beside the open passage.
+- `identity_motif` is painted/decal work. `facade_frame`, `entrance_frame` and
+  `sunshade` are real scheduled solid members with collision. The new
+  `facade_recess` and `portal_bearing` joins govern their backing/landings.
+  Do not mistake a painted arch for a new opening or a freestanding load path.
+
+Section 12's SuperEgg formation safeguards still apply. The browser model's
+long members now use capped constant-section superellipse profiles rather
+than the former stretched/coarse sphere shortcut. The game implementation
+must still use the actual shared builders and prove the close-up profiles.
+
+**Handoff checks:** compare the final game with the interactive model's
+overview, twins, court entrance and cutaway kit views; verify each of the nine
+identity records and its entrance repeat. Inspect at noon and dusk, including
+contrast/readability without relying on colour alone. Assert that no text or
+numeral geometry/textures were introduced. Keep all prior geometry, collision,
+passage, lift, streaming and actual-controller checks from this brief.
+
+Actual model screenshots: [overview](../drawings/references/moy_north_estate_colour_model.png)
+and [twins](../drawings/references/moy_north_estate_colour_twins.png).
+Plan generation passed (nine identities, 39 parts, 12 joins) with all non-kit
+layout data unchanged. Browser checks passed for model load, view selection,
+section/dusk switches and absence of text textures/meshes; bake freshness
+passed at 246 packs. This verifies the design handoff, not P5 gameplay.
+
+The model is saved locally in the repository; artifact publication remains
+pending because this chat has no publication tool. No fresh HDB-photo
+research or completed P5 runtime build is claimed by this update.

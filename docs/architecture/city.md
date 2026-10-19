@@ -614,7 +614,7 @@ The shares are of the city's land.
 | Roofs | flat, with parapets; rooftop gardens, water tanks, laundry, rooftop bars on the hotel and offices |
 | Circulation on the facade | open gallery corridors on the homes; round **ramp towers** in place of stair towers |
 | Downtown | stone-and-glass towers on podiums; setbacks; each tower its own crown, lit at night; sky lobbies; the Windspire's observation deck |
-| Public housing | point and slab blocks with open void decks at the ground; open corridors; laundry poles out of every window; painted block numbers as big graphic shapes (numerals only, as on any real estate); sky bridges and a sky garden between twin blocks |
+| Public housing | point and slab blocks with open void decks at the ground; open corridors; laundry poles out of every window; large unlettered colour fields and pictorial motifs for each block (no letters, words or numerals); sky bridges and a sky garden between twin blocks |
 | Shade | verandas, arcade roofs, shade sails, void decks, the Deck, street trees; pale tile and white roofs; misters |
 | Palette | pale tile (cream, mint, salmon, pale blue and grey); concrete; sand and white against the desert; warm window light; saturated sign colour at night |
 

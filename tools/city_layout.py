@@ -3771,7 +3771,7 @@ def _p3():
 _p3()
 # ---- P5: the North Estate kit (2026-10-19). Existing sites and heights are locked.
 ESTATE['kit'] = dict(
-    version=1, buildings=[17,18,19,20,21,22,49,50,53],
+    version=2, buildings=[17,18,19,20,21,22,49,50,53],
     civic=[23,51], datum=-60.0, storey=3.25, void_clear=3.01,
     slab=0.24, wall=0.16, gallery=1.8, guard=1.2, bay=3.2,
     column=0.55, column_pitch=6.4, door=(1.5,2.4), landing=2.0,
@@ -3781,7 +3781,22 @@ ESTATE['kit'] = dict(
     roof=dict(guard=1.2,headroom=2.4),
     centre=dict(public_floor=0.0,upper_floor=3.25,garden_floor=6.5,roof_top=8.0),
     hawker=dict(floor=0.0,eave=4.5,roof_top=6.0,aisle=2.0),
-    palette=dict(wall='#e3d6bc',frame='#f2e9d7',accent='#4f9b96',panel='#d9a267',roof='#647c7d',glass='#526b72'),
+    palette=dict(wall='#fff0d4',frame='#fff5dd',accent='#298f89',panel='#efb83f',roof='#537c7d',glass='#304f64'),
+    facade=dict(recess=0.24,frame_t=0.28,frame_depth=0.18,group_storeys=4,
+                panel_fraction=0.38,panel_height_fraction=0.86,mark_fraction=0.62,mark_stroke_fraction=0.24,
+                entrance_w=4.4,entrance_h=3.01,entrance_t=0.24,entrance_depth=0.24,
+                profile_exponent=5.5,motif_exponent=3.0,sunshade_depth=0.18),
+    identities=[
+      dict(n=17,primary='#268f88',secondary='#ee795f',motif='circle',frame='grouped',family='jade circle'),
+      dict(n=18,primary='#ee795f',secondary='#edbb43',motif='steps',frame='grouped',family='coral steps'),
+      dict(n=19,primary='#268f88',secondary='#edbb43',motif='arch',frame='grouped',family='jade arch'),
+      dict(n=20,primary='#ee795f',secondary='#268f88',motif='arch',frame='hero',family='coral twin'),
+      dict(n=21,primary='#305ba4',secondary='#268f88',motif='arch',frame='hero',family='cobalt twin'),
+      dict(n=22,primary='#edbb43',secondary='#268f88',motif='arch',frame='repeated',family='sunflower portals'),
+      dict(n=49,primary='#268f88',secondary='#edbb43',motif='arch',frame='repeated',family='jade portals'),
+      dict(n=50,primary='#305ba4',secondary='#ee795f',motif='steps',frame='grouped',family='cobalt steps'),
+      dict(n=53,primary='#edbb43',secondary='#268f88',motif='circle',frame='grouped',family='sunflower circle')],
+    printed_marks=False,
     blocks=[
       dict(n=n,storeys=storeys,court=court,kind=kind,
            court_point=(-628,-146) if court=='west' else (-520,-154))
@@ -3835,7 +3850,10 @@ ep('hawker_column','open-sided hall columns','clipped',(0.275,2.25,0.275),'solid
 ep('hawker_roof','shallow vented roof within 6 m envelope','clipped',('W/2',0.75,'D/2'),'solid','roof',join='civic_roof')
 ep('centre_wall','centre walls with real public entry openings','wall',('face/2','storey_clear/2',0.08),'solid','wall',outline='door_threshold')
 ep('laundry_pole','paired slender laundry rods on outward faces','egg',(0.025,0.025,0.7),'decorative','trim')
-ep('block_number','numeral painted on facade, not a new mesh','box',('glyph/2','glyph/2',0.001),'decorative','mark')
+ep('identity_motif','unlettered arch, circle or stepped colour motif, repeated at entry; no numerals','decal',('panel_w/2','panel_h/2',0.001),'decorative','mark')
+ep('facade_frame','constant-section cream superellipse frame grouping four storeys; backing recessed inside existing footprint','profile',('bay_span/2','group_h/2',0.09),'solid','frame',n=5.5,join='facade_recess')
+ep('entrance_frame','open-bottom U portal with broad rounded crown and flat feet; same colour and motif as block','profile',(2.2,1.505,0.12),'solid','frame',n=5.5,join='portal_bearing')
+ep('sunshade','square-ended clipped sunshade inside original envelope','clipped',('bay_span/2',0.10,0.09),'solid','beam',join='facade_recess')
 EJ=[
  dict(id='column_bearing',kind='seated',parts=['void_column','void_soffit','footing'],plane='footing top 0, column top 3.01, slab underside 3.01',rule='clip column ends to the shared bearing planes; no rounding gap'),
  dict(id='floor_wall',kind='meet',parts=['floor','outer_wall','gallery_floor'],plane='shared floor perimeter and gallery inner edge',rule='private sealed volume ends at gallery wall; one floor collider owns each surface'),
@@ -3848,6 +3866,9 @@ EJ=[
  dict(id='civic_roof',kind='seated',parts=['hawker_column','hawker_roof','centre_wall','roof_floor'],plane='hawker eave +4.5 and roof top +6; centre garden +6.5',rule='support bearing lines continuously, no bowl under roof; roof garden connects existing Deck bridge at its datum'),
  dict(id='furniture_bearing',kind='seated',parts=['bench','bench_leg','chess_table','chess_base','mailbox','planter'],plane='ground or floor top',rule='supports meet seats/table; keep furniture out of route and door-clearance boxes'),
 ]
+EJ += [
+ dict(id='facade_recess',kind='seated',parts=['outer_wall','facade_frame','sunshade','identity_motif'],plane='original footprint face; backing recessed 0.24 m, relief depth at most 0.18 m',rule='all relief remains within existing envelope; cut window apertures and relief from coordinated profiles, not overlays blocking windows or galleries'),
+ dict(id='portal_bearing',kind='seated',parts=['entrance_frame','footing','void_soffit','identity_motif'],plane='portal feet at ground 0, crown at +3.01, bearing at first-slab underside',rule='flat capped feet and full-profile crown; open-bottom clear path with no crossbar at threshold; mark stays pictorial, never letters/numbers')]
 EK['parts']=EP; EK['joins']=EJ
 parts_checks('North Estate',EP,EJ)
 if set(EK['buildings']) != {x['n'] for x in B if x['kind']=='estate'}:
@@ -3857,6 +3878,17 @@ for row in EK['blocks']:
         problems.append(('P5: height/storey mismatch',row['n']))
     if HEIGHTS[row['n']]-(row['storeys']-1)*EK['storey']-EK['slab'] < EK['roof']['headroom']:
         problems.append(('P5: top gallery lacks headroom',row['n']))
+if {i['n'] for i in EK['identities']} != set(EK['buildings']) or len(EK['identities']) != 9:
+    problems.append(('P5: colour identity coverage differs',))
+if len({(i['primary'],i['motif'],i['frame']) for i in EK['identities']}) != 9:
+    problems.append(('P5: block identities are not distinct',))
+for ident in EK['identities']:
+    if ident['motif'] not in ('arch','circle','steps'):
+        problems.append(('P5: unsupported identity shape',ident['n']))
+if EK['printed_marks'] or EK['facade']['frame_depth'] > EK['facade']['recess']:
+    problems.append(('P5: printed marks or facade outside locked envelope',))
+if EK['facade']['entrance_h'] - EK['facade']['entrance_t'] < 2.4:
+    problems.append(('P5: entrance frame lacks clearance',))
 if EK['gallery'] < 1.5 or EK['link']['top']-EK['link']['slab'] < 2.4:
     problems.append(('P5: public clearance too small',))
 if EK['bridge']['floor'] != 26*EK['storey'] or EK['centre']['garden_floor'] != 2*EK['storey']:
