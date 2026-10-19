@@ -104,6 +104,7 @@ func _run_p1_subset(make_shots: bool) -> void:
 	_test_p1_beam_spans(names)
 	_test_crossing_clear_volumes(city)
 	_test_tower_ways_out(city)
+	_test_rain_gardens(names)
 	_test_city_hall_gallery_bands(names)
 	print("MOY_P1_SUBSET_RESULT failures=",failures)
 	if make_shots and failures==0: await _capture_p1_fix_shots(city,names)
@@ -117,17 +118,24 @@ func _count_p1_bodies(node: Node) -> int:
 
 
 func _capture_p1_fix_shots(city: Node, names: Dictionary) -> void:
-	var output: String="res://docs/diagnostics/images/2026-10-18-P1-fixes-2"
+	var output: String="res://docs/diagnostics/images/2026-10-19-P1-fixes-4"
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
 	var world_env:=WorldEnvironment.new(); var environment:=Environment.new()
 	environment.background_mode=Environment.BG_COLOR; environment.background_color=Color("#8293a5"); environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; environment.ambient_light_color=Color("#8b929c"); environment.ambient_light_energy=0.65; world_env.environment=environment; add_child(world_env)
 	var light:=DirectionalLight3D.new(); light.rotation_degrees=Vector3(-46.0,-31.0,0.0); light.light_energy=1.1; add_child(light)
 	var camera:=Camera3D.new(); camera.current=true; camera.fov=58.0; add_child(camera); get_viewport().size=Vector2i(1440,900)
+	# The pack scenes carry no terrain: a flat plane at the datum stands in for the ground, so the garden, the paths and the lawn cut-outs read against it.
+	var ground:=MeshInstance3D.new(); var ground_plane:=PlaneMesh.new(); ground_plane.size=Vector2(260.0,260.0); ground.mesh=ground_plane; ground.position=Vector3(-560.0,-60.03,0.0)
+	var ground_material:=StandardMaterial3D.new(); ground_material.albedo_color=Color("#8f7f86"); ground.material_override=ground_material; add_child(ground)
 	var tower: Dictionary=PLAN.CROSSING.towers[0]; var c:=Vector2(float(tower.c[0]),float(tower.c[1])); var center_dir:=1.0 if c.x< -560.0 else -1.0
 	var l37:=names.get("CityHallGallery_south_L37o") as Node3D; var g37:=names.get("CityHallGallery_south_G37") as Node3D
 	var targets: Array[Dictionary]=[
 		{"name":"under_spine_head_beam","camera":Vector3(c.x+center_dir*5.5,-53.0,c.y),"at":Vector3(c.x+center_dir*22.0,-49.0,c.y)},
 		{"name":"looking_up_helix_band","camera":Vector3(c.x,-58.0,c.y+8.5),"at":Vector3(c.x,-28.0,c.y)},
+		{"name":"tower_foot_lawn_paths","camera":Vector3(-560.0,-55.5,0.0),"at":Vector3(c.x,-59.6,c.y)},
+		{"name":"garden_path_cut_edge","camera":Vector3(c.x-14.0,-58.9,c.y+0.4),"at":Vector3(c.x-6.5,-59.8,c.y+0.4)},
+		{"name":"city_hall_steps_and_rostrum","camera":Vector3(-414.0,-54.0,-21.0),"at":Vector3(-376.0,-48.0,-21.0)},
+		{"name":"on_the_rostrum","camera":Vector3(-366.5,-44.2,4.0),"at":Vector3(-367.0,-44.4,-22.0)},
 	]
 	if l37!=null and g37!=null:
 		var focal: Vector3=(l37.global_position+g37.global_position)*0.5
@@ -331,31 +339,69 @@ func _test_crossing_clear_volumes(city: Node) -> void:
 					if sample_hit: hit_samples+=1
 		if not tower_hits.is_empty():
 			towers_with_hits[String(tower.name)]=tower_hits.size()
-			_fail("helix band blocked on %s by %d non-hand colliders"%[tower.name,tower_hits.size()])
+			_fail("helix band blocked on %s by %s"%[tower.name,_p1_format_collider_kinds(tower_hits)])
 	var collider_examples: Array=unique_colliders.keys(); collider_examples.sort()
-	print("MOY_P1_HELIX_BAND towers_with_hits=",towers_with_hits.size()," hit_samples=",hit_samples," unique_non_hand_colliders=",unique_colliders.size()," volume_samples=",band_samples," examples=",collider_examples.slice(0,24))
+	print("MOY_P1_HELIX_BAND towers_with_hits=",towers_with_hits.size()," hit_samples=",hit_samples," unique_non_hand_colliders=",unique_colliders.size()," collider_kinds=[",_p1_format_collider_kinds(unique_colliders),"] volume_samples=",band_samples," examples=",collider_examples.slice(0,24))
 
 
 func _test_tower_ways_out(city: Node) -> void:
 	var state: PhysicsDirectSpaceState3D=city.get_world_3d().direct_space_state
-	var checked:=0; var hit_samples:=0; var blocked: Dictionary={}; var shape:=BoxShape3D.new()
+	var checked:=0; var hit_samples:=0; var blocked: Dictionary={}; var way_colliders: Dictionary={}; var shape:=BoxShape3D.new()
+	# The box runs from the rail line (r 4.2) to the drum + 1.0 (r 7.0), from the floor + 0.05 to + 2.8.
+	var r_from:=4.2; var r_to:=7.0; var tested_width:=0.0; var tested_top:=0.0
 	var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.collision_mask=1; query.collide_with_areas=false
 	for tower in PLAN.CROSSING.towers:
 		var center:=Vector2(float(tower.c[0]),float(tower.c[1]))
 		for way in tower.ways_out:
 			var angle:=deg_to_rad(float(way.bearing)); var radial:=Vector3(cos(angle),0.0,sin(angle))
-			shape.size=Vector3(float(way.width),float(way.clear)-0.05,3.0)
-			var origin:=Vector3(center.x,-60.0+float(way.y)+1.425,center.y)+radial*5.5
+			shape.size=Vector3(float(way.width),float(way.clear)-0.05,r_to-r_from)
+			var origin:=Vector3(center.x,-60.0+float(way.y)+0.05+shape.size.y*0.5,center.y)+radial*((r_from+r_to)*0.5)
+			tested_width=shape.size.x; tested_top=0.05+shape.size.y
 			query.transform=Transform3D(Basis.looking_at(radial,Vector3.UP),origin)
 			checked+=1
 			for result in state.intersect_shape(query,64):
 				var collider:=result.collider as Node
 				if collider==null: continue
-				hit_samples+=1; blocked[String(tower.name)+"/"+str(way.y)+"/"+str(way.bearing)]=String(collider.name)
+				hit_samples+=1; blocked[String(tower.name)+"/"+str(way.y)+"/"+str(way.bearing)]=String(collider.name); way_colliders[String(collider.name)]=true
 		for key in blocked:
 			if String(key).begins_with(String(tower.name)+"/"):
-				_fail("Crossing way out blocked at %s by %s"%[key,blocked[key]])
-	print("MOY_P1_WAYS_OUT checked=",checked," hit_samples=",hit_samples," blocked_boxes=",blocked.size())
+				_fail("Crossing way out blocked at %s by %s"%[key,_p1_collider_kind(String(blocked[key]))])
+	print("MOY_P1_WAYS_OUT checked=",checked," hit_samples=",hit_samples," blocked_boxes=",blocked.size()," unique_colliders=",way_colliders.size()," collider_kinds=[",_p1_format_collider_kinds(way_colliders),"] r=%.1f..%.1f width=%.2f floor+0.05..+%.2f"%[r_from,r_to,tested_width,tested_top])
+
+
+func _test_rain_gardens(names: Dictionary) -> void:
+	# Each garden is a few polygons: a top, outer walls, convex collision. A bed
+	# that grows past a few hundred triangles has gone back to a per-cell mesh.
+	var triangles:=0; var shapes:=0; var found:=0
+	for garden_index in 4:
+		var body: Node=names.get("CrossingRainGarden_%02d"%garden_index)
+		if body==null: _fail("rain garden %d is not in the bake"%garden_index); continue
+		found+=1
+		var ring:=body.get_node_or_null("CrossingRainGardenRing") as MeshInstance3D
+		if ring==null or ring.mesh==null: _fail("rain garden %d has no ring mesh"%garden_index); continue
+		var garden_triangles:=ring.mesh.get_faces().size()/3
+		triangles+=garden_triangles
+		for child in body.get_children():
+			if child is CollisionShape3D: shapes+=1
+		if garden_triangles>1200: _fail("rain garden %d has %d triangles (limit 1200)"%[garden_index,garden_triangles])
+	print("MOY_P1_RAIN_GARDENS found=",found," triangles=",triangles," convex_shapes=",shapes)
+
+
+func _p1_collider_kind(collider_name: String) -> String:
+	for prefix in ["CrossingGalleryInnerRail", "CrossingGallery_", "CrossingRainGardenPath", "CrossingRainGarden", "CrossingTowerLift", "CrossingTowerRib", "CrossingTowerHoop", "Open_park"]:
+		if collider_name.begins_with(prefix): return prefix.trim_suffix("_")
+	return collider_name
+
+
+func _p1_format_collider_kinds(colliders: Dictionary) -> String:
+	var kinds: Dictionary={}
+	for collider_name in colliders:
+		var kind:=_p1_collider_kind(String(collider_name))
+		kinds[kind]=int(kinds.get(kind,0))+1
+	var names: Array=kinds.keys(); names.sort()
+	var parts: PackedStringArray=[]
+	for kind in names: parts.append("%s ×%d"%[kind,kinds[kind]])
+	return ", ".join(parts)
 
 
 func _test_city_hall_gallery_bands(names: Dictionary) -> void:

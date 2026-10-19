@@ -522,13 +522,17 @@ static func _box_body(label: String, size: Vector3, center: Vector3, color: Colo
 
 static func _park_ground_body(rect: Rect2) -> StaticBody3D:
 	# The terrain already contains the authored 4 m pond basin. Make the park
-	# paving a baked grid with an actual elliptical opening so neither this slab
-	# nor its collision can seal the water surface.
+	# paving a baked grid with actual pond and tower-drum openings. The helix
+	# ground landings are level with the datum, so the lawn must not overlap them.
 	var pond: Dictionary = PLAN.PARK.pond
 	var pond_center := Vector2(float(pond.c[0]), float(pond.c[1]))
 	var pond_radii := Vector2(float(pond.r[0]), float(pond.r[1]))
+	var tower_centers: Array[Vector2] = []
+	for tower in PLAN.CROSSING.towers:
+		tower_centers.append(Vector2(float(tower.c[0]), float(tower.c[1])))
+	var drum_radius := float(PLAN.CROSSING.tower.drum)
 	var step := 1.0
-	var surface_y := DATUM + 0.07
+	var surface_y := DATUM + float(PLAN.CROSSING.lawn_y)
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for ix in ceili(rect.size.x / step):
@@ -540,6 +544,14 @@ static func _park_ground_body(rect: Rect2) -> StaticBody3D:
 			var closest := Vector2(clampf(pond_center.x, x0, x1), clampf(pond_center.y, z0, z1))
 			var basin_point := (closest - pond_center) / pond_radii
 			if basin_point.length_squared() <= 1.0:
+				continue
+			var tower_open := false
+			for tower_center in tower_centers:
+				var nearest := Vector2(clampf(tower_center.x, x0, x1), clampf(tower_center.y, z0, z1))
+				if nearest.distance_to(tower_center) <= drum_radius:
+					tower_open = true
+					break
+			if tower_open:
 				continue
 			var a := Vector3(x0, surface_y, z0)
 			var b := Vector3(x0, surface_y, z1)
@@ -569,6 +581,228 @@ static func _park_ground_body(rect: Rect2) -> StaticBody3D:
 	collision.shape = shape
 	body.add_child(collision)
 	return body
+
+
+static func _rain_garden_polygons(data: Dictionary, index: int, step_degrees: float) -> Array:
+	# A ring bed from r_in to r about the tower's centre, cut by a paved corridor
+	# along each bearing in `paths` and clear of the lift. Built as a few
+	# polygons: a top, outer walls, no hidden faces and no bottom (it lies on the
+	# ground). Collision is the convex pieces of the same polygons.
+	var center := Vector2(float(data.c[0]), float(data.c[1]))
+	var inner := float(data.r_in)
+	var outer := float(data.r)
+	var path_half := float(data.path_width) * 0.5 + 0.16
+	var lift_world := Vector2(float(PLAN.CROSSING.towers[index].lift.c[0]), float(PLAN.CROSSING.towers[index].lift.c[1]))
+	var lift_local := lift_world - center
+	var lift_radius := float(data.lift_clear) + 0.16
+	var bearings: Array[float] = []
+	for bearing in data.paths: bearings.append(fposmod(float(bearing), 360.0))
+	bearings.sort()
+	var cutters: Array = []
+	for bearing in bearings:
+		var direction := Vector2(cos(deg_to_rad(bearing)), sin(deg_to_rad(bearing)))
+		var side := Vector2(-direction.y, direction.x)
+		cutters.append(_rain_garden_orient(PackedVector2Array([-side * path_half, side * path_half, direction * (outer + 0.5) + side * path_half, direction * (outer + 0.5) - side * path_half])))
+	var lift_circle := PackedVector2Array()
+	for step in 32: lift_circle.append(lift_local + Vector2(cos(TAU * step / 32.0), sin(TAU * step / 32.0)) * lift_radius)
+	cutters.append(_rain_garden_orient(lift_circle))
+	var polygons: Array = []
+	for k in bearings.size():
+		var a0 := bearings[k]
+		var a1 := bearings[(k + 1) % bearings.size()]
+		if a1 <= a0: a1 += 360.0
+		var sector := PackedVector2Array()
+		var steps := maxi(2, ceili((a1 - a0) / step_degrees))
+		for step in steps + 1:
+			var angle := deg_to_rad(lerpf(a0, a1, float(step) / steps))
+			sector.append(Vector2(cos(angle), sin(angle)) * outer)
+		for step in steps + 1:
+			var angle := deg_to_rad(lerpf(a1, a0, float(step) / steps))
+			sector.append(Vector2(cos(angle), sin(angle)) * inner)
+		var pieces: Array = [_rain_garden_orient(sector)]
+		for cutter in cutters:
+			var next_pieces: Array = []
+			for piece in pieces:
+				for result in Geometry2D.clip_polygons(piece, cutter):
+					var oriented := _rain_garden_orient(result)
+					if Geometry2D.is_polygon_clockwise(result) == Geometry2D.is_polygon_clockwise(piece) and absf(_polygon_area(oriented)) > 0.05:
+						next_pieces.append(oriented)
+			pieces = next_pieces
+		polygons.append_array(pieces)
+	return polygons
+
+
+static func _crossing_rain_garden(data: Dictionary, index: int) -> StaticBody3D:
+	# The visual follows the ring at 3 degrees; the collision at 9 degrees (a 0.02 m chord) in convex pieces.
+	var center := Vector2(float(data.c[0]), float(data.c[1]))
+	var polygons := _rain_garden_polygons(data, index, 3.0)
+	var height := 0.22
+	var body := StaticBody3D.new()
+	body.name = "CrossingRainGarden_%02d" % index
+	body.position = Vector3(center.x, DATUM, center.y)
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for polygon in polygons:
+		var triangles := Geometry2D.triangulate_polygon(polygon)
+		for t in range(0, triangles.size(), 3):
+			var a := Vector3(polygon[triangles[t]].x, height, polygon[triangles[t]].y)
+			var b := Vector3(polygon[triangles[t + 1]].x, height, polygon[triangles[t + 1]].y)
+			var c := Vector3(polygon[triangles[t + 2]].x, height, polygon[triangles[t + 2]].y)
+			_add_facing_triangle(tool, a, b, c, Vector3.UP)
+		var area := _polygon_area(polygon)
+		for i in polygon.size():
+			var p0: Vector2 = polygon[i]
+			var p1: Vector2 = polygon[(i + 1) % polygon.size()]
+			var edge := p1 - p0
+			if edge.length_squared() < 0.000001: continue
+			var outward := Vector2(edge.y, -edge.x).normalized() if area > 0.0 else Vector2(-edge.y, edge.x).normalized()
+			var wall_normal := Vector3(outward.x, 0.0, outward.y)
+			var b0 := Vector3(p0.x, 0.0, p0.y)
+			var b1 := Vector3(p1.x, 0.0, p1.y)
+			var t0 := Vector3(p0.x, height, p0.y)
+			var t1 := Vector3(p1.x, height, p1.y)
+			_add_facing_triangle(tool, b0, b1, t1, wall_normal)
+			_add_facing_triangle(tool, b0, t1, t0, wall_normal)
+	var piece_index := 0
+	for polygon in _rain_garden_polygons(data, index, 9.0):
+		for convex in Geometry2D.decompose_polygon_in_convex(polygon):
+			var points := PackedVector3Array()
+			for point in convex:
+				points.append(Vector3(point.x, 0.0, point.y))
+				points.append(Vector3(point.x, height, point.y))
+			var shape := ConvexPolygonShape3D.new()
+			shape.points = points
+			var collision := CollisionShape3D.new()
+			collision.name = "CrossingRainGardenRingCollision_%02d" % piece_index
+			collision.shape = shape
+			body.add_child(collision)
+			piece_index += 1
+	var visual := MeshInstance3D.new()
+	visual.name = "CrossingRainGardenRing"
+	visual.mesh = tool.commit()
+	visual.material_override = _material(Color("#648350"))
+	body.add_child(visual)
+	return body
+
+
+static func _polygon_deck_body(label: String, outline: PackedVector2Array, top_y: float, thickness: float, color: Color) -> StaticBody3D:
+	# A deck of any outline (world x, z): a top, a soffit and sides, with convex pieces for collision.
+	var polygon := _rain_garden_orient(outline)
+	var area := _polygon_area(polygon)
+	var bottom_y := top_y - thickness
+	var body := StaticBody3D.new()
+	body.name = label
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var triangles := Geometry2D.triangulate_polygon(polygon)
+	for t in range(0, triangles.size(), 3):
+		var p0: Vector2 = polygon[triangles[t]]
+		var p1: Vector2 = polygon[triangles[t + 1]]
+		var p2: Vector2 = polygon[triangles[t + 2]]
+		_add_facing_triangle(tool, Vector3(p0.x, top_y, p0.y), Vector3(p1.x, top_y, p1.y), Vector3(p2.x, top_y, p2.y), Vector3.UP)
+		_add_facing_triangle(tool, Vector3(p0.x, bottom_y, p0.y), Vector3(p1.x, bottom_y, p1.y), Vector3(p2.x, bottom_y, p2.y), Vector3.DOWN)
+	for i in polygon.size():
+		var a: Vector2 = polygon[i]
+		var b: Vector2 = polygon[(i + 1) % polygon.size()]
+		var edge := b - a
+		if edge.length_squared() < 0.000001: continue
+		var outward := Vector2(edge.y, -edge.x).normalized() if area > 0.0 else Vector2(-edge.y, edge.x).normalized()
+		var wall_normal := Vector3(outward.x, 0.0, outward.y)
+		_add_facing_triangle(tool, Vector3(a.x, bottom_y, a.y), Vector3(b.x, bottom_y, b.y), Vector3(b.x, top_y, b.y), wall_normal)
+		_add_facing_triangle(tool, Vector3(a.x, bottom_y, a.y), Vector3(b.x, top_y, b.y), Vector3(a.x, top_y, a.y), wall_normal)
+	var piece_index := 0
+	for convex in Geometry2D.decompose_polygon_in_convex(polygon):
+		var points := PackedVector3Array()
+		for point in convex:
+			points.append(Vector3(point.x, bottom_y, point.y))
+			points.append(Vector3(point.x, top_y, point.y))
+		var shape := ConvexPolygonShape3D.new()
+		shape.points = points
+		var collision := CollisionShape3D.new()
+		collision.name = "%sCollision_%02d" % [label, piece_index]
+		collision.shape = shape
+		body.add_child(collision)
+		piece_index += 1
+	var visual := MeshInstance3D.new()
+	visual.name = label + "Visual"
+	visual.mesh = tool.commit()
+	visual.material_override = _material(color)
+	body.add_child(visual)
+	return body
+
+
+static func _add_box_faces(tool: SurfaceTool, lo: Vector3, hi: Vector3) -> void:
+	var corners := [Vector3(lo.x, lo.y, lo.z), Vector3(hi.x, lo.y, lo.z), Vector3(hi.x, lo.y, hi.z), Vector3(lo.x, lo.y, hi.z), Vector3(lo.x, hi.y, lo.z), Vector3(hi.x, hi.y, lo.z), Vector3(hi.x, hi.y, hi.z), Vector3(lo.x, hi.y, hi.z)]
+	var faces := [[4, 7, 6, 5, Vector3.UP], [0, 1, 2, 3, Vector3.DOWN], [0, 3, 7, 4, Vector3.LEFT], [1, 5, 6, 2, Vector3.RIGHT], [0, 4, 5, 1, Vector3.FORWARD], [3, 2, 6, 7, Vector3.BACK]]
+	for face in faces:
+		_add_facing_triangle(tool, corners[face[0]], corners[face[1]], corners[face[2]], face[4])
+		_add_facing_triangle(tool, corners[face[0]], corners[face[2]], corners[face[3]], face[4])
+
+
+static func _stair_body(label: String, foot: Vector3, head: Vector3, width: float) -> StaticBody3D:
+	# A stone stair of 0.18 m risers, one box per step hanging the escalator section's depth below its
+	# own lower tread edge (a sawtooth soffit). World coordinates, body at the origin.
+	var rise := head.y - foot.y
+	var run := head.x - foot.x
+	var count := maxi(1, ceili(absf(rise) / 0.18))
+	var depth := float(PLAN.ESCALATORS.section.depth)
+	var body := StaticBody3D.new()
+	body.name = label
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in count:
+		var x0 := foot.x + run * float(i) / count
+		var x1 := foot.x + run * float(i + 1) / count
+		var top := foot.y + rise * float(i + 1) / count
+		var bottom := foot.y + rise * float(i) / count - depth
+		var lo := Vector3(minf(x0, x1), bottom, foot.z - width * 0.5)
+		var hi := Vector3(maxf(x0, x1), top, foot.z + width * 0.5)
+		_add_box_faces(tool, lo, hi)
+		var shape := BoxShape3D.new()
+		shape.size = hi - lo
+		var collision := CollisionShape3D.new()
+		collision.name = "Step_%02d" % i
+		collision.shape = shape
+		collision.position = (lo + hi) * 0.5
+		body.add_child(collision)
+	var visual := MeshInstance3D.new()
+	visual.name = "StairSteps"
+	visual.mesh = tool.commit()
+	visual.material_override = _material(Color("#d3c6ad"))
+	body.add_child(visual)
+	return body
+
+
+static func _rain_garden_orient(points: PackedVector2Array) -> PackedVector2Array:
+	# One winding for every polygon fed to the clipper: holes come back reversed.
+	var result := PackedVector2Array(points)
+	if Geometry2D.is_polygon_clockwise(result): result.reverse()
+	return result
+
+
+static func _polygon_area(points: PackedVector2Array) -> float:
+	var area := 0.0
+	for i in points.size():
+		var p0: Vector2 = points[i]
+		var p1: Vector2 = points[(i + 1) % points.size()]
+		area += p0.x * p1.y - p1.x * p0.y
+	return area * 0.5
+
+
+static func _add_facing_triangle(tool: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, facing: Vector3) -> void:
+	# Godot's front faces are clockwise, so the front normal is (c - a) x (b - a).
+	var normal := (c - a).cross(b - a)
+	var vertices: Array[Vector3] = [a, b, c]
+	if normal.dot(facing) < 0.0: vertices = [a, c, b]
+	for vertex in vertices:
+		tool.set_normal(facing)
+		tool.add_vertex(vertex)
 
 
 static func _round_column(label: String, radius: float, height: float, center: Vector3, color: Color) -> StaticBody3D:
@@ -1196,7 +1430,7 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 				body.set_meta("walk_deck", true)
 				body.set_meta("walk_run_id", "CrossingHelix_%02d_%s" % [ti, String(hand.hand)])
 				if not is_equal_approx(y0,y1): body.set_meta("flight", true)
-				var visual:=MeshInstance3D.new(); visual.mesh=mesh; visual.material_override=_material(Color("#aaa58f" if y1!=y0 else "#b5a783")); body.add_child(visual)
+				var visual:=MeshInstance3D.new(); visual.name="CrossingHandDeck"; visual.mesh=mesh; visual.material_override=_material(Color("#aaa58f" if y1!=y0 else "#b5a783")); body.add_child(visual)
 				var shape:=ConcavePolygonShape3D.new(); shape.set_faces(mesh.get_faces()); var collision:=CollisionShape3D.new(); collision.shape=shape; body.add_child(collision)
 				if not is_equal_approx(y0,y1):
 					body.set_script(load("res://scripts/moy_escalator.gd")); body.set("helix_center",Vector3.ZERO); body.set("helix_rise_per_radian",(y1-y0)/(a1-a0)); body.set("helix_direction",1.0 if is_up else -1.0); body.set("travel_speed",0.55)
@@ -1231,12 +1465,14 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 							var rail_belt:=MeshInstance3D.new(); rail_belt.name="HelixMovingRubberHandrail"; var rbm:=BoxMesh.new(); rbm.size=Vector3(0.72,0.09,0.13); rail_belt.mesh=rbm; rail_belt.material_override=_material(Color("#242827")); var fraction:=float(rail_i)*0.5; if not is_up: fraction=1.0-fraction; rail_belt.set_meta("helix_fraction",fraction); rail_belt.set_meta("helix_radius",rail_radius); rail_belt.set_meta("helix_offset_y",float(PLAN.ESCALATORS.handrail.height)); var ra:=lerpf(a0,a1,fraction); var ry:=lerpf(y0,y1,fraction)+float(PLAN.ESCALATORS.handrail.height); rail_belt.position=Vector3(cos(ra)*rail_radius,ry,sin(ra)*rail_radius); rail_belt.rotation.y=-ra-PI*0.5; body.add_child(rail_belt)
 				root.add_child(body)
 		for level in [6.5,14.2,37.0]:
-			var ann:=_annulus_body("CrossingGallery_%.1f"%level,float(tcfg.gallery_r[0]),float(tcfg.gallery_r[1]),48,1.0,level); root.add_child(ann)
+			var inner_radius:=maxf(float(tcfg.gallery_r[0]),float(tcfg.gallery_clear))/cos(PI/48.0)
+			var ann:=_annulus_body("CrossingGallery_%.1f"%level,inner_radius,float(tcfg.gallery_r[1]),48,1.0,level); root.add_child(ann)
 			for rail_i in 36:
 				var a_deg:=float(rail_i)*10.0; var b_deg:=float(rail_i+1)*10.0; var mid_deg:float=(a_deg+b_deg)*0.5
-				if _crossing_hand_landing_open(data.hands,level,mid_deg): continue
-				var a:=Vector2(c.x+cos(deg_to_rad(a_deg))*float(tcfg.gallery_r[0]),c.y+sin(deg_to_rad(a_deg))*float(tcfg.gallery_r[0]))
-				var b:=Vector2(c.x+cos(deg_to_rad(b_deg))*float(tcfg.gallery_r[0]),c.y+sin(deg_to_rad(b_deg))*float(tcfg.gallery_r[0]))
+				if _crossing_hand_landing_open(data.hands,level,mid_deg) or _crossing_way_out_open(data.ways_out,level,mid_deg,float(tcfg.rail_r)): continue
+				var rail_radius:=float(tcfg.rail_r)
+				var a:=Vector2(c.x+cos(deg_to_rad(a_deg))*rail_radius,c.y+sin(deg_to_rad(a_deg))*rail_radius)
+				var b:=Vector2(c.x+cos(deg_to_rad(b_deg))*rail_radius,c.y+sin(deg_to_rad(b_deg))*rail_radius)
 				var rail:=_segment_body("CrossingGalleryInnerRail_%02d_%.1f_%02d"%[ti,level,rail_i],a,b,0.12,DATUM+level,1.1,Color("#80908a")); _add(packs,_cell(c),rail)
 		for rib_i in int(tcfg.ribs):
 			var angle:=TAU*(float(rib_i)+0.5)/float(tcfg.ribs); var rib:=_round_column("CrossingTowerRib_%02d"%rib_i,0.22,float(cfg.roof.y),Vector3(cos(angle)*float(tcfg.drum),float(cfg.roof.y)*0.5,sin(angle)*float(tcfg.drum)),Color("#a4aaa2")); root.add_child(rib)
@@ -1313,7 +1549,11 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 		var x: float=cfg._beams.high.x[beam_index]; var beam_y0:=float(cfg._beams.high.y[0]); var beam_y1:=float(cfg._beams.high.y[1])
 		var beam:=_box_body("CrossingMeridianHeadBeam_%d"%beam_index,Vector3(1.6,beam_y1-beam_y0,14.8),Vector3(x,DATUM+(beam_y0+beam_y1)*0.5,0.0),Color("#8d948b")); _add(packs,_cell(Vector2(x,0.0)),beam)
 	for garden_index in cfg.rain_gardens.size():
-		var garden: Dictionary=cfg.rain_gardens[garden_index]; var gc:=Vector2(float(garden.c[0]),float(garden.c[1])); var disc:=_round_column("CrossingRainGarden_%02d"%garden_index,float(garden.r),0.22,Vector3(gc.x,DATUM+0.11,gc.y),Color("#648350")); _add(packs,_cell(gc),disc)
+		var garden: Dictionary=cfg.rain_gardens[garden_index]; var gc:=Vector2(float(garden.c[0]),float(garden.c[1])); var ring:=_crossing_rain_garden(garden,garden_index); _add(packs,_cell(gc),ring)
+		for path_index in garden.paths.size():
+			var angle:=deg_to_rad(float(garden.paths[path_index])); var direction:=Vector2(cos(angle),sin(angle))
+			var start:=gc+direction*float(garden.r_in); var finish:=gc+direction*float(garden.r)
+			var path:=_segment_body("CrossingRainGardenPath_%02d_%02d"%[garden_index,path_index],start,finish,float(garden.path_width),DATUM-0.12,0.16,Color("#b9a586")); _add(packs,_cell(gc),path)
 		for reed in garden.reeds:
 			var rp:=Vector2(float(reed[0]),float(reed[1])); var clump:=Node3D.new(); clump.name="CrossingRainReeds_%0.2f_%0.2f"%[rp.x,rp.y]; clump.position=Vector3(rp.x,DATUM,rp.y)
 			for ri in 3:
@@ -1377,6 +1617,14 @@ static func _crossing_hand_landing_open(hands: Array, level: float, bearing: flo
 			if not is_equal_approx(float(profile[2]),level) or not is_equal_approx(float(profile[3]),level): continue
 			var span:=fposmod(float(profile[1])-float(profile[0]),360.0)
 			if fposmod(bearing-float(profile[0]),360.0)<=span: return true
+	return false
+
+
+static func _crossing_way_out_open(ways: Array, level: float, bearing: float, rail_radius: float) -> bool:
+	for way in ways:
+		if not is_equal_approx(float(way.y), level): continue
+		var half_angle:=rad_to_deg(asin(clampf(float(way.width)*0.5/rail_radius,0.0,1.0)))+5.0
+		if absf(wrapf(bearing-float(way.bearing)+180.0,0.0,360.0)-180.0)<=half_angle: return true
 	return false
 
 
@@ -1511,7 +1759,7 @@ static func _add_ramp_guardrails(body: StaticBody3D, width: float, length: float
 		_add_building_box_part(body,Vector3(length,0.9,0.12),Vector3(0.0,0.65,side*(width*0.5-0.06)),Color("#806f59"))
 
 
-static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3, head: Vector3, total_width: float) -> void:
+static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3, head: Vector3, total_width: float, pad_sink: float = 0.0, pad_beyond: bool = false) -> void:
 	var horizontal:=head-foot; horizontal.y=0.0
 	var lateral:=Vector3(-horizontal.z,0.0,horizontal.x).normalized()
 	if lateral.length_squared()<0.5: lateral=Vector3.RIGHT
@@ -1536,9 +1784,19 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	var landing_size:=Vector3(total_width+0.6,0.3,2.4) if along_z else Vector3(2.4,0.3,total_width+0.6)
 	for endpoint_i in 2:
 		var endpoint: Vector3=foot if endpoint_i==0 else head
-		var landing:=_box_body("%s_Landing_%d"%[label,endpoint_i],landing_size,endpoint-Vector3.UP*0.15,Color("#b6a17b"))
+		# pad_beyond: a shallow pad just past the flight's end, on the deck it meets, not half under the belt box.
+		var pad_center:=endpoint-Vector3.UP*(0.15+pad_sink); var pad_size:=landing_size
+		if pad_beyond and horizontal.length_squared()>0.01:
+			var outward:=horizontal.normalized()*(-1.0 if endpoint_i==0 else 1.0)
+			pad_center+=outward*0.65
+			if along_z: pad_size.z=1.2
+			else: pad_size.x=1.2
+		var landing:=_box_body("%s_Landing_%d"%[label,endpoint_i],pad_size,pad_center,Color("#b6a17b"))
 		landing.set_meta("walk_deck", true); landing.set_meta("walk_run_id", "Escalator:%s" % label); landing.set_meta("reach_link_id", "Escalator:%s" % label)
 		_add(packs,_cell(Vector2(endpoint.x,endpoint.z)),landing)
+		if pad_beyond:
+			landing.remove_meta("reach_target")
+			var lane_target:=Node3D.new(); lane_target.name="ReachTarget"; lane_target.position=-lateral*belt_width*0.5; lane_target.set_meta("reach_target",true); landing.add_child(lane_target)
 
 
 static func _add_escalator_handrails(body: StaticBody3D, length: float, width: float, height: float) -> void:
@@ -1671,7 +1929,9 @@ static func _add_gate_forms(packs: Dictionary) -> void:
 		# Plan train_hall.arc defines the actual wall openings; leave the 12–21 m band clear through each data-defined leg.
 		var hall: Dictionary=PLAN.ARCH.train_hall; var hall_index:=0 if center.y<0 else 1; var bounds: Array=hall.x[hall_index]
 		var left_width:=maxf(0.0,float(bounds[0])-r.position.x); var right_start:=minf(r.size.x,float(bounds[1])-r.position.x)
-		for part in [Rect2(r.position.x,r.position.y,left_width,r.size.y),Rect2(r.position.x+right_start,r.position.y,r.size.x-right_start,r.size.y)]:
+		# The east wall of the band is the outer platform's place: city.md puts the outer pair down the leg's east side and its landing inside the leg
+		# (ARCH.front.legs.outer_landing, x -347.04 to -342.2). A solid pier there swallows both, so only the west wall stands.
+		for part in [Rect2(r.position.x,r.position.y,left_width,r.size.y)]:
 			if part.size.x>0.1: _add(packs,_cell(center),_box_body("MeridianArchTrainHallPier",Vector3(part.size.x,9.0,part.size.y),Vector3(part.get_center().x,DATUM+16.5,part.get_center().y),color))
 	var east_leg: Array=PLAN.ARCH.legs[0]
 	_add_bridge_station(packs,"MeridianArch",float(PLAN.ARCH.lower[0]),float(PLAN.ARCH.lower[1]),float(east_leg[0]),float(east_leg[2]),float(PLAN.ARCH.opening))
@@ -1738,18 +1998,51 @@ static func _add_civic_square(packs: Dictionary, tree_templates: Dictionary) -> 
 
 
 static func _add_arch_front(packs: Dictionary) -> void:
-	var front: Dictionary=PLAN.ARCH.front; var rostrum: Dictionary=front.rostrum; var rx: Array=rostrum.x; var rz: Array=rostrum.z; var y:=float(rostrum.y)
+	var front: Dictionary=PLAN.ARCH.front; var rostrum: Dictionary=front.rostrum; var rx: Array=rostrum.x; var rz: Array=rostrum.z; var y:=float(rostrum.y); var y_rostrum:=y
 	# Rostrum piers leave the authored central bay and two portals open.
+	var west_open: Array=[[-3.0,3.0]]
+	var east_open: Array=[[-float(PLAN.ARCH.opening)*0.5,float(PLAN.ARCH.opening)*0.5]]
+	for leg in front.legs:
+		var steps_z: float=float(leg.steps.z); var half_width: float=float(leg.steps.width)*0.5
+		west_open.append([steps_z-half_width-0.08,steps_z+half_width+0.08])
+		var sign_z:=-1.0 if String(leg.side)=="north" else 1.0
+		east_open.append([minf(sign_z*float(rostrum.portals[0]),sign_z*float(rostrum.portals[1])),maxf(sign_z*float(rostrum.portals[0]),sign_z*float(rostrum.portals[1]))])
 	for side in [-1.0,1.0]:
 		var x: float=(float(rx[0])+float(rx[1]))*0.5+side*(float(rx[1])-float(rx[0]))*0.5
-		_add(packs,_cell(Vector2(x,0)),_box_body("CityHallRostrumPier",Vector3(0.6,5.0,float(rz[1])-float(rz[0])),Vector3(x,DATUM+y+2.5,0),Color("#d3c6ad")))
-	_add(packs,_cell(Vector2(-367,0)),_box_body("CityHallRostrumLintel",Vector3(7.0,0.6,60),Vector3(-367,DATUM+y+5.0,0),Color("#d3c6ad")))
+		var openings: Array=west_open if side<0.0 else east_open
+		openings.sort_custom(func(a: Array, b: Array) -> bool: return a[0]<b[0])
+		var z_cursor:=float(rz[0]); var pier_index:=0
+		for gap in openings:
+			if float(gap[0])-z_cursor>0.3:
+				var length:=float(gap[0])-z_cursor
+				_add(packs,_cell(Vector2(x,z_cursor+length*0.5)),_box_body("CityHallRostrumPier_%d_%d"%[0 if side<0.0 else 1,pier_index],Vector3(0.6,5.0,length),Vector3(x,DATUM+y+2.5,z_cursor+length*0.5),Color("#d3c6ad")))
+				pier_index+=1
+			z_cursor=maxf(z_cursor,float(gap[1]))
+		if float(rz[1])-z_cursor>0.3:
+			var length:=float(rz[1])-z_cursor
+			_add(packs,_cell(Vector2(x,z_cursor+length*0.5)),_box_body("CityHallRostrumPier_%d_%d"%[0 if side<0.0 else 1,pier_index],Vector3(0.6,5.0,length),Vector3(x,DATUM+y+2.5,z_cursor+length*0.5),Color("#d3c6ad")))
+	# The lintel spans the gate's opening only: the legs' scissor flights climb through the rest of the Rostrum's width.
+	_add(packs,_cell(Vector2(-367,0)),_box_body("CityHallRostrumLintel",Vector3(7.0,0.6,float(PLAN.ARCH.opening)),Vector3(-367,DATUM+y+5.0,0),Color("#d3c6ad")))
+	# The Rostrum itself (city.md, the front): the 7 m balcony across the whole west
+	# front at +14.2 with the speaker's bay on the axis, and the deck across the gate's
+	# opening to the Wall Line's inner platform. One run, so their seam is not an overlap.
+	var bay: Dictionary=rostrum.bay; var bay_c:=Vector2(float(bay.c[0]),float(bay.c[1])); var bay_r:=float(bay.r)
+	var outline:=PackedVector2Array([Vector2(float(rx[1]),float(rz[0])),Vector2(float(rx[0]),float(rz[0])),Vector2(float(rx[0]),bay_c.y-bay_r)])
+	for arc_step in range(1,12):
+		var arc_angle:=deg_to_rad(-90.0-180.0*float(arc_step)/12.0)
+		outline.append(bay_c+Vector2(cos(arc_angle),sin(arc_angle))*bay_r)
+	outline.append(Vector2(float(rx[0]),bay_c.y+bay_r)); outline.append(Vector2(float(rx[0]),float(rz[1]))); outline.append(Vector2(float(rx[1]),float(rz[1])))
+	var rostrum_deck:=_polygon_deck_body("CityHallRostrumDeck",outline,DATUM+y,0.4,Color("#c9b999"))
+	rostrum_deck.set_meta("walk_deck",true); rostrum_deck.set_meta("walk_run_id","CityHallRostrum"); _add(packs,_cell(Vector2(-367,0)),rostrum_deck)
+	var opening_x: Array=rostrum.opening_x; var opening_half:=float(PLAN.ARCH.opening)*0.5
+	var opening_deck:=_box_body("CityHallRostrumOpeningDeck",Vector3(float(opening_x[1])-float(opening_x[0]),0.4,opening_half*2.0),Vector3((float(opening_x[0])+float(opening_x[1]))*0.5,DATUM+y-0.2,0),Color("#c9b999"))
+	opening_deck.set_meta("walk_deck",true); opening_deck.set_meta("walk_run_id","CityHallRostrum"); _add(packs,_cell(Vector2(-361.3,0)),opening_deck)
 	for leg in front.legs:
 		var side:=String(leg.side)
 		for flight in leg.flights:
 			var band: Array=front.bands[String(flight.band)]; var ys: Array=flight.y; var zs: Array=flight.z
 			var foot:=Vector3((float(band[0])+float(band[1]))*0.5,DATUM+float(ys[0]),float(zs[0])); var head:=Vector3(foot.x,DATUM+float(ys[1]),float(zs[1]))
-			_add_escalator_pair(packs,"CityHall_%s_%s"%[side,String(flight.name)],foot,head,2.8)
+			_add_escalator_pair(packs,"CityHall_%s_%s"%[side,String(flight.name)],foot,head,2.8,0.04,true)
 		for gallery in leg.galleries:
 			var band_name:=String(gallery.band); var xr: Array
 			if band_name=="AB": xr=[minf(float(front.bands.A[0]),float(front.bands.B[0])),maxf(float(front.bands.A[1]),float(front.bands.B[1]))]
@@ -1757,23 +2050,26 @@ static func _add_arch_front(packs: Dictionary) -> void:
 			var zr: Array=gallery.z; var gy:=DATUM+float(gallery.y)
 			var g:=_box_body("CityHallGallery_%s_%s"%[side,String(gallery.name)],Vector3(absf(float(xr[1])-float(xr[0])),0.38,absf(float(zr[1])-float(zr[0]))),Vector3((float(xr[0])+float(xr[1]))*0.5,gy-0.19,(float(zr[0])+float(zr[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(g.position.x,g.position.z)),g)
 		var ov: Dictionary=leg.over_tracks; var ox: Array=ov.x; var oz: Array=ov.z
-		var walk:=_box_body("CityHallOverTrackWalk_%s"%side,Vector3(float(ox[1])-float(ox[0]),0.4,absf(float(oz[1])-float(oz[0]))),Vector3((float(ox[0])+float(ox[1]))*0.5,DATUM+float(ov.y),(float(oz[0])+float(oz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(walk.position.x,walk.position.z)),walk)
+		var walk:=_box_body("CityHallOverTrackWalk_%s"%side,Vector3(float(ox[1])-float(ox[0]),0.4,absf(float(oz[1])-float(oz[0]))),Vector3((float(ox[0])+float(ox[1]))*0.5,DATUM+float(ov.y)-0.2,(float(oz[0])+float(oz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(walk.position.x,walk.position.z)),walk)
 		var outer: Dictionary=leg.outer; var oys: Array=outer.y; var ozs: Array=outer.z
-		_add_escalator_pair(packs,"CityHallOuter_%s"%side,Vector3(float(outer.x[0]),DATUM+float(oys[0]),float(ozs[0])),Vector3(float(outer.x[1]),DATUM+float(oys[1]),float(ozs[1])),2.8)
+		# The pair's head is drawn on the landing's east edge (x outer.x[1]); its belts are 2.2 m wide about that line, so the head sits one belt half-width inside the landing.
+		_add_escalator_pair(packs,"CityHallOuter_%s"%side,Vector3(float(outer.x[0]),DATUM+float(oys[0]),float(ozs[0])),Vector3(float(outer.x[1])-1.1,DATUM+float(oys[1]),float(ozs[1])),2.8,0.04,true)
 		var ol: Dictionary=leg.outer_landing; var olx: Array=ol.x; var olz: Array=ol.z
-		var landing:=_box_body("CityHallOuterLanding_%s"%side,Vector3(float(olx[1])-float(olx[0]),0.4,absf(float(olz[1])-float(olz[0]))),Vector3((float(olx[0])+float(olx[1]))*0.5,DATUM+float(ol.y),(float(olz[0])+float(olz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(landing.position.x,landing.position.z)),landing)
-		var steps: Dictionary=leg.steps; var footx:=float(steps.foot); var headx:=float(steps.head); var half: Array=steps.half
+		var landing:=_box_body("CityHallOuterLanding_%s"%side,Vector3(float(olx[1])-float(olx[0]),0.4,absf(float(olz[1])-float(olz[0]))),Vector3((float(olx[0])+float(olx[1]))*0.5,DATUM+float(ol.y)-0.2,(float(olz[0])+float(olz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(landing.position.x,landing.position.z)),landing)
+		var steps: Dictionary=leg.steps; var footx:=float(steps.foot); var headx:=float(steps.head); var half: Array=steps.half; var half_y:=float(steps.half_y)
+		# Two flights share the half-landing (city.md): the forecourt (the plaza's paving, +0.13) to the half-landing, then on to the Rostrum.
+		var flights: Array=[[footx,0.13,float(half[0]),half_y],[float(half[1]),half_y,headx,y_rostrum]]
 		for lane in steps.lanes:
 			var z:=float(lane.z)
-			if String(lane.kind).contains("escalator"):
-				var a:=Vector3(footx,DATUM+7.1,z); var b:=Vector3(headx,DATUM+14.2,z)
-				if String(lane.kind)=="down escalator": var swap:=a; a=b; b=swap
-				_add_escalator_pair(packs,"CityHallSteps_%s_%s"%[side,String(lane.kind).to_snake_case()],a,b,2.4)
-			else:
-				for i in 12:
-					var t:=float(i)/11.0; var x:=lerpf(footx,headx,t); var sy:=lerpf(DATUM+7.1,DATUM+14.2,t)
-					var stair:=_box_body("CityHallStep_%s_%02d"%[side,i],Vector3(2.5,0.24,float(lane.w)),Vector3(x,sy,z),Color("#c9b999")); _add(packs,_cell(Vector2(x,z)),stair)
-		var half_land:=_box_body("CityHallStepsHalfLanding_%s"%side,Vector3(absf(float(half[1])-float(half[0])),0.4,float(steps.width)),Vector3((float(half[0])+float(half[1]))*0.5,DATUM+float(steps.half_y),float(steps.z)),Color("#c9b999")); _add(packs,_cell(Vector2(half_land.position.x,half_land.position.z)),half_land)
+			for flight_i in flights.size():
+				var span: Array=flights[flight_i]
+				var a:=Vector3(float(span[0]),DATUM+float(span[1]),z); var b:=Vector3(float(span[2]),DATUM+float(span[3]),z)
+				if String(lane.kind).contains("escalator"):
+					if String(lane.kind)=="down escalator": var swap:=a; a=b; b=swap
+					_add_escalator_pair(packs,"CityHallSteps_%s_%s_%d"%[side,String(lane.kind).to_snake_case(),flight_i],a,b,2.4,0.04,true)
+				else:
+					_add(packs,_cell(Vector2((a.x+b.x)*0.5,z)),_stair_body("CityHallStair_%s_%d"%[side,flight_i],a,b,float(lane.w)))
+		var half_land:=_box_body("CityHallStepsHalfLanding_%s"%side,Vector3(absf(float(half[1])-float(half[0])),0.4,float(steps.width)),Vector3((float(half[0])+float(half[1]))*0.5,DATUM+half_y-0.2,float(steps.z)),Color("#c9b999")); _add(packs,_cell(Vector2(half_land.position.x,half_land.position.z)),half_land)
 		for li in leg.lifts.size():
 			var ld: Dictionary=leg.lifts[li]; var c: Vector2=Vector2(ld.c[0],float(ld.c[1])); var stops: Array=ld.stops
 			var car:=AnimatableBody3D.new(); car.name="CityHall_%s_Lift_%d"%[side,li]; car.position=Vector3(c.x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd")); car.set("base_height",DATUM)
@@ -1781,7 +2077,11 @@ static func _add_arch_front(packs: Dictionary) -> void:
 			for stop in stops: levels.append(float(stop)); labels.append("Floor %s"%str(stop))
 			car.set("stop_levels",levels); car.set("stop_names",labels)
 			var cm:=BoxMesh.new(); cm.size=Vector3(float(ld.size),0.22,float(ld.size)); var cv:=MeshInstance3D.new(); cv.mesh=cm; cv.material_override=_material(Color(0.55,0.74,0.77,0.35)); car.add_child(cv); var cs:=BoxShape3D.new(); cs.size=cm.size; var cc:=CollisionShape3D.new(); cc.shape=cs; car.add_child(cc); _add(packs,_cell(c),car)
-			var controls:=Node3D.new(); controls.name=car.name+"Controls"; _add_moy_lift_call(controls,car,1,"City Hall",Vector3(c.x+float(ld.size),DATUM,c.y)); _add(packs,_cell(c),controls)
+			var controls:=Node3D.new(); controls.name=car.name+"Controls"
+			var door_reach:=float(ld.size)*0.5+0.9; var call_offset:=Vector2(-door_reach,0.0)
+			if str(ld.door)!="w": call_offset=Vector2(0.0,float(ld.door)*door_reach)
+			for stop_i in stops.size(): _add_moy_lift_call(controls,car,stop_i,"Floor %s"%str(stops[stop_i]),Vector3(c.x+call_offset.x,DATUM+float(stops[stop_i]),c.y+call_offset.y))
+			_add(packs,_cell(c),controls)
 	# Only the plan-authored guard runs are built; glass and shoe share a solid body.
 	for guard in PLAN.ARCH.front_guard.runs:
 		var pts: Array=guard.pts; var level:=DATUM+float(guard.y)

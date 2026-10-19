@@ -3,178 +3,317 @@
 [ext_resource type="Script" path="res://scripts/moy_escalator.gd" id="1_us1k1"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ftw83"]
-size = Vector3(9.202222, 0.9, 1.2)
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u2vur"]
-albedo_color = Color(0.6431373, 0.5764706, 0.44705883, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_dlc4c"]
-size = Vector3(9.202222, 0.9, 1.2)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4e5sy"]
-albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
-roughness = 0.92
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_8bv5o"]
-_surfaces = [{
-"aabb": AABB(-5.0511107, -0.45, -0.6, 10.1022215, 0.9, 1.2),
-"format": 34359738369,
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 114,
-"vertex_data": PackedByteArray("TTyTwGZm5j6amRm/TTyTwGZm5j6amRk/TTyTQGZm5j6amRk/TTyTwGZm5j6amRm/TTyTQGZm5j6amRk/TTyTQGZm5j6amRm/TTyTQGZm5j6amRm/TTyTQGZm5j6amRk/Br+YQKLc1D6amRk/TTyTQGZm5j6amRm/Br+YQKLc1D6amRk/Br+YQKLc1D6amRm/Br+YQKLc1D6amRm/Br+YQKLc1D6amRk/+2qdQNvqoj6amRk/Br+YQKLc1D6amRm/+2qdQNvqoj6amRk/+2qdQNvqoj6amRm/+2qdQNvqoj6amRm/+2qdQNvqoj6amRk/F4qgQC1XMD6amRk/+2qdQNvqoj6amRm/F4qgQC1XMD6amRk/F4qgQC1XMD6amRm/F4qgQC1XMD6amRm/F4qgQC1XMD6amRk/s6KhQAAAAACamRk/F4qgQC1XMD6amRm/s6KhQAAAAACamRk/s6KhQAAAAACamRm/s6KhQAAAAACamRm/s6KhQAAAAACamRk/F4qgQC1XML6amRk/s6KhQAAAAACamRm/F4qgQC1XML6amRk/F4qgQC1XML6amRm/F4qgQC1XML6amRm/F4qgQC1XML6amRk/+2qdQNvqor6amRk/F4qgQC1XML6amRm/+2qdQNvqor6amRk/+2qdQNvqor6amRm/+2qdQNvqor6amRm/+2qdQNvqor6amRk/Br+YQKLc1L6amRk/+2qdQNvqor6amRm/Br+YQKLc1L6amRk/Br+YQKLc1L6amRm/Br+YQKLc1L6amRm/Br+YQKLc1L6amRk/TTyTQGZm5r6amRk/Br+YQKLc1L6amRm/TTyTQGZm5r6amRk/TTyTQGZm5r6amRm/TTyTQGZm5r6amRm/TTyTQGZm5r6amRk/TTyTwGZm5r6amRk/TTyTQGZm5r6amRm/TTyTwGZm5r6amRk/TTyTwGZm5r6amRm/TTyTwGZm5r6amRm/TTyTwGZm5r6amRk/Br+YwKLc1L6amRk/TTyTwGZm5r6amRm/Br+YwKLc1L6amRk/Br+YwKLc1L6amRm/Br+YwKLc1L6amRm/Br+YwKLc1L6amRk/+2qdwNvqor6amRk/Br+YwKLc1L6amRm/+2qdwNvqor6amRk/+2qdwNvqor6amRm/+2qdwNvqor6amRm/+2qdwNvqor6amRk/F4qgwC1XML6amRk/+2qdwNvqor6amRm/F4qgwC1XML6amRk/F4qgwC1XML6amRm/F4qgwC1XML6amRm/F4qgwC1XML6amRk/s6KhwFklfqSamRk/F4qgwC1XML6amRm/s6KhwFklfqSamRk/s6KhwFklfqSamRm/s6KhwFklfqSamRm/s6KhwFklfqSamRk/F4qgwC1XMD6amRk/s6KhwFklfqSamRm/F4qgwC1XMD6amRk/F4qgwC1XMD6amRm/F4qgwC1XMD6amRm/F4qgwC1XMD6amRk/+2qdwNvqoj6amRk/F4qgwC1XMD6amRm/+2qdwNvqoj6amRk/+2qdwNvqoj6amRm/+2qdwNvqoj6amRm/+2qdwNvqoj6amRk/Br+YwKLc1D6amRk/+2qdwNvqoj6amRm/Br+YwKLc1D6amRk/Br+YwKLc1D6amRm/Br+YwKLc1D6amRm/Br+YwKLc1D6amRk/TTyTwGZm5j6amRk/Br+YwKLc1D6amRm/TTyTwGZm5j6amRk/TTyTwGZm5j6amRm/TTyTwGZm5j6amRm/TTyTwGZm5j6amRk/TTyTwGZm5j6amRk/TTyTwGZm5j6amRm/TTyTwGZm5j6amRk/TTyTwGZm5j6amRm/")
-}]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_70hsu"]
-albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_vuuck"]
-size = Vector3(0.055, 0.035, 1.056)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_htpnf"]
-size = Vector3(9.202222, 0.95, 0.11)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3iygc"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_im7mh"]
 transparency = 1
-albedo_color = Color(0.48, 0.68, 0.72, 0.24)
-roughness = 0.2
+albedo_color = Color(0.38, 0.63, 0.68, 0.18)
+roughness = 0.15
+
+[sub_resource type="BoxMesh" id="BoxMesh_u2vur"]
+size = Vector3(1.0602897, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dlc4c"]
+size = Vector3(1.1803657, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4e5sy"]
+size = Vector3(1.1803657, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8bv5o"]
+size = Vector3(1.3494778, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_70hsu"]
+size = Vector3(1.3494778, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vuuck"]
+size = Vector3(1.6117029, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_htpnf"]
+size = Vector3(1.6117029, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3iygc"]
+size = Vector3(2.111854, 6.1, 0.12)
 
 [sub_resource type="BoxMesh" id="BoxMesh_y114p"]
-size = Vector3(9.202222, 0.95, 0.11)
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i6lli"]
-albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
-roughness = 0.4
+[sub_resource type="BoxShape3D" id="BoxShape3D_i6lli"]
+size = Vector3(2.111854, 5.2, 0.12)
 
 [sub_resource type="BoxMesh" id="BoxMesh_h4vbd"]
-size = Vector3(0.75, 0.09, 0.13)
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yusle"]
-size = Vector3(0.75, 0.09, 0.13)
+[sub_resource type="BoxShape3D" id="BoxShape3D_yusle"]
+size = Vector3(5.1148515, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ww66d"]
-size = Vector3(0.22, 0.9, 0.22)
+[sub_resource type="BoxMesh" id="BoxMesh_ww66d"]
+size = Vector3(5.1148515, 6.1, 0.12)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dq15e"]
-albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
-roughness = 0.92
+[sub_resource type="BoxShape3D" id="BoxShape3D_dq15e"]
+size = Vector3(5.1148515, 5.2, 0.12)
 
 [sub_resource type="BoxMesh" id="BoxMesh_x46p8"]
-size = Vector3(0.22, 0.9, 0.22)
+size = Vector3(5.1148515, 5.2, 0.12)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3s571"]
-size = Vector3(0.22, 0.9, 0.22)
+size = Vector3(14.2, 0.32, 3.53)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c8s2i"]
-albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_mrxps"]
-size = Vector3(0.22, 0.9, 0.22)
+size = Vector3(14.2, 0.32, 3.53)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cjymg"]
-size = Vector3(9.202222, 0.95, 0.11)
+size = Vector3(14.2, 0.32, 5.55)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yl3yh"]
-size = Vector3(9.202222, 0.95, 0.11)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5plh2"]
-albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
-roughness = 0.4
-
-[sub_resource type="BoxMesh" id="BoxMesh_xn0cs"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxMesh" id="BoxMesh_jsxfh"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_4aucx"]
-size = Vector3(0.22, 0.9, 0.22)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jyish"]
-albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yl3yh"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_1hy6x"]
-size = Vector3(0.22, 0.9, 0.22)
+[sub_resource type="BoxMesh" id="BoxMesh_5plh2"]
+size = Vector3(14.2, 0.32, 5.55)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_tt7ii"]
-size = Vector3(0.22, 0.9, 0.22)
+[sub_resource type="BoxShape3D" id="BoxShape3D_xn0cs"]
+size = Vector3(14.2, 0.32, 21.84)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6oboe"]
-albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jsxfh"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_5roxn"]
-size = Vector3(0.22, 0.9, 0.22)
+[sub_resource type="BoxMesh" id="BoxMesh_4aucx"]
+size = Vector3(14.2, 0.32, 21.84)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_g4mdy"]
-size = Vector3(3.8, 0.3, 2.4)
+[sub_resource type="BoxShape3D" id="BoxShape3D_jyish"]
+size = Vector3(14.2, 0.32, 5.55)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s2317"]
-albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1hy6x"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ok6ct"]
-size = Vector3(3.8, 0.3, 2.4)
+[sub_resource type="BoxMesh" id="BoxMesh_tt7ii"]
+size = Vector3(14.2, 0.32, 5.55)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4h4d1"]
-size = Vector3(3.8, 0.3, 2.4)
+[sub_resource type="BoxShape3D" id="BoxShape3D_6oboe"]
+size = Vector3(14.2, 0.32, 3.53)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_64sbp"]
-albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5roxn"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_miwfh"]
-size = Vector3(3.8, 0.3, 2.4)
+[sub_resource type="BoxMesh" id="BoxMesh_g4mdy"]
+size = Vector3(14.2, 0.32, 3.53)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_wrcro"]
-size = Vector3(5.549999, 1.1, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_s2317"]
+size = Vector3(3.6, 0.32, 3.53)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0i3lw"]
-albedo_color = Color(0.4, 0.65, 0.68, 0.35)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ok6ct"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ahfyi"]
-size = Vector3(5.549999, 1.1, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_4h4d1"]
+size = Vector3(3.6, 0.32, 3.53)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_nvew8"]
-size = Vector3(3.5999756, 1.1, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_64sbp"]
+size = Vector3(3.6, 0.32, 21.84)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8qm8b"]
-albedo_color = Color(0.4, 0.65, 0.68, 0.35)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_miwfh"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_2ho1b"]
-size = Vector3(3.5999756, 1.1, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_wrcro"]
+size = Vector3(3.6, 0.32, 21.84)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5qo1i"]
-size = Vector3(5.549999, 1.1, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_0i3lw"]
+size = Vector3(3.6, 0.32, 3.53)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_82yxk"]
-albedo_color = Color(0.4, 0.65, 0.68, 0.35)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ahfyi"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_gidpu"]
-size = Vector3(5.549999, 1.1, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_nvew8"]
+size = Vector3(3.6, 0.32, 3.53)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ecpiu"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8qm8b"]
+size = Vector3(4.4, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2ho1b"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_5qo1i"]
+size = Vector3(4.4, 0.32, 3.53)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_82yxk"]
+size = Vector3(4.4, 0.32, 5.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gidpu"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ecpiu"]
+size = Vector3(4.4, 0.32, 5.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jjlad"]
+size = Vector3(4.4, 0.32, 21.84)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ypku"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_td885"]
+size = Vector3(4.4, 0.32, 21.84)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5wx52"]
+size = Vector3(4.4, 0.32, 5.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0b1he"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_j8xcv"]
+size = Vector3(4.4, 0.32, 5.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gkxa4"]
+size = Vector3(4.4, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1lqt"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_qu2xs"]
+size = Vector3(4.4, 0.32, 3.53)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ptgs3"]
+size = Vector3(3.6, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_21s1f"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ls3a7"]
+size = Vector3(3.6, 0.32, 3.53)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bwmmb"]
+size = Vector3(3.6, 0.32, 21.84)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jg4i6"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_k8jlj"]
+size = Vector3(3.6, 0.32, 21.84)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_rkpns"]
+size = Vector3(3.6, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e31cv"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_xx84g"]
+size = Vector3(3.6, 0.32, 3.53)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dpip8"]
+size = Vector3(14.2, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b56n1"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_g5yjj"]
+size = Vector3(14.2, 0.32, 3.53)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a7cwo"]
+size = Vector3(14.2, 0.32, 5.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5rlyo"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_127dq"]
+size = Vector3(14.2, 0.32, 5.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fo7m7"]
+size = Vector3(14.2, 0.32, 21.84)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hmyyj"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mm4wg"]
+size = Vector3(14.2, 0.32, 21.84)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lum3a"]
+size = Vector3(14.2, 0.32, 5.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bcmn0"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_y7ie5"]
+size = Vector3(14.2, 0.32, 5.55)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_336ju"]
+size = Vector3(14.2, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gfe24"]
+albedo_color = Color(0.8352941, 0.81960785, 0.78039217, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ejdls"]
+size = Vector3(14.2, 0.32, 3.53)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6p6x7"]
+albedo_color = Color(0.6431373, 0.6666667, 0.63529414, 1)
+roughness = 0.92
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_8wi2q"]
+_surfaces = [{
+"aabb": AABB(-3.6, -0.02, -3.6, 7.2, 0.04, 7.2),
+"format": 34359738369,
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 1536,
+"vertex_data": PackedByteArray("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")
+}]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d8dcm"]
+size = Vector3(11.8, 0.32, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lputr"]
+albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_v8cbe"]
+size = Vector3(11.8, 0.32, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fv7hs"]
+size = Vector3(11.8, 0.32, 2.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bvday"]
+albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_5upgo"]
+size = Vector3(11.8, 0.32, 2.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yje7u"]
 size = Vector3(9.202222, 0.9, 1.2)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jjlad"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frfsy"]
 albedo_color = Color(0.7019608, 0.63529414, 0.49411765, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_6ypku"]
+[sub_resource type="BoxMesh" id="BoxMesh_uiwdt"]
 size = Vector3(9.202222, 0.9, 1.2)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_td885"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r5f7y"]
 albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
 roughness = 0.92
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_5wx52"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_0befm"]
 _surfaces = [{
 "aabb": AABB(-5.0511107, -0.45, -0.6, 10.1022215, 0.9, 1.2),
 "format": 34359738369,
@@ -184,414 +323,439 @@ _surfaces = [{
 "vertex_data": PackedByteArray("TTyTwGZm5j6amRm/TTyTwGZm5j6amRk/TTyTQGZm5j6amRk/TTyTwGZm5j6amRm/TTyTQGZm5j6amRk/TTyTQGZm5j6amRm/TTyTQGZm5j6amRm/TTyTQGZm5j6amRk/Br+YQKLc1D6amRk/TTyTQGZm5j6amRm/Br+YQKLc1D6amRk/Br+YQKLc1D6amRm/Br+YQKLc1D6amRm/Br+YQKLc1D6amRk/+2qdQNvqoj6amRk/Br+YQKLc1D6amRm/+2qdQNvqoj6amRk/+2qdQNvqoj6amRm/+2qdQNvqoj6amRm/+2qdQNvqoj6amRk/F4qgQC1XMD6amRk/+2qdQNvqoj6amRm/F4qgQC1XMD6amRk/F4qgQC1XMD6amRm/F4qgQC1XMD6amRm/F4qgQC1XMD6amRk/s6KhQAAAAACamRk/F4qgQC1XMD6amRm/s6KhQAAAAACamRk/s6KhQAAAAACamRm/s6KhQAAAAACamRm/s6KhQAAAAACamRk/F4qgQC1XML6amRk/s6KhQAAAAACamRm/F4qgQC1XML6amRk/F4qgQC1XML6amRm/F4qgQC1XML6amRm/F4qgQC1XML6amRk/+2qdQNvqor6amRk/F4qgQC1XML6amRm/+2qdQNvqor6amRk/+2qdQNvqor6amRm/+2qdQNvqor6amRm/+2qdQNvqor6amRk/Br+YQKLc1L6amRk/+2qdQNvqor6amRm/Br+YQKLc1L6amRk/Br+YQKLc1L6amRm/Br+YQKLc1L6amRm/Br+YQKLc1L6amRk/TTyTQGZm5r6amRk/Br+YQKLc1L6amRm/TTyTQGZm5r6amRk/TTyTQGZm5r6amRm/TTyTQGZm5r6amRm/TTyTQGZm5r6amRk/TTyTwGZm5r6amRk/TTyTQGZm5r6amRm/TTyTwGZm5r6amRk/TTyTwGZm5r6amRm/TTyTwGZm5r6amRm/TTyTwGZm5r6amRk/Br+YwKLc1L6amRk/TTyTwGZm5r6amRm/Br+YwKLc1L6amRk/Br+YwKLc1L6amRm/Br+YwKLc1L6amRm/Br+YwKLc1L6amRk/+2qdwNvqor6amRk/Br+YwKLc1L6amRm/+2qdwNvqor6amRk/+2qdwNvqor6amRm/+2qdwNvqor6amRm/+2qdwNvqor6amRk/F4qgwC1XML6amRk/+2qdwNvqor6amRm/F4qgwC1XML6amRk/F4qgwC1XML6amRm/F4qgwC1XML6amRm/F4qgwC1XML6amRk/s6KhwFklfqSamRk/F4qgwC1XML6amRm/s6KhwFklfqSamRk/s6KhwFklfqSamRm/s6KhwFklfqSamRm/s6KhwFklfqSamRk/F4qgwC1XMD6amRk/s6KhwFklfqSamRm/F4qgwC1XMD6amRk/F4qgwC1XMD6amRm/F4qgwC1XMD6amRm/F4qgwC1XMD6amRk/+2qdwNvqoj6amRk/F4qgwC1XMD6amRm/+2qdwNvqoj6amRk/+2qdwNvqoj6amRm/+2qdwNvqoj6amRm/+2qdwNvqoj6amRk/Br+YwKLc1D6amRk/+2qdwNvqoj6amRm/Br+YwKLc1D6amRk/Br+YwKLc1D6amRm/Br+YwKLc1D6amRm/Br+YwKLc1D6amRk/TTyTwGZm5j6amRk/Br+YwKLc1D6amRm/TTyTwGZm5j6amRk/TTyTwGZm5j6amRm/TTyTwGZm5j6amRm/TTyTwGZm5j6amRk/TTyTwGZm5j6amRk/TTyTwGZm5j6amRm/TTyTwGZm5j6amRk/TTyTwGZm5j6amRm/")
 }]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0b1he"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ijwh1"]
 albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_j8xcv"]
+[sub_resource type="BoxMesh" id="BoxMesh_ocg81"]
 size = Vector3(0.055, 0.035, 1.056)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_gkxa4"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_q2xf3"]
 size = Vector3(9.202222, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1lqt"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1jmm4"]
 transparency = 1
 albedo_color = Color(0.48, 0.68, 0.72, 0.24)
 roughness = 0.2
 
-[sub_resource type="BoxMesh" id="BoxMesh_qu2xs"]
+[sub_resource type="BoxMesh" id="BoxMesh_gl5jj"]
 size = Vector3(9.202222, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ptgs3"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kyeu8"]
 albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
 roughness = 0.4
 
-[sub_resource type="BoxMesh" id="BoxMesh_21s1f"]
+[sub_resource type="BoxMesh" id="BoxMesh_niaj2"]
 size = Vector3(0.75, 0.09, 0.13)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ls3a7"]
+[sub_resource type="BoxMesh" id="BoxMesh_tvct7"]
 size = Vector3(0.75, 0.09, 0.13)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_bwmmb"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_5p6e3"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jg4i6"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0htky"]
 albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_k8jlj"]
+[sub_resource type="BoxMesh" id="BoxMesh_304x6"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rkpns"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_dxkuv"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e31cv"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o57n8"]
 albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_xx84g"]
+[sub_resource type="BoxMesh" id="BoxMesh_umfn5"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_dpip8"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_pn1io"]
 size = Vector3(9.202222, 0.95, 0.11)
 
-[sub_resource type="BoxMesh" id="BoxMesh_b56n1"]
+[sub_resource type="BoxMesh" id="BoxMesh_d7pqs"]
 size = Vector3(9.202222, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g5yjj"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aqiff"]
 albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
 roughness = 0.4
 
-[sub_resource type="BoxMesh" id="BoxMesh_a7cwo"]
+[sub_resource type="BoxMesh" id="BoxMesh_4b07p"]
 size = Vector3(0.75, 0.09, 0.13)
 
-[sub_resource type="BoxMesh" id="BoxMesh_5rlyo"]
+[sub_resource type="BoxMesh" id="BoxMesh_7074t"]
 size = Vector3(0.75, 0.09, 0.13)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_127dq"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_f6crc"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fo7m7"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lyt0x"]
 albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_hmyyj"]
+[sub_resource type="BoxMesh" id="BoxMesh_v1qju"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_mm4wg"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_57sv5"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lum3a"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dobao"]
 albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_bcmn0"]
+[sub_resource type="BoxMesh" id="BoxMesh_ov2pt"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[node name="MoyCell_03_03_Part_23" type="Node3D" unique_id=1309900973]
+[node name="MoyCell_03_03_Part_23" type="Node3D" unique_id=1107018723]
 
-[node name="ClockRoomArrival_00_north_Down" type="StaticBody3D" parent="." unique_id=1428873061]
-transform = Transform3D(0, 0, -1, -0.49987933, 0.8660951, 0, 0.8660951, 0.49987933, 0, -563.4, -20.7, -12.485)
-script = ExtResource("1_us1k1")
-travel_direction = Vector3(0, -0.49987933, 0.8660951)
-travel_speed = 0.35
-belt_length = 9.202222
-belt_width = 1.2
-belt_thickness = 0.9
-metadata/flight = true
-metadata/walk_deck = true
-metadata/walk_run_id = "Escalator:ClockRoomArrival_00_north"
-metadata/enterable = true
+[node name="DomeGlassPanel_90" type="StaticBody3D" parent="." unique_id=2024024733]
+transform = Transform3D(0.22478424, 0, -0.97440857, 0, 1, 0, 0.97440857, 0, 0.22478424, 19.3429, 8.5, -11.855704)
 
-[node name="@CollisionShape3D@12310" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=838488615]
+[node name="@CollisionShape3D@11934" type="CollisionShape3D" parent="DomeGlassPanel_90" unique_id=882364432]
 shape = SubResource("BoxShape3D_ftw83")
 
-[node name="@MeshInstance3D@12311" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=583329108]
-material_override = SubResource("StandardMaterial3D_u2vur")
-mesh = SubResource("BoxMesh_dlc4c")
+[node name="@MeshInstance3D@11935" type="MeshInstance3D" parent="DomeGlassPanel_90" unique_id=1019296584]
+material_override = SubResource("StandardMaterial3D_im7mh")
+mesh = SubResource("BoxMesh_u2vur")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=2104257719]
-material_override = SubResource("StandardMaterial3D_4e5sy")
-mesh = SubResource("ArrayMesh_8bv5o")
+[node name="DomeGlassPanel_91" type="StaticBody3D" parent="." unique_id=400495818]
+transform = Transform3D(0.16455762, 0, -0.98636746, 0, 1, 0, 0.98636746, 0, 0.16455762, 19.559187, 8.5, -10.7569895)
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1892676694]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 0.0
+[node name="@CollisionShape3D@11936" type="CollisionShape3D" parent="DomeGlassPanel_91" unique_id=1209830742]
+shape = SubResource("BoxShape3D_dlc4c")
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=198723711]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 0.6848992622282433
+[node name="@MeshInstance3D@11937" type="MeshInstance3D" parent="DomeGlassPanel_91" unique_id=139728533]
+material_override = SubResource("StandardMaterial3D_im7mh")
+mesh = SubResource("BoxMesh_4e5sy")
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=268395364]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 1.3697985244564865
+[node name="DomeGlassPanel_92" type="StaticBody3D" parent="." unique_id=288566234]
+transform = Transform3D(0.1116104, 0, -0.99375206, 0, 1, 0, 0.99375206, 0, 0.1116104, 19.731613, 8.5, -9.504329)
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=923570735]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 2.05469778668473
+[node name="@CollisionShape3D@11938" type="CollisionShape3D" parent="DomeGlassPanel_92" unique_id=2121198333]
+shape = SubResource("BoxShape3D_8bv5o")
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=862605135]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 2.739597048912973
+[node name="@MeshInstance3D@11939" type="MeshInstance3D" parent="DomeGlassPanel_92" unique_id=1745550931]
+material_override = SubResource("StandardMaterial3D_im7mh")
+mesh = SubResource("BoxMesh_70hsu")
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1550811701]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 3.4244963111412163
+[node name="DomeGlassPanel_93" type="StaticBody3D" parent="." unique_id=302989197]
+transform = Transform3D(0.066602916, 0, -0.99777955, 0, 1, 0, 0.99777955, 0, 0.066602916, 19.860592, 8.5, -8.029744)
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1770717268]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 4.10939557336946
+[node name="@CollisionShape3D@11940" type="CollisionShape3D" parent="DomeGlassPanel_93" unique_id=865705877]
+shape = SubResource("BoxShape3D_vuuck")
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1894491109]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 4.794294835597703
+[node name="@MeshInstance3D@11941" type="MeshInstance3D" parent="DomeGlassPanel_93" unique_id=1865122073]
+material_override = SubResource("StandardMaterial3D_im7mh")
+mesh = SubResource("BoxMesh_htpnf")
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=359941824]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 5.479194097825946
+[node name="DomeGlassEyeRim_94_0" type="StaticBody3D" parent="." unique_id=608836455]
+transform = Transform3D(0.03045334, 0, -0.9995362, 0, 1, 0, 0.9995362, 0, 0.03045334, 19.94642, 3.05, -6.170244)
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=731710081]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 6.164093360054189
+[node name="@CollisionShape3D@11942" type="CollisionShape3D" parent="DomeGlassEyeRim_94_0" unique_id=1024555324]
+shape = SubResource("BoxShape3D_3iygc")
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=277915483]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 6.848992622282433
-
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=320950346]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 7.533891884510676
-
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1114300388]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 8.21879114673892
-
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=955655172]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 8.903690408967163
-
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1034041064]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 9.588589671195406
-
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=770459486]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 10.27348893342365
-
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=2107724059]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 10.958388195651892
-
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1797494959]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 11.643287457880136
-
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1152819122]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 12.328186720108379
-
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=912444550]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 13.013085982336623
-
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=757331283]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 13.697985244564865
-
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=419972157]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 14.38288450679311
-
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1880827032]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 15.067783769021352
-
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=519244623]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 15.752683031249596
-
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=120575764]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 16.43758229347784
-
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1067700645]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 17.12248155570608
-
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1852779787]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 17.807380817934327
-
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=58594368]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 18.49228008016257
-
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=830312084]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 19.17717934239081
-
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1385314199]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 19.862078604619054
-
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=345336122]
-material_override = SubResource("StandardMaterial3D_70hsu")
-mesh = SubResource("BoxMesh_vuuck")
-metadata/belt_distance = 20.5469778668473
-
-[node name="@CollisionShape3D@12312" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=605651435]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
-shape = SubResource("BoxShape3D_htpnf")
-
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=2022366230]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
-material_override = SubResource("StandardMaterial3D_3iygc")
+[node name="@MeshInstance3D@11943" type="MeshInstance3D" parent="DomeGlassEyeRim_94_0" unique_id=391124609]
+material_override = SubResource("StandardMaterial3D_im7mh")
 mesh = SubResource("BoxMesh_y114p")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1014083392]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, -0.545)
-material_override = SubResource("StandardMaterial3D_i6lli")
+[node name="DomeGlassEyeRim_94_1" type="StaticBody3D" parent="." unique_id=1970370592]
+transform = Transform3D(0.03045334, 0, -0.9995362, 0, 1, 0, 0.9995362, 0, 0.03045334, 19.94642, 14.4, -6.170244)
+
+[node name="@CollisionShape3D@11944" type="CollisionShape3D" parent="DomeGlassEyeRim_94_1" unique_id=1190242940]
+shape = SubResource("BoxShape3D_i6lli")
+
+[node name="@MeshInstance3D@11945" type="MeshInstance3D" parent="DomeGlassEyeRim_94_1" unique_id=1591274139]
+material_override = SubResource("StandardMaterial3D_im7mh")
 mesh = SubResource("BoxMesh_h4vbd")
-metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1410209804]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, -0.545)
-material_override = SubResource("StandardMaterial3D_i6lli")
-mesh = SubResource("BoxMesh_yusle")
-metadata/handrail_distance = 6.9016664028167725
+[node name="DomeGlassEyeRim_95_0" type="StaticBody3D" parent="." unique_id=2103142051]
+transform = Transform3D(0.0041882433, 0, -0.99999124, 0, 1, 0, 0.99999124, 0, 0.0041882433, 19.989288, 3.05, -2.5574038)
 
-[node name="@CollisionShape3D@12314" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=1715975828]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
-shape = SubResource("BoxShape3D_ww66d")
+[node name="@CollisionShape3D@11946" type="CollisionShape3D" parent="DomeGlassEyeRim_95_0" unique_id=325290126]
+shape = SubResource("BoxShape3D_yusle")
 
-[node name="@MeshInstance3D@12315" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1635023853]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
-material_override = SubResource("StandardMaterial3D_dq15e")
+[node name="@MeshInstance3D@11947" type="MeshInstance3D" parent="DomeGlassEyeRim_95_0" unique_id=854528876]
+material_override = SubResource("StandardMaterial3D_im7mh")
+mesh = SubResource("BoxMesh_ww66d")
+
+[node name="DomeGlassEyeRim_95_1" type="StaticBody3D" parent="." unique_id=249309579]
+transform = Transform3D(0.0041882433, 0, -0.99999124, 0, 1, 0, 0.99999124, 0, 0.0041882433, 19.989288, 14.4, -2.5574038)
+
+[node name="@CollisionShape3D@11948" type="CollisionShape3D" parent="DomeGlassEyeRim_95_1" unique_id=307361720]
+shape = SubResource("BoxShape3D_dq15e")
+
+[node name="@MeshInstance3D@11949" type="MeshInstance3D" parent="DomeGlassEyeRim_95_1" unique_id=710390283]
+material_override = SubResource("StandardMaterial3D_im7mh")
 mesh = SubResource("BoxMesh_x46p8")
 
-[node name="@CollisionShape3D@12316" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=90920794]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
+[node name="ClockRoomTerrazzo" type="StaticBody3D" parent="." unique_id=24354055]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -572.9, -18.56, -18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12169" type="CollisionShape3D" parent="ClockRoomTerrazzo" unique_id=1102174297]
 shape = SubResource("BoxShape3D_3s571")
 
-[node name="@MeshInstance3D@12317" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=40125291]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
+[node name="@MeshInstance3D@12170" type="MeshInstance3D" parent="ClockRoomTerrazzo" unique_id=1247280700]
 material_override = SubResource("StandardMaterial3D_c8s2i")
 mesh = SubResource("BoxMesh_mrxps")
 
-[node name="@CollisionShape3D@12318" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=1260642672]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
+[node name="@StaticBody3D@12173" type="StaticBody3D" parent="." unique_id=954081493]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -572.9, -18.56, -13.695)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12171" type="CollisionShape3D" parent="@StaticBody3D@12173" unique_id=1580549581]
 shape = SubResource("BoxShape3D_cjymg")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1582522724]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
-material_override = SubResource("StandardMaterial3D_3iygc")
-mesh = SubResource("BoxMesh_yl3yh")
+[node name="@MeshInstance3D@12172" type="MeshInstance3D" parent="@StaticBody3D@12173" unique_id=1829317381]
+material_override = SubResource("StandardMaterial3D_yl3yh")
+mesh = SubResource("BoxMesh_5plh2")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1059285232]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, 0.545)
-material_override = SubResource("StandardMaterial3D_5plh2")
-mesh = SubResource("BoxMesh_xn0cs")
-metadata/handrail_distance = 2.3005555
+[node name="@StaticBody3D@12176" type="StaticBody3D" parent="." unique_id=1770502702]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -572.9, -18.56, 0)
+metadata/enterable = true
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=433895501]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, 0.545)
-material_override = SubResource("StandardMaterial3D_5plh2")
-mesh = SubResource("BoxMesh_jsxfh")
-metadata/handrail_distance = 6.9016664028167725
+[node name="@CollisionShape3D@12174" type="CollisionShape3D" parent="@StaticBody3D@12176" unique_id=1437530588]
+shape = SubResource("BoxShape3D_xn0cs")
 
-[node name="@CollisionShape3D@12320" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=150437983]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
-shape = SubResource("BoxShape3D_4aucx")
+[node name="@MeshInstance3D@12175" type="MeshInstance3D" parent="@StaticBody3D@12176" unique_id=1759569898]
+material_override = SubResource("StandardMaterial3D_jsxfh")
+mesh = SubResource("BoxMesh_4aucx")
 
-[node name="@MeshInstance3D@12321" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=344127480]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
-material_override = SubResource("StandardMaterial3D_jyish")
-mesh = SubResource("BoxMesh_1hy6x")
+[node name="@StaticBody3D@12179" type="StaticBody3D" parent="." unique_id=1156051195]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -572.9, -18.56, 13.695)
+metadata/enterable = true
 
-[node name="@CollisionShape3D@12322" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Down" unique_id=2076943797]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
-shape = SubResource("BoxShape3D_tt7ii")
+[node name="@CollisionShape3D@12177" type="CollisionShape3D" parent="@StaticBody3D@12179" unique_id=662232729]
+shape = SubResource("BoxShape3D_jyish")
 
-[node name="@MeshInstance3D@12323" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Down" unique_id=1302448714]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
-material_override = SubResource("StandardMaterial3D_6oboe")
-mesh = SubResource("BoxMesh_5roxn")
+[node name="@MeshInstance3D@12178" type="MeshInstance3D" parent="@StaticBody3D@12179" unique_id=1638805319]
+material_override = SubResource("StandardMaterial3D_1hy6x")
+mesh = SubResource("BoxMesh_tt7ii")
 
-[node name="ClockRoomArrival_00_north_Landing_0" type="StaticBody3D" parent="." unique_id=934372882]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564, -23.15, -8.5)
-metadata/walk_deck = true
-metadata/walk_run_id = "Escalator:ClockRoomArrival_00_north"
-metadata/reach_link_id = "Escalator:ClockRoomArrival_00_north"
+[node name="@StaticBody3D@12182" type="StaticBody3D" parent="." unique_id=1647194617]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -572.9, -18.56, 18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12180" type="CollisionShape3D" parent="@StaticBody3D@12182" unique_id=286930937]
+shape = SubResource("BoxShape3D_6oboe")
+
+[node name="@MeshInstance3D@12181" type="MeshInstance3D" parent="@StaticBody3D@12182" unique_id=1760738845]
+material_override = SubResource("StandardMaterial3D_5roxn")
+mesh = SubResource("BoxMesh_g4mdy")
+
+[node name="@StaticBody3D@12185" type="StaticBody3D" parent="." unique_id=97102986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564, -18.56, -18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12183" type="CollisionShape3D" parent="@StaticBody3D@12185" unique_id=2144541370]
+shape = SubResource("BoxShape3D_s2317")
+
+[node name="@MeshInstance3D@12184" type="MeshInstance3D" parent="@StaticBody3D@12185" unique_id=1522197981]
+material_override = SubResource("StandardMaterial3D_ok6ct")
+mesh = SubResource("BoxMesh_4h4d1")
+
+[node name="@StaticBody3D@12188" type="StaticBody3D" parent="." unique_id=1074514966]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564, -18.56, 0)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12186" type="CollisionShape3D" parent="@StaticBody3D@12188" unique_id=1333445265]
+shape = SubResource("BoxShape3D_64sbp")
+
+[node name="@MeshInstance3D@12187" type="MeshInstance3D" parent="@StaticBody3D@12188" unique_id=237004664]
+material_override = SubResource("StandardMaterial3D_miwfh")
+mesh = SubResource("BoxMesh_wrcro")
+
+[node name="@StaticBody3D@12191" type="StaticBody3D" parent="." unique_id=1811559163]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564, -18.56, 18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12189" type="CollisionShape3D" parent="@StaticBody3D@12191" unique_id=1150399808]
+shape = SubResource("BoxShape3D_0i3lw")
+
+[node name="@MeshInstance3D@12190" type="MeshInstance3D" parent="@StaticBody3D@12191" unique_id=946282830]
+material_override = SubResource("StandardMaterial3D_ahfyi")
+mesh = SubResource("BoxMesh_nvew8")
+
+[node name="@StaticBody3D@12194" type="StaticBody3D" parent="." unique_id=180524559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.56, -18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12192" type="CollisionShape3D" parent="@StaticBody3D@12194" unique_id=1849019114]
+shape = SubResource("BoxShape3D_8qm8b")
+
+[node name="@MeshInstance3D@12193" type="MeshInstance3D" parent="@StaticBody3D@12194" unique_id=857098737]
+material_override = SubResource("StandardMaterial3D_2ho1b")
+mesh = SubResource("BoxMesh_5qo1i")
+
+[node name="@StaticBody3D@12197" type="StaticBody3D" parent="." unique_id=1862514079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.56, -13.695)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12195" type="CollisionShape3D" parent="@StaticBody3D@12197" unique_id=1207797508]
+shape = SubResource("BoxShape3D_82yxk")
+
+[node name="@MeshInstance3D@12196" type="MeshInstance3D" parent="@StaticBody3D@12197" unique_id=345224012]
+material_override = SubResource("StandardMaterial3D_gidpu")
+mesh = SubResource("BoxMesh_ecpiu")
+
+[node name="@StaticBody3D@12200" type="StaticBody3D" parent="." unique_id=380290218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.56, 0)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12198" type="CollisionShape3D" parent="@StaticBody3D@12200" unique_id=811207931]
+shape = SubResource("BoxShape3D_jjlad")
+
+[node name="@MeshInstance3D@12199" type="MeshInstance3D" parent="@StaticBody3D@12200" unique_id=678866221]
+material_override = SubResource("StandardMaterial3D_6ypku")
+mesh = SubResource("BoxMesh_td885")
+
+[node name="@StaticBody3D@12203" type="StaticBody3D" parent="." unique_id=668867599]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.56, 13.695)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12201" type="CollisionShape3D" parent="@StaticBody3D@12203" unique_id=388513112]
+shape = SubResource("BoxShape3D_5wx52")
+
+[node name="@MeshInstance3D@12202" type="MeshInstance3D" parent="@StaticBody3D@12203" unique_id=1378210926]
+material_override = SubResource("StandardMaterial3D_0b1he")
+mesh = SubResource("BoxMesh_j8xcv")
+
+[node name="@StaticBody3D@12206" type="StaticBody3D" parent="." unique_id=259159428]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.56, 18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12204" type="CollisionShape3D" parent="@StaticBody3D@12206" unique_id=952054817]
+shape = SubResource("BoxShape3D_gkxa4")
+
+[node name="@MeshInstance3D@12205" type="MeshInstance3D" parent="@StaticBody3D@12206" unique_id=821552884]
+material_override = SubResource("StandardMaterial3D_f1lqt")
+mesh = SubResource("BoxMesh_qu2xs")
+
+[node name="@StaticBody3D@12209" type="StaticBody3D" parent="." unique_id=1178837837]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556, -18.56, -18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12207" type="CollisionShape3D" parent="@StaticBody3D@12209" unique_id=1070349420]
+shape = SubResource("BoxShape3D_ptgs3")
+
+[node name="@MeshInstance3D@12208" type="MeshInstance3D" parent="@StaticBody3D@12209" unique_id=1214945826]
+material_override = SubResource("StandardMaterial3D_21s1f")
+mesh = SubResource("BoxMesh_ls3a7")
+
+[node name="@StaticBody3D@12212" type="StaticBody3D" parent="." unique_id=1532579479]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556, -18.56, 0)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12210" type="CollisionShape3D" parent="@StaticBody3D@12212" unique_id=614900520]
+shape = SubResource("BoxShape3D_bwmmb")
+
+[node name="@MeshInstance3D@12211" type="MeshInstance3D" parent="@StaticBody3D@12212" unique_id=809921752]
+material_override = SubResource("StandardMaterial3D_jg4i6")
+mesh = SubResource("BoxMesh_k8jlj")
+
+[node name="@StaticBody3D@12215" type="StaticBody3D" parent="." unique_id=1353929976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556, -18.56, 18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12213" type="CollisionShape3D" parent="@StaticBody3D@12215" unique_id=544736187]
+shape = SubResource("BoxShape3D_rkpns")
+
+[node name="@MeshInstance3D@12214" type="MeshInstance3D" parent="@StaticBody3D@12215" unique_id=2072848832]
+material_override = SubResource("StandardMaterial3D_e31cv")
+mesh = SubResource("BoxMesh_xx84g")
+
+[node name="@StaticBody3D@12218" type="StaticBody3D" parent="." unique_id=589224568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547.1, -18.56, -18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12216" type="CollisionShape3D" parent="@StaticBody3D@12218" unique_id=1747629892]
+shape = SubResource("BoxShape3D_dpip8")
+
+[node name="@MeshInstance3D@12217" type="MeshInstance3D" parent="@StaticBody3D@12218" unique_id=1549006776]
+material_override = SubResource("StandardMaterial3D_b56n1")
+mesh = SubResource("BoxMesh_g5yjj")
+
+[node name="@StaticBody3D@12221" type="StaticBody3D" parent="." unique_id=402202328]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547.1, -18.56, -13.695)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12219" type="CollisionShape3D" parent="@StaticBody3D@12221" unique_id=343273119]
+shape = SubResource("BoxShape3D_a7cwo")
+
+[node name="@MeshInstance3D@12220" type="MeshInstance3D" parent="@StaticBody3D@12221" unique_id=1729802974]
+material_override = SubResource("StandardMaterial3D_5rlyo")
+mesh = SubResource("BoxMesh_127dq")
+
+[node name="@StaticBody3D@12224" type="StaticBody3D" parent="." unique_id=1618046005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547.1, -18.56, 0)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12222" type="CollisionShape3D" parent="@StaticBody3D@12224" unique_id=1113627924]
+shape = SubResource("BoxShape3D_fo7m7")
+
+[node name="@MeshInstance3D@12223" type="MeshInstance3D" parent="@StaticBody3D@12224" unique_id=1411048422]
+material_override = SubResource("StandardMaterial3D_hmyyj")
+mesh = SubResource("BoxMesh_mm4wg")
+
+[node name="@StaticBody3D@12227" type="StaticBody3D" parent="." unique_id=1235251767]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547.1, -18.56, 13.695)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12225" type="CollisionShape3D" parent="@StaticBody3D@12227" unique_id=191263360]
+shape = SubResource("BoxShape3D_lum3a")
+
+[node name="@MeshInstance3D@12226" type="MeshInstance3D" parent="@StaticBody3D@12227" unique_id=1572752434]
+material_override = SubResource("StandardMaterial3D_bcmn0")
+mesh = SubResource("BoxMesh_y7ie5")
+
+[node name="@StaticBody3D@12230" type="StaticBody3D" parent="." unique_id=1499619999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547.1, -18.56, 18.235)
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12228" type="CollisionShape3D" parent="@StaticBody3D@12230" unique_id=1164762312]
+shape = SubResource("BoxShape3D_336ju")
+
+[node name="@MeshInstance3D@12229" type="MeshInstance3D" parent="@StaticBody3D@12230" unique_id=1679363223]
+material_override = SubResource("StandardMaterial3D_gfe24")
+mesh = SubResource("BoxMesh_ejdls")
+
+[node name="ClockRoomCompassRose" type="MeshInstance3D" parent="." unique_id=1078557510]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.38, 0)
+material_override = SubResource("StandardMaterial3D_6p6x7")
+mesh = SubResource("ArrayMesh_8wi2q")
+metadata/enterable = true
+
+[node name="ClockRoomPlatformWidening_north" type="StaticBody3D" parent="." unique_id=161279339]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -23.16, -7.2)
 metadata/reach_target = true
-metadata/enterable = true
-
-[node name="@CollisionShape3D@12324" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Landing_0" unique_id=986739895]
-shape = SubResource("BoxShape3D_g4mdy")
-
-[node name="@MeshInstance3D@12325" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Landing_0" unique_id=1890775880]
-material_override = SubResource("StandardMaterial3D_s2317")
-mesh = SubResource("BoxMesh_ok6ct")
-
-[node name="ClockRoomArrival_00_north_Landing_1" type="StaticBody3D" parent="." unique_id=573035188]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564, -18.55, -16.47)
+metadata/station_platform = true
 metadata/walk_deck = true
-metadata/walk_run_id = "Escalator:ClockRoomArrival_00_north"
-metadata/reach_link_id = "Escalator:ClockRoomArrival_00_north"
+metadata/enterable = true
+
+[node name="@CollisionShape3D@12231" type="CollisionShape3D" parent="ClockRoomPlatformWidening_north" unique_id=125818621]
+shape = SubResource("BoxShape3D_d8dcm")
+
+[node name="@MeshInstance3D@12232" type="MeshInstance3D" parent="ClockRoomPlatformWidening_north" unique_id=960354068]
+material_override = SubResource("StandardMaterial3D_lputr")
+mesh = SubResource("BoxMesh_v8cbe")
+
+[node name="ClockRoomPlatformWidening_south" type="StaticBody3D" parent="." unique_id=87233277]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -23.16, 7.2)
 metadata/reach_target = true
+metadata/station_platform = true
+metadata/walk_deck = true
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12326" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Landing_1" unique_id=12576730]
-shape = SubResource("BoxShape3D_4h4d1")
+[node name="@CollisionShape3D@12233" type="CollisionShape3D" parent="ClockRoomPlatformWidening_south" unique_id=1095866295]
+shape = SubResource("BoxShape3D_fv7hs")
 
-[node name="@MeshInstance3D@12327" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Landing_1" unique_id=1743458339]
-material_override = SubResource("StandardMaterial3D_64sbp")
-mesh = SubResource("BoxMesh_miwfh")
+[node name="@MeshInstance3D@12234" type="MeshInstance3D" parent="ClockRoomPlatformWidening_south" unique_id=689957717]
+material_override = SubResource("StandardMaterial3D_bvday")
+mesh = SubResource("BoxMesh_5upgo")
 
-[node name="ClockRoomWellGuard" type="StaticBody3D" parent="." unique_id=1355881307]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -562.2, -17.3, -13.695)
-metadata/enterable = true
-
-[node name="@CollisionShape3D@12328" type="CollisionShape3D" parent="ClockRoomWellGuard" unique_id=1491600305]
-shape = SubResource("BoxShape3D_wrcro")
-
-[node name="@MeshInstance3D@12329" type="MeshInstance3D" parent="ClockRoomWellGuard" unique_id=2005446770]
-material_override = SubResource("StandardMaterial3D_0i3lw")
-mesh = SubResource("BoxMesh_ahfyi")
-
-[node name="@StaticBody3D@12332" type="StaticBody3D" parent="." unique_id=758037331]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -564, -17.3, -10.92)
-metadata/enterable = true
-
-[node name="@CollisionShape3D@12330" type="CollisionShape3D" parent="@StaticBody3D@12332" unique_id=1831719176]
-shape = SubResource("BoxShape3D_nvew8")
-
-[node name="@MeshInstance3D@12331" type="MeshInstance3D" parent="@StaticBody3D@12332" unique_id=370673898]
-material_override = SubResource("StandardMaterial3D_8qm8b")
-mesh = SubResource("BoxMesh_2ho1b")
-
-[node name="@StaticBody3D@12335" type="StaticBody3D" parent="." unique_id=1372897725]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -565.8, -17.3, -13.695)
-metadata/enterable = true
-
-[node name="@CollisionShape3D@12333" type="CollisionShape3D" parent="@StaticBody3D@12335" unique_id=1642942264]
-shape = SubResource("BoxShape3D_5qo1i")
-
-[node name="@MeshInstance3D@12334" type="MeshInstance3D" parent="@StaticBody3D@12335" unique_id=1884893629]
-material_override = SubResource("StandardMaterial3D_82yxk")
-mesh = SubResource("BoxMesh_gidpu")
-
-[node name="ClockRoomArrival_01_north_Up" type="StaticBody3D" parent="." unique_id=472022911]
-transform = Transform3D(0, 0, 1, 0.49987933, 0.8660951, 0, -0.8660951, 0.49987933, 0, -556.6, -20.7, -12.485)
+[node name="ClockRoomArrival_00_north_Up" type="StaticBody3D" parent="." unique_id=1947123410]
+transform = Transform3D(0, 0, 1, 0.49987933, 0.8660951, 0, -0.8660951, 0.49987933, 0, -564.6, -20.7, -12.485)
 script = ExtResource("1_us1k1")
 travel_direction = Vector3(0, 0.49987933, -0.8660951)
 travel_speed = 0.35
@@ -600,249 +764,280 @@ belt_width = 1.2
 belt_thickness = 0.9
 metadata/flight = true
 metadata/walk_deck = true
-metadata/walk_run_id = "Escalator:ClockRoomArrival_01_north"
+metadata/walk_run_id = "Escalator:ClockRoomArrival_00_north"
 metadata/enterable = true
 
-[node name="@CollisionShape3D@12336" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=145288582]
-shape = SubResource("BoxShape3D_ecpiu")
+[node name="@CollisionShape3D@12235" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=1969112113]
+shape = SubResource("BoxShape3D_yje7u")
 
-[node name="@MeshInstance3D@12337" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=397502105]
-material_override = SubResource("StandardMaterial3D_jjlad")
-mesh = SubResource("BoxMesh_6ypku")
+[node name="@MeshInstance3D@12236" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=120861932]
+material_override = SubResource("StandardMaterial3D_frfsy")
+mesh = SubResource("BoxMesh_uiwdt")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1880867151]
-material_override = SubResource("StandardMaterial3D_td885")
-mesh = SubResource("ArrayMesh_5wx52")
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1128747889]
+material_override = SubResource("StandardMaterial3D_r5f7y")
+mesh = SubResource("ArrayMesh_0befm")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1206649459]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=829017004]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 0.0
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1457985736]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=3346136]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 0.6848992622282433
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1009679391]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1019602503]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 1.3697985244564865
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1238162879]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=67050369]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 2.05469778668473
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=448116163]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1962941040]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 2.739597048912973
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=620739074]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=136615021]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 3.4244963111412163
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=243139122]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=682338906]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 4.10939557336946
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=810672711]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1158756141]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 4.794294835597703
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1862088416]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=2061394798]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 5.479194097825946
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=429254558]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1797078509]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 6.164093360054189
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=331208965]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=862181024]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 6.848992622282433
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=463705727]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1041066956]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 7.533891884510676
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1004700888]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=211295576]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 8.21879114673892
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1715697948]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=388531745]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 8.903690408967163
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=695979054]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1675938197]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 9.588589671195406
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1054411896]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=616267522]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 10.27348893342365
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=177247760]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=146187433]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 10.958388195651892
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=74271160]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1796131072]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 11.643287457880136
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1969231192]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1599480804]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 12.328186720108379
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1203119488]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=188998237]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 13.013085982336623
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=702600094]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=642211056]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 13.697985244564865
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1438880107]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=26851247]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 14.38288450679311
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=174137993]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=392779457]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 15.067783769021352
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=388749644]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1588599614]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 15.752683031249596
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1014516871]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1612987372]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 16.43758229347784
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1991911410]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=451546866]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 17.12248155570608
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1166791998]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=793140873]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 17.807380817934327
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1539511436]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1495761839]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 18.49228008016257
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1559561597]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1771948931]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 19.17717934239081
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=37539952]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1633709506]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 19.862078604619054
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=331394606]
-material_override = SubResource("StandardMaterial3D_0b1he")
-mesh = SubResource("BoxMesh_j8xcv")
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=347756672]
+material_override = SubResource("StandardMaterial3D_ijwh1")
+mesh = SubResource("BoxMesh_ocg81")
 metadata/belt_distance = 20.5469778668473
+metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@12338" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=1254475220]
+[node name="@CollisionShape3D@12237" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=2024041271]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
-shape = SubResource("BoxShape3D_gkxa4")
+shape = SubResource("BoxShape3D_q2xf3")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=891027013]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=700348263]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
-material_override = SubResource("StandardMaterial3D_f1lqt")
-mesh = SubResource("BoxMesh_qu2xs")
+material_override = SubResource("StandardMaterial3D_1jmm4")
+mesh = SubResource("BoxMesh_gl5jj")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=418599737]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=62605288]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, -0.545)
-material_override = SubResource("StandardMaterial3D_ptgs3")
-mesh = SubResource("BoxMesh_21s1f")
+material_override = SubResource("StandardMaterial3D_kyeu8")
+mesh = SubResource("BoxMesh_niaj2")
 metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=550610899]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1216606027]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, -0.545)
-material_override = SubResource("StandardMaterial3D_ptgs3")
-mesh = SubResource("BoxMesh_ls3a7")
+material_override = SubResource("StandardMaterial3D_kyeu8")
+mesh = SubResource("BoxMesh_tvct7")
 metadata/handrail_distance = 6.9016664028167725
 
-[node name="@CollisionShape3D@12340" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=1855330699]
+[node name="@CollisionShape3D@12239" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=95636998]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
-shape = SubResource("BoxShape3D_bwmmb")
+shape = SubResource("BoxShape3D_5p6e3")
 
-[node name="@MeshInstance3D@12341" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=619347144]
+[node name="@MeshInstance3D@12240" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1935014955]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, -0.545)
-material_override = SubResource("StandardMaterial3D_jg4i6")
-mesh = SubResource("BoxMesh_k8jlj")
+material_override = SubResource("StandardMaterial3D_0htky")
+mesh = SubResource("BoxMesh_304x6")
 
-[node name="@CollisionShape3D@12342" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=11160562]
+[node name="@CollisionShape3D@12241" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=645394942]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
-shape = SubResource("BoxShape3D_rkpns")
+shape = SubResource("BoxShape3D_dxkuv")
 
-[node name="@MeshInstance3D@12343" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=6045003]
+[node name="@MeshInstance3D@12242" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1084774772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, -0.545)
-material_override = SubResource("StandardMaterial3D_e31cv")
-mesh = SubResource("BoxMesh_xx84g")
+material_override = SubResource("StandardMaterial3D_o57n8")
+mesh = SubResource("BoxMesh_umfn5")
 
-[node name="@CollisionShape3D@12344" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=1521838131]
+[node name="@CollisionShape3D@12243" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=746709319]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
-shape = SubResource("BoxShape3D_dpip8")
+shape = SubResource("BoxShape3D_pn1io")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1097236292]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=960400588]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
-material_override = SubResource("StandardMaterial3D_f1lqt")
-mesh = SubResource("BoxMesh_b56n1")
+material_override = SubResource("StandardMaterial3D_1jmm4")
+mesh = SubResource("BoxMesh_d7pqs")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1260700167]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=186197128]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3005555, 1.4, 0.545)
-material_override = SubResource("StandardMaterial3D_g5yjj")
-mesh = SubResource("BoxMesh_a7cwo")
+material_override = SubResource("StandardMaterial3D_aqiff")
+mesh = SubResource("BoxMesh_4b07p")
 metadata/handrail_distance = 2.3005555
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=473279344]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=55316890]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3005555, 1.4, 0.545)
-material_override = SubResource("StandardMaterial3D_g5yjj")
-mesh = SubResource("BoxMesh_5rlyo")
+material_override = SubResource("StandardMaterial3D_aqiff")
+mesh = SubResource("BoxMesh_7074t")
 metadata/handrail_distance = 6.9016664028167725
 
-[node name="@CollisionShape3D@12346" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=1539320501]
+[node name="@CollisionShape3D@12245" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=484655601]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
-shape = SubResource("BoxShape3D_127dq")
+shape = SubResource("BoxShape3D_f6crc")
 
-[node name="@MeshInstance3D@12347" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1567646170]
+[node name="@MeshInstance3D@12246" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=771183898]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.451111, 0.925, 0.545)
-material_override = SubResource("StandardMaterial3D_fo7m7")
-mesh = SubResource("BoxMesh_hmyyj")
+material_override = SubResource("StandardMaterial3D_lyt0x")
+mesh = SubResource("BoxMesh_v1qju")
 
-[node name="@CollisionShape3D@12348" type="CollisionShape3D" parent="ClockRoomArrival_01_north_Up" unique_id=137237090]
+[node name="@CollisionShape3D@12247" type="CollisionShape3D" parent="ClockRoomArrival_00_north_Up" unique_id=99471499]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
-shape = SubResource("BoxShape3D_mm4wg")
+shape = SubResource("BoxShape3D_57sv5")
 
-[node name="@MeshInstance3D@12349" type="MeshInstance3D" parent="ClockRoomArrival_01_north_Up" unique_id=1525614130]
+[node name="@MeshInstance3D@12248" type="MeshInstance3D" parent="ClockRoomArrival_00_north_Up" unique_id=1837046573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.451111, 0.925, 0.545)
-material_override = SubResource("StandardMaterial3D_lum3a")
-mesh = SubResource("BoxMesh_bcmn0")
+material_override = SubResource("StandardMaterial3D_dobao")
+mesh = SubResource("BoxMesh_ov2pt")

@@ -45,7 +45,7 @@ else:
 expected_prototype_counts = {
     "crossing_towers": 4, "deck_columns": 140, "deck_parapets": 123,
     "deck_beds": 44, "deck_trees": 10, "park_trees": 23, "shrubs": 62,
-    "reed_clumps": 28, "rocks": 21, "agave": 6, "climber_panels": 72,
+    "reed_clumps": 28, "rocks": 21, "agave": 6, "climber_panels": 71,
     "meridian_piers": 8, "spine_frames": 8, "station_escalator_sets": 8,
     "trains_per_service": 3, "service_lines": 4, "deck_escalator_pairs": 4,
     "deck_ramp_towers": 2, "city_clocks": 4, "city_bells": 1, "timekeepers": 0,

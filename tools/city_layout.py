@@ -1355,6 +1355,9 @@ def _crossing_layout():
     C=CROSSING; T=C['tower']; H=ESCALATORS['helix']; cx,cz=C['c']
     band0=H['eye']; band1=band0+H['band']; gal=band1+T['gallery']; drum=gal+0.2
     T['band']=(band0,band1); T['gallery_r']=(band1,gal); T['drum']=round(drum,2)
+    # P1 (2026-10-19): the gallery stands clear of the helix's band. Its inner guard is 0.12 m boxes on 10-degree chords
+    # about rail_r; nothing of the gallery or its guard comes inside gallery_clear. The lawn stands below the ways-out floor.
+    T['rail_r']=4.1; T['gallery_clear']=4.02; C['lawn_y']=0.04
     C['towers']=[]
     for nm,sx,sz in (('north-east',1,-1),('north-west',-1,-1),('south-east',1,1),('south-west',-1,1)):
         tc=(cx+sx*T['offset'],cz+sz*T['offset']); d=drum+T['lift']+0.1
@@ -2272,6 +2275,9 @@ _planting()
 for _g in CROSSING['rain_gardens']:
     if _g['r_in']<CROSSING['tower']['drum'] or len(_g['reeds'])<6: problems.append(('crossing: a rain garden inside its drum, or bare of reeds',_g['c']))
     if len(_g['paths'])!=3: problems.append(('crossing: a rain garden without a path for each way out on the lawn',_g['c']))
+_T=CROSSING['tower']
+if _T['rail_r']*math.cos(math.pi/36)-0.06<_T['gallery_clear'] or _T['gallery_clear']<_T['band'][1]: problems.append(('crossing: the gallery or its rail stands inside the helix band',_T['rail_r']))
+if not 0.0<=CROSSING['lawn_y']<0.05: problems.append(('crossing: the lawn stands at or above the ways-out floor',CROSSING['lawn_y']))
 ## The timetable (city.md 6g, 2026-10-17, at the user's direction). A clock-face
 ## service: on every line a train every 60 real seconds, which in the game's
 ## clock (one real second is one game minute) is a train every hour, on the same

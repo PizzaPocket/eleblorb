@@ -500,3 +500,47 @@ Add to the fix list:
    the diagnostic which of the 34 belongs to a later package and why. The four
    lift calls with no walk cell in 2 m (Crossing) are the same kind: link or
    move them.
+
+## 8. Fourth build, and closed (2026-10-19)
+
+Built by the planning session at the user's request (diagnostic
+`docs/diagnostics/2026-10-19-moy-P1-fixes-4.md`; its suite changes are in
+`2026-10-19-moy-P0-fixes-4.md`).
+
+- **Fixes 1 to 6 built.** The rain garden is a clipped polygon ring (690
+  triangles a garden, 224 convex shapes in all; the bake is 71.6 MB, not 88.0);
+  the rail radius, the gallery clearance and the lawn's height are plan data with
+  checks; the way-out line prints its box; the shots have a ground and show a
+  path's cut edge; the commits are by package.
+- **Fix 7 built, and more than its text:** City Hall's `reach` findings are 34 to
+  0. The builder lacked the Rostrum deck, the deck across the opening and the
+  Steps' lower flight (the stair began 7.1 m in the air); the piers were solid
+  60 m walls; the lintel cut through the scissor flights; three decks stood 0.2 m
+  above their plan level; every flight's pads sat half under the belt; each lift
+  had one call post; and the leg's east wall swallowed the outer landing and
+  pair. All are in the diagnostic. They were found with the suite once it could
+  see a narrow escalator (see section 13 of `moy_pkg_P0.md`).
+- **The section 6 checks still pass** (`failures=0`), plus the new garden count.
+
+**Result: done at L2.** Four items need planning decisions and are not P1's to
+build (plan change requests; the plan is locked):
+1. the wedge under every flight's low end where the soffit is 2.0 to 2.2 m (20
+   blocking `headroom` findings in P1's area): close it or accept it;
+2. the outer pair's foot against the walk over the tracks (4 `trap` findings, 3
+   cells each): move the foot or notch the walk;
+3. the tower lifts' deck-concourse calls (4 `reach`): a +6.5 landing within reach
+   of the lift, or drop the stop;
+4. the Crossing's `overlap` and `solid` findings (136 and 35), which belong to P7.
+
+Found on the way and given to others: the park's paving is wound face-down and
+cannot be seen (P8; one line); the arch legs' east wall band is opened for the
+outer platform (P11 owns the legs).
+
+**Decisions:**
+- 2026-10-19: P1 done at L2. The build chat's earlier *done* (before the review)
+  stood on a validator that did not run the suite; this one stands on the suite's
+  baseline, with the four items above recorded as plan questions.
+- 2026-10-19: P1's gate was "no new blocking suite findings and every finding on
+  its own elements triaged". New blocking findings exist (the `trap` pockets and
+  the `headroom` fringe); each is triaged above. A future pass that closes the
+  four items takes P1 to a clean suite.

@@ -111,14 +111,14 @@ roughness = 0.92
 size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_x8jsh"]
-size = Vector3(3.4, 0.3, 2.4)
+size = Vector3(3.4, 0.3, 1.2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mmb5c"]
 albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_8tg3x"]
-size = Vector3(3.4, 0.3, 2.4)
+size = Vector3(3.4, 0.3, 1.2)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ns36k"]
 size = Vector3(16.81547, 0.9, 1.2)
@@ -228,9 +228,9 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_xvw2k"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[node name="MoyCell_06_04_Part_03" type="Node3D" unique_id=1670233120]
+[node name="MoyCell_06_04_Part_03" type="Node3D" unique_id=436275033]
 
-[node name="CityHall_south_F2_Down" type="StaticBody3D" parent="." unique_id=1013529492]
+[node name="CityHall_south_F2_Down" type="StaticBody3D" parent="." unique_id=1612401514]
 transform = Transform3D(0, 0, -1, -0.4519648, 0.8920358, 0, 0.8920357, 0.45196483, 0, -367.5, -34.4, 21)
 script = ExtResource("1_7wowf")
 travel_direction = Vector3(0, -0.4519648, 0.8920357)
@@ -242,375 +242,431 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:CityHall_south_F2"
 
-[node name="@CollisionShape3D@11209" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1556646999]
+[node name="@CollisionShape3D@11088" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1767689270]
 shape = SubResource("BoxShape3D_rcsfb")
 
-[node name="@MeshInstance3D@11210" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=837772718]
+[node name="@MeshInstance3D@11089" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=149779937]
 material_override = SubResource("StandardMaterial3D_o2mh3")
 mesh = SubResource("BoxMesh_aa27u")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=901453479]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1952578166]
 material_override = SubResource("StandardMaterial3D_wh5nr")
 mesh = SubResource("ArrayMesh_0qyrm")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1971640046]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1380935740]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 0.0
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1904550439]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1170056763]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 0.6878938277711961
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1572738617]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=371032639]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 1.3757876555423922
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1784254491]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=539948556]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 2.063681483313588
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=852949451]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1621115706]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 2.7515753110847845
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1368666206]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1416046616]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 3.4394691388559804
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1368481231]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1315626673]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 4.127362966627176
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=113841283]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1305094784]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 4.815256794398373
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1256002482]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1070357623]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 5.503150622169569
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1704208993]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1326216939]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 6.191044449940765
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=784474962]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=845956934]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 6.878938277711961
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1051974876]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1205462273]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 7.566832105483157
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1588501996]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1068686810]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 8.254725933254353
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=613898812]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1383384107]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 8.942619761025549
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1189152672]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=761851244]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 9.630513588796745
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1605610814]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1698784963]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 10.318407416567942
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=635044772]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1289237670]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 11.006301244339138
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1546629578]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1618859077]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 11.694195072110334
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1831910084]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2021967652]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 12.38208889988153
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=898106211]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1541188318]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 13.069982727652725
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=118035954]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1130602081]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 13.757876555423922
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=254371963]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1348271128]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 14.445770383195118
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1245746665]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2010183556]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 15.133664210966314
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1389736030]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2687843]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 15.82155803873751
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1788686806]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=211878375]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 16.509451866508705
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1684835285]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1377249849]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 17.197345694279903
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=253681795]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=558878861]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 17.885239522051098
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1426367345]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2069402835]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 18.573133349822296
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=300567580]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=587664905]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 19.26102717759349
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=240555390]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1765592785]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 19.94892100536469
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1482857149]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=156380834]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 20.636814833135883
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=259362431]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2107105319]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 21.324708660907078
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1037323532]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=986093145]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 22.012602488678276
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=368878396]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1616368529]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 22.700496316449474
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=267681456]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1401111283]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 23.38839014422067
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1318528725]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=210928745]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 24.076283971991863
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1843000013]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1502222507]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 24.76417779976306
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1810747356]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1628173375]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 25.45207162753426
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=244612487]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=927536586]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 26.13996545530545
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=226785091]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1098938666]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 26.827859283076645
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1073851549]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1073037526]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 27.515753110847843
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1719215175]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=889164667]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 28.20364693861904
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_42" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1171902654]
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=843834323]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 28.891540766390236
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_43" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1062092591]
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=80231577]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 29.57943459416143
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_44" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=848087733]
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1389592170]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 30.26732842193263
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_45" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1741011166]
+[node name="Moving_Tread_45" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1979585862]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 30.955222249703827
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_46" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=138081300]
+[node name="Moving_Tread_46" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1311290956]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 31.64311607747502
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_47" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1163906854]
+[node name="Moving_Tread_47" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1709504925]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 32.33100990524621
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_48" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=321467497]
+[node name="Moving_Tread_48" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1700895677]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 33.01890373301741
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_49" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=631088490]
+[node name="Moving_Tread_49" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=645753908]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 33.70679756078861
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_50" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1911777242]
+[node name="Moving_Tread_50" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=50214254]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 34.39469138855981
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_51" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1436278082]
+[node name="Moving_Tread_51" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1732542225]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 35.082585216331
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_52" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=958105644]
+[node name="Moving_Tread_52" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=951771497]
 material_override = SubResource("StandardMaterial3D_oggqh")
 mesh = SubResource("BoxMesh_oqsvx")
 metadata/belt_distance = 35.770479044102196
+metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@11211" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=2057774465]
+[node name="@CollisionShape3D@11090" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1038637640]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_m1yh0")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1712813559]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1191060592]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_uprpl")
 mesh = SubResource("BoxMesh_whu1g")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2000833939]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2049517690]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2038674, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_qm4qu")
 mesh = SubResource("BoxMesh_t4c5e")
 metadata/handrail_distance = 4.2038674
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1590186478]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1443176863]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2038674, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_qm4qu")
 mesh = SubResource("BoxMesh_0fc1e")
 metadata/handrail_distance = 12.611602306365967
 
-[node name="@CollisionShape3D@11213" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=2092740784]
+[node name="@CollisionShape3D@11092" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1627801076]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, -0.545)
 shape = SubResource("BoxShape3D_s2ctn")
 
-[node name="@MeshInstance3D@11214" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=813913319]
+[node name="@MeshInstance3D@11093" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1303889809]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_5auc4")
 mesh = SubResource("BoxMesh_wcjno")
 
-[node name="@CollisionShape3D@11215" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=595742859]
+[node name="@CollisionShape3D@11094" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=172627093]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, -0.545)
 shape = SubResource("BoxShape3D_ubipn")
 
-[node name="@MeshInstance3D@11216" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1712835392]
+[node name="@MeshInstance3D@11095" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=478551705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_vrr1u")
 mesh = SubResource("BoxMesh_sq60r")
 
-[node name="@CollisionShape3D@11217" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1572786540]
+[node name="@CollisionShape3D@11096" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1701893429]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_vlq00")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=391780450]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1365635939]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_uprpl")
 mesh = SubResource("BoxMesh_qhkhc")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=228516957]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=2080960364]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2038674, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_n4j5b")
 mesh = SubResource("BoxMesh_wiy03")
 metadata/handrail_distance = 4.2038674
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=995841103]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=907366918]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2038674, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_n4j5b")
 mesh = SubResource("BoxMesh_t5xx6")
 metadata/handrail_distance = 12.611602306365967
 
-[node name="@CollisionShape3D@11219" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1174690789]
+[node name="@CollisionShape3D@11098" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=376712604]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, 0.545)
 shape = SubResource("BoxShape3D_4o73s")
 
-[node name="@MeshInstance3D@11220" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1851429256]
+[node name="@MeshInstance3D@11099" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=741949262]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_lfhep")
 mesh = SubResource("BoxMesh_08gcn")
 
-[node name="@CollisionShape3D@11221" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1714746643]
+[node name="@CollisionShape3D@11100" type="CollisionShape3D" parent="CityHall_south_F2_Down" unique_id=1674254349]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, 0.545)
 shape = SubResource("BoxShape3D_nola7")
 
-[node name="@MeshInstance3D@11222" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=1185527534]
+[node name="@MeshInstance3D@11101" type="MeshInstance3D" parent="CityHall_south_F2_Down" unique_id=303665578]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_tg00t")
 mesh = SubResource("BoxMesh_dhnux")
 
-[node name="CityHall_south_F2_Landing_0" type="StaticBody3D" parent="." unique_id=1877041484]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -368.1, -38.350002, 28.5)
+[node name="CityHall_south_F2_Landing_0" type="StaticBody3D" parent="." unique_id=1521895143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -368.1, -38.39, 29.15)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:CityHall_south_F2"
 metadata/reach_link_id = "Escalator:CityHall_south_F2"
-metadata/reach_target = true
 
-[node name="@CollisionShape3D@11223" type="CollisionShape3D" parent="CityHall_south_F2_Landing_0" unique_id=50485071]
+[node name="@CollisionShape3D@11102" type="CollisionShape3D" parent="CityHall_south_F2_Landing_0" unique_id=2130621143]
 shape = SubResource("BoxShape3D_x8jsh")
 
-[node name="@MeshInstance3D@11224" type="MeshInstance3D" parent="CityHall_south_F2_Landing_0" unique_id=1706376137]
+[node name="@MeshInstance3D@11103" type="MeshInstance3D" parent="CityHall_south_F2_Landing_0" unique_id=2116034401]
 material_override = SubResource("StandardMaterial3D_mmb5c")
 mesh = SubResource("BoxMesh_8tg3x")
 
-[node name="CityHall_south_F3_Up" type="StaticBody3D" parent="." unique_id=425685442]
+[node name="ReachTarget" type="Node3D" parent="CityHall_south_F2_Landing_0" unique_id=150280217]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0, 0)
+metadata/reach_target = true
+
+[node name="CityHall_south_F3_Up" type="StaticBody3D" parent="." unique_id=2023940914]
 transform = Transform3D(0, 0, -1, 0.4519648, 0.8920358, 0, 0.8920357, -0.45196483, 0, -364.3, -26.8, 21)
 script = ExtResource("1_7wowf")
 travel_direction = Vector3(0, 0.4519648, 0.8920357)
@@ -622,356 +678,409 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:CityHall_south_F3"
 
-[node name="@CollisionShape3D@11227" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1458371901]
+[node name="@CollisionShape3D@11106" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1475356491]
 shape = SubResource("BoxShape3D_ns36k")
 
-[node name="@MeshInstance3D@11228" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=695523183]
+[node name="@MeshInstance3D@11107" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=845148884]
 material_override = SubResource("StandardMaterial3D_pvl6q")
 mesh = SubResource("BoxMesh_5twh6")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=148784792]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1374706823]
 material_override = SubResource("StandardMaterial3D_gx3o3")
 mesh = SubResource("ArrayMesh_l3k7s")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=482903647]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1551260761]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 0.0
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1250345065]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=144485001]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 0.6878938277711961
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1379738866]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1700734072]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 1.3757876555423922
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1455499752]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=198490732]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 2.063681483313588
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1211039527]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=572475408]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 2.7515753110847845
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=339813384]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1744469338]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 3.4394691388559804
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=774974895]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2080107914]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 4.127362966627176
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=233481198]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=616229844]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 4.815256794398373
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=225727952]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=113505684]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 5.503150622169569
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1960578448]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1880168186]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 6.191044449940765
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1815519621]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=607478551]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 6.878938277711961
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=589971407]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1090828681]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 7.566832105483157
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=869034089]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=346300600]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 8.254725933254353
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1074715298]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1214484147]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 8.942619761025549
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2143547445]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1428486449]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 9.630513588796745
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1444597611]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1737188433]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 10.318407416567942
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=342313117]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=627517979]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 11.006301244339138
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=368133476]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1686449067]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 11.694195072110334
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=808435890]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1550995986]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 12.38208889988153
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=320607330]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=20754074]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 13.069982727652725
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=267335878]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1804273687]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 13.757876555423922
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1831053440]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1604351213]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 14.445770383195118
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=409061791]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1771354402]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 15.133664210966314
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2068650282]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=477174904]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 15.82155803873751
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1603784376]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2014722610]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 16.509451866508705
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1482367170]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1810589968]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 17.197345694279903
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2009851970]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=925960654]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 17.885239522051098
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=919310112]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=633752752]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 18.573133349822296
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1526415572]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=454472149]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 19.26102717759349
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=339280728]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=596928019]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 19.94892100536469
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=176370354]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1184638449]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 20.636814833135883
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=628106635]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1592695197]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 21.324708660907078
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1858138709]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=220628653]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 22.012602488678276
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=484062357]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=573070095]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 22.700496316449474
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1913441126]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=814870697]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 23.38839014422067
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=727362276]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1616217973]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 24.076283971991863
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1698274819]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1788763312]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 24.76417779976306
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1214313335]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=700050497]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 25.45207162753426
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1020343032]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=392250667]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 26.13996545530545
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2094546030]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1623818500]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 26.827859283076645
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1991278633]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=121800581]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 27.515753110847843
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=369070983]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=293159200]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 28.20364693861904
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_42" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1525924318]
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=269737261]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 28.891540766390236
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_43" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1633433471]
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=414634885]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 29.57943459416143
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_44" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1317712055]
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1007152467]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 30.26732842193263
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_45" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=30533044]
+[node name="Moving_Tread_45" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1077008397]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 30.955222249703827
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_46" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1095882306]
+[node name="Moving_Tread_46" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1201868886]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 31.64311607747502
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_47" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=256555703]
+[node name="Moving_Tread_47" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=768002376]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 32.33100990524621
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_48" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=333232775]
+[node name="Moving_Tread_48" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=915465701]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 33.01890373301741
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_49" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=255221082]
+[node name="Moving_Tread_49" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=979405297]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 33.70679756078861
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_50" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=916780423]
+[node name="Moving_Tread_50" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1655163040]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 34.39469138855981
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_51" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2017026339]
+[node name="Moving_Tread_51" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=645968639]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 35.082585216331
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_52" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1107452805]
+[node name="Moving_Tread_52" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=744129]
 material_override = SubResource("StandardMaterial3D_8rqmq")
 mesh = SubResource("BoxMesh_h7xqk")
 metadata/belt_distance = 35.770479044102196
+metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@11229" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=483080666]
+[node name="@CollisionShape3D@11108" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1915128747]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_mvb1s")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=768878196]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1437988418]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_0qwn7")
 mesh = SubResource("BoxMesh_mbcm0")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=24209943]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2060219218]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2038674, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_rxiva")
 mesh = SubResource("BoxMesh_cr65q")
 metadata/handrail_distance = 4.2038674
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=532147981]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1753029998]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2038674, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_rxiva")
 mesh = SubResource("BoxMesh_x7x05")
 metadata/handrail_distance = 12.611602306365967
 
-[node name="@CollisionShape3D@11231" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=208110970]
+[node name="@CollisionShape3D@11110" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1771167181]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, -0.545)
 shape = SubResource("BoxShape3D_5obuj")
 
-[node name="@MeshInstance3D@11232" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=823451928]
+[node name="@MeshInstance3D@11111" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1358123630]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_72iek")
 mesh = SubResource("BoxMesh_3yacm")
 
-[node name="@CollisionShape3D@11233" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1106424235]
+[node name="@CollisionShape3D@11112" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1799571186]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, -0.545)
 shape = SubResource("BoxShape3D_p6ykd")
 
-[node name="@MeshInstance3D@11234" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=878411925]
+[node name="@MeshInstance3D@11113" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=764211157]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_uxeft")
 mesh = SubResource("BoxMesh_l28sj")
 
-[node name="@CollisionShape3D@11235" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1902869129]
+[node name="@CollisionShape3D@11114" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1172694174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_u0sdf")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=752906425]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2084546295]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_0qwn7")
 mesh = SubResource("BoxMesh_iq5up")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=2053934497]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=292730348]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2038674, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_bqvqg")
 mesh = SubResource("BoxMesh_s3vrh")
 metadata/handrail_distance = 4.2038674
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1271958627]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=846499890]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2038674, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_bqvqg")
 mesh = SubResource("BoxMesh_vnpxf")
 metadata/handrail_distance = 12.611602306365967
 
-[node name="@CollisionShape3D@11237" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=2021630134]
+[node name="@CollisionShape3D@11116" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=2070075527]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, 0.545)
 shape = SubResource("BoxShape3D_hs40r")
 
-[node name="@MeshInstance3D@11238" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=888671372]
+[node name="@MeshInstance3D@11117" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=888999406]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.257735, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_i1hj0")
 mesh = SubResource("BoxMesh_40lcp")
 
-[node name="@CollisionShape3D@11239" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=903985511]
+[node name="@CollisionShape3D@11118" type="CollisionShape3D" parent="CityHall_south_F3_Up" unique_id=1204815654]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, 0.545)
 shape = SubResource("BoxShape3D_8no1n")
 
-[node name="@MeshInstance3D@11240" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1179111613]
+[node name="@MeshInstance3D@11119" type="MeshInstance3D" parent="CityHall_south_F3_Up" unique_id=1420072617]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.257735, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_d5idl")
 mesh = SubResource("BoxMesh_xvw2k")

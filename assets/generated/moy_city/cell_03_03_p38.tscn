@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/moy_timekeeper.gd" id="1_n852x"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yiaba"]
+albedo_color = Color(0.5882353, 0.4627451, 0.2901961, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5wwuy"]
+top_radius = 1.54
+bottom_radius = 2.2
+height = 4.6
+
+[node name="MoyCell_03_03_Part_38" type="Node3D" unique_id=239733041]
+
+[node name="CrossingCityDome_Part_02" type="Node3D" parent="." unique_id=1882629736]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.4, 0)
+
+[node name="CityBell_SOUND_PLACEHOLDER" type="MeshInstance3D" parent="CrossingCityDome_Part_02" unique_id=622426602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 24.7, 0)
+material_override = SubResource("StandardMaterial3D_yiaba")
+mesh = SubResource("CylinderMesh_5wwuy")
+
+[node name="CityBellScheduler" type="Node3D" parent="CrossingCityDome_Part_02" unique_id=890451062]
+script = ExtResource("1_n852x")
+bell_path = NodePath("../CityBell_SOUND_PLACEHOLDER")
+
+[node name="CityBellAudio_PLACEHOLDER_NO_ASSET" type="AudioStreamPlayer3D" parent="CrossingCityDome_Part_02/CityBellScheduler" unique_id=1415709927]

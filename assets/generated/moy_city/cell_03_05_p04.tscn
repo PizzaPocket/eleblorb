@@ -288,9 +288,9 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_aeich"]
 size = Vector3(2.8, 0.3, 2.5)
 
-[node name="MoyCell_03_05_Part_04" type="Node3D" unique_id=181792823]
+[node name="MoyCell_03_05_Part_04" type="Node3D" unique_id=1409171445]
 
-[node name="SpineAccess_Market_Square_east_0_Up" type="StaticBody3D" parent="." unique_id=1418900430]
+[node name="SpineAccess_Market_Square_east_0_Up" type="StaticBody3D" parent="." unique_id=1896463683]
 transform = Transform3D(0, 0, -1, 0.49990994, 0.8660774, 0, 0.8660774, -0.49990994, 0, -554.9, -49.65, 102.33)
 script = ExtResource("1_1c4hs")
 travel_direction = Vector3(0, 0.49990994, 0.8660774)
@@ -302,341 +302,390 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:SpineAccess_Market_Square_east_0"
 
-[node name="@CollisionShape3D@7144" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=545094412]
+[node name="@CollisionShape3D@6956" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=464202301]
 shape = SubResource("BoxShape3D_631no")
 
-[node name="@MeshInstance3D@7145" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1977100171]
+[node name="@MeshInstance3D@6957" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=112363022]
 material_override = SubResource("StandardMaterial3D_ugv8s")
 mesh = SubResource("BoxMesh_jttai")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1444407152]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1919413141]
 material_override = SubResource("StandardMaterial3D_25p2j")
 mesh = SubResource("ArrayMesh_2uh7n")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=492917984]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1120098561]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 0.0
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=440323366]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1974506397]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 0.6863874472890098
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1003726954]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1898699933]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 1.3727748945780196
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1500522127]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=514017825]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 2.0591623418670295
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1517478343]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1310366022]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 2.745549789156039
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1102812913]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=755578386]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 3.431937236445049
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=482097039]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1724512347]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 4.118324683734059
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1291763845]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2017431118]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 4.804712131023068
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1101146994]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1043090980]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 5.491099578312078
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1874513546]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2078483168]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 6.1774870256010885
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=485981716]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=189186139]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 6.863874472890098
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1564882679]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1253965760]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 7.550261920179108
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1242861978]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1829368310]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 8.236649367468118
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2018295758]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2107759281]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 8.923036814757127
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=272673549]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2034566101]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 9.609424262046137
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=524224213]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=876766671]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 10.295811709335148
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=352927154]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1212877231]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 10.982199156624157
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1597550011]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1691078191]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 11.668586603913166
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=122489096]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1686142785]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 12.354974051202177
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=506165454]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1804032815]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 13.041361498491186
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=473547290]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1524853197]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 13.727748945780196
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1312327419]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1552922242]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 14.414136393069205
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1902420605]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1983818676]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 15.100523840358216
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=584246618]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=433374647]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 15.786911287647225
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1443632240]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1433030673]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 16.473298734936236
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=57665679]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=830395508]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 17.159686182225244
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1352981201]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=875976530]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 17.846073629514255
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=311125068]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=137354507]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 18.532461076803266
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2024367986]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1887175482]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 19.218848524092273
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1677925930]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1563222098]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 19.905235971381284
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=917952725]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1781476945]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 20.591623418670295
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1463376358]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1344205003]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 21.278010865959303
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=280363551]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=908852666]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 21.964398313248314
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1768715696]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=108777236]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 22.650785760537325
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1650519610]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=334685007]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 23.337173207826332
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=876914607]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1825447539]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 24.02356065511534
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1686676254]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1783142318]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 24.709948102404354
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=388422451]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1198402081]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 25.396335549693365
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1147546439]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=373799709]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 26.082722996982373
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2015352086]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1891126047]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 26.76911044427138
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=127670844]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=637086375]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 27.45549789156039
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2084742801]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=421627533]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 28.141885338849402
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_42" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1260522087]
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=830307476]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 28.82827278613841
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_43" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1169294110]
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=315966641]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 29.514660233427417
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_44" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=936679618]
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1724062715]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 30.20104768071643
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_45" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=500874806]
+[node name="Moving_Tread_45" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1137079259]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 30.887435128005443
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_46" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=445332121]
+[node name="Moving_Tread_46" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=837861518]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 31.57382257529445
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_47" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1476191848]
+[node name="Moving_Tread_47" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=754458347]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 32.26021002258346
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_48" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=897234813]
+[node name="Moving_Tread_48" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=977685983]
 material_override = SubResource("StandardMaterial3D_3hyw1")
 mesh = SubResource("BoxMesh_7d0m2")
 metadata/belt_distance = 32.94659746987247
+metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@7146" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=406004059]
+[node name="@CollisionShape3D@6958" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=600542823]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_t0unx")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1178892566]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1004433445]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_vsm1l")
 mesh = SubResource("BoxMesh_klupa")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1495805782]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1139717057]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.850694, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_a3vih")
 mesh = SubResource("BoxMesh_vraoh")
 metadata/handrail_distance = 3.850694
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1659415763]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=940889529]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.850694, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_a3vih")
 mesh = SubResource("BoxMesh_8t3f4")
 metadata/handrail_distance = 11.552081823348999
 
-[node name="@CollisionShape3D@7148" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=211678157]
+[node name="@CollisionShape3D@6960" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1816469754]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, -0.545)
 shape = SubResource("BoxShape3D_4h7mw")
 
-[node name="@MeshInstance3D@7149" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1781099853]
+[node name="@MeshInstance3D@6961" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1454416170]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_06rwe")
 mesh = SubResource("BoxMesh_rk62w")
 
-[node name="@CollisionShape3D@7150" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=731348428]
+[node name="@CollisionShape3D@6962" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=602552005]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, -0.545)
 shape = SubResource("BoxShape3D_00ram")
 
-[node name="@MeshInstance3D@7151" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=495784217]
+[node name="@MeshInstance3D@6963" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=881025088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_3fslp")
 mesh = SubResource("BoxMesh_u5owy")
 
-[node name="@CollisionShape3D@7152" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=793105050]
+[node name="@CollisionShape3D@6964" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1386239916]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_1faiv")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2017993503]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=503044331]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_vsm1l")
 mesh = SubResource("BoxMesh_35v0i")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2014996967]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1838279160]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.850694, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_hb4rm")
 mesh = SubResource("BoxMesh_kfkq7")
 metadata/handrail_distance = 3.850694
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=2036066338]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=125257282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.850694, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_hb4rm")
 mesh = SubResource("BoxMesh_htkaf")
 metadata/handrail_distance = 11.552081823348999
 
-[node name="@CollisionShape3D@7154" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1177851597]
+[node name="@CollisionShape3D@6966" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1479203027]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, 0.545)
 shape = SubResource("BoxShape3D_3di4k")
 
-[node name="@MeshInstance3D@7155" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1228410308]
+[node name="@MeshInstance3D@6967" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1389774971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_f071x")
 mesh = SubResource("BoxMesh_8q6x7")
 
-[node name="@CollisionShape3D@7156" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1900742932]
+[node name="@CollisionShape3D@6968" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=865070316]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, 0.545)
 shape = SubResource("BoxShape3D_3sldh")
 
-[node name="@MeshInstance3D@7157" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=986832768]
+[node name="@MeshInstance3D@6969" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Up" unique_id=1758415558]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_iqq35")
 mesh = SubResource("BoxMesh_pew4y")
 
-[node name="SpineAccess_Market_Square_east_0_Down" type="StaticBody3D" parent="." unique_id=1760443956]
+[node name="SpineAccess_Market_Square_east_0_Down" type="StaticBody3D" parent="." unique_id=941113943]
 transform = Transform3D(0, 0, 1, -0.49990994, 0.8660774, 0, -0.8660774, -0.49990994, 0, -556.1, -49.65, 102.33)
 script = ExtResource("1_1c4hs")
 travel_direction = Vector3(0, -0.49990994, -0.8660774)
@@ -648,422 +697,471 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:SpineAccess_Market_Square_east_0"
 
-[node name="@CollisionShape3D@7158" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1856729440]
+[node name="@CollisionShape3D@6970" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1227804096]
 shape = SubResource("BoxShape3D_aytk5")
 
-[node name="@MeshInstance3D@7159" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1696177598]
+[node name="@MeshInstance3D@6971" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=338172855]
 material_override = SubResource("StandardMaterial3D_wjtiu")
 mesh = SubResource("BoxMesh_7rlnn")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1195463389]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1388982348]
 material_override = SubResource("StandardMaterial3D_rid6b")
 mesh = SubResource("ArrayMesh_koyq4")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1856898574]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1180565053]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 0.0
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=772112284]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1006145994]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 0.6863874472890098
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=784843293]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=606527402]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 1.3727748945780196
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1725246795]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=732481802]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 2.0591623418670295
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1853725048]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1490970621]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 2.745549789156039
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=371513218]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1021823435]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 3.431937236445049
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1643376897]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=189729374]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 4.118324683734059
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=104574557]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1328326292]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 4.804712131023068
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=174541759]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=773182960]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 5.491099578312078
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1328457689]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1304318463]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 6.1774870256010885
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=173521737]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1534394572]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 6.863874472890098
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=896251407]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=684836273]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 7.550261920179108
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1133322400]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=525325454]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 8.236649367468118
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=2130320887]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=614761080]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 8.923036814757127
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=208218895]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1857092236]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 9.609424262046137
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1476751077]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=302967744]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 10.295811709335148
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1592437436]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=341777192]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 10.982199156624157
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1387854355]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1340519344]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 11.668586603913166
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=576141383]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=300700481]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 12.354974051202177
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=313334121]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=861288858]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 13.041361498491186
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1694633120]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1696667514]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 13.727748945780196
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=751144586]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1826926917]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 14.414136393069205
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=280956116]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1331296616]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 15.100523840358216
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=235933373]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=2067106743]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 15.786911287647225
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1586731414]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1624262154]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 16.473298734936236
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1425262699]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=737390261]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 17.159686182225244
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1175627722]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=690860894]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 17.846073629514255
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=49679479]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=749104812]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 18.532461076803266
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=189219739]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1971876698]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 19.218848524092273
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1387065885]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=429739955]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 19.905235971381284
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1262734436]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=791915744]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 20.591623418670295
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=805096547]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=831897686]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 21.278010865959303
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1049176831]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1098194987]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 21.964398313248314
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1429933231]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=31713757]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 22.650785760537325
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1530712696]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1332772752]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 23.337173207826332
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=710521189]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=192935]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 24.02356065511534
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1187373994]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1159709929]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 24.709948102404354
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=863500495]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=993230897]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 25.396335549693365
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1765079861]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=986701562]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 26.082722996982373
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1030883477]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=817054460]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 26.76911044427138
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=175841554]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=234641648]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 27.45549789156039
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=432896333]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=952622449]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 28.141885338849402
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_42" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=609182404]
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=169228817]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 28.82827278613841
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_43" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=577790735]
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1246405274]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 29.514660233427417
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_44" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1664328159]
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=908559339]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 30.20104768071643
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_45" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=557006714]
+[node name="Moving_Tread_45" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1140062211]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 30.887435128005443
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_46" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=689075182]
+[node name="Moving_Tread_46" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1903053154]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 31.57382257529445
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_47" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=528698412]
+[node name="Moving_Tread_47" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=400914577]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 32.26021002258346
+metadata/underside_visual_only = true
 
-[node name="Moving_Tread_48" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1251962491]
+[node name="Moving_Tread_48" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=370374236]
 material_override = SubResource("StandardMaterial3D_ql27d")
 mesh = SubResource("BoxMesh_tgbhn")
 metadata/belt_distance = 32.94659746987247
+metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@7160" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1078252024]
+[node name="@CollisionShape3D@6972" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=83553702]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_rbmi1")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1878324307]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1544225932]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_apwmf")
 mesh = SubResource("BoxMesh_tdxpp")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1286941709]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1092584740]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.850694, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_y7h8s")
 mesh = SubResource("BoxMesh_v72tk")
 metadata/handrail_distance = 3.850694
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=778026195]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1390897312]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.850694, 1.4, -0.545)
 material_override = SubResource("StandardMaterial3D_y7h8s")
 mesh = SubResource("BoxMesh_mjsbg")
 metadata/handrail_distance = 11.552081823348999
 
-[node name="@CollisionShape3D@7162" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=136361424]
+[node name="@CollisionShape3D@6974" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1659114658]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, -0.545)
 shape = SubResource("BoxShape3D_18xiu")
 
-[node name="@MeshInstance3D@7163" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1625453713]
+[node name="@MeshInstance3D@6975" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=278278204]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_reff0")
 mesh = SubResource("BoxMesh_xmbm6")
 
-[node name="@CollisionShape3D@7164" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=192482522]
+[node name="@CollisionShape3D@6976" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=540681530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, -0.545)
 shape = SubResource("BoxShape3D_bcfhw")
 
-[node name="@MeshInstance3D@7165" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=352260901]
+[node name="@MeshInstance3D@6977" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1751312523]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_ubv8o")
 mesh = SubResource("BoxMesh_30ncv")
 
-[node name="@CollisionShape3D@7166" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1787174979]
+[node name="@CollisionShape3D@6978" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1586958540]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_k5a68")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=428030734]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1459815322]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_apwmf")
 mesh = SubResource("BoxMesh_3h1cd")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1310347916]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=512528034]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.850694, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_c4tr1")
 mesh = SubResource("BoxMesh_wsm46")
 metadata/handrail_distance = 3.850694
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=642910363]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1412347283]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.850694, 1.4, 0.545)
 material_override = SubResource("StandardMaterial3D_c4tr1")
 mesh = SubResource("BoxMesh_w8uh0")
 metadata/handrail_distance = 11.552081823348999
 
-[node name="@CollisionShape3D@7168" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1679829867]
+[node name="@CollisionShape3D@6980" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1687623632]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, 0.545)
 shape = SubResource("BoxShape3D_l2mj6")
 
-[node name="@MeshInstance3D@7169" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=407134197]
+[node name="@MeshInstance3D@6981" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=2077572116]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.551388, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_pj1rn")
 mesh = SubResource("BoxMesh_momnw")
 
-[node name="@CollisionShape3D@7170" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1694441912]
+[node name="@CollisionShape3D@6982" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=1429431590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, 0.545)
 shape = SubResource("BoxShape3D_6f8wn")
 
-[node name="@MeshInstance3D@7171" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=908577401]
+[node name="@MeshInstance3D@6983" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Down" unique_id=231294620]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.551388, 0.925, 0.545)
 material_override = SubResource("StandardMaterial3D_hntk1")
 mesh = SubResource("BoxMesh_plvgj")
 
-[node name="SpineAccess_Market_Square_east_0_Landing_0" type="StaticBody3D" parent="." unique_id=1898982469]
+[node name="SpineAccess_Market_Square_east_0_Landing_0" type="StaticBody3D" parent="." unique_id=1187826289]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -53.65, 95.66)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:SpineAccess_Market_Square_east_0"
 metadata/reach_link_id = "Escalator:SpineAccess_Market_Square_east_0"
 metadata/reach_target = true
 
-[node name="@CollisionShape3D@7172" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Landing_0" unique_id=1321555666]
+[node name="@CollisionShape3D@6984" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Landing_0" unique_id=1247750091]
 shape = SubResource("BoxShape3D_3w1n6")
 
-[node name="@MeshInstance3D@7173" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Landing_0" unique_id=346276655]
+[node name="@MeshInstance3D@6985" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Landing_0" unique_id=513232097]
 material_override = SubResource("StandardMaterial3D_vlaub")
 mesh = SubResource("BoxMesh_oa2pf")
 
-[node name="SpineAccess_Market_Square_east_0_Landing_1" type="StaticBody3D" parent="." unique_id=1147854156]
+[node name="SpineAccess_Market_Square_east_0_Landing_1" type="StaticBody3D" parent="." unique_id=17304533]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -45.95, 109)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:SpineAccess_Market_Square_east_0"
 metadata/reach_link_id = "Escalator:SpineAccess_Market_Square_east_0"
 metadata/reach_target = true
 
-[node name="@CollisionShape3D@7174" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Landing_1" unique_id=1601468330]
+[node name="@CollisionShape3D@6986" type="CollisionShape3D" parent="SpineAccess_Market_Square_east_0_Landing_1" unique_id=192799623]
 shape = SubResource("BoxShape3D_jd5im")
 
-[node name="@MeshInstance3D@7175" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Landing_1" unique_id=862518738]
+[node name="@MeshInstance3D@6987" type="MeshInstance3D" parent="SpineAccess_Market_Square_east_0_Landing_1" unique_id=1798238982]
 material_override = SubResource("StandardMaterial3D_t0jn8")
 mesh = SubResource("BoxMesh_rltud")
 
-[node name="@StaticBody3D@7178" type="StaticBody3D" parent="." unique_id=1781534964]
+[node name="@StaticBody3D@6990" type="StaticBody3D" parent="." unique_id=781898763]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -53.675, 94.41)
 
-[node name="@CollisionShape3D@7176" type="CollisionShape3D" parent="@StaticBody3D@7178" unique_id=1303547325]
+[node name="@CollisionShape3D@6988" type="CollisionShape3D" parent="@StaticBody3D@6990" unique_id=1526572447]
 shape = SubResource("BoxShape3D_yxrya")
 
-[node name="@MeshInstance3D@7177" type="MeshInstance3D" parent="@StaticBody3D@7178" unique_id=1972814172]
+[node name="@MeshInstance3D@6989" type="MeshInstance3D" parent="@StaticBody3D@6990" unique_id=1561791754]
 material_override = SubResource("StandardMaterial3D_bnpa1")
 mesh = SubResource("BoxMesh_s2mwv")
 
-[node name="SpineAccess_South_Gate_west_0_Landing_0" type="StaticBody3D" parent="." unique_id=2071605710]
+[node name="SpineAccess_South_Gate_west_0_Landing_0" type="StaticBody3D" parent="." unique_id=1019272567]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564.5, -60.15, 142.4)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:SpineAccess_South_Gate_west_0"
 metadata/reach_link_id = "Escalator:SpineAccess_South_Gate_west_0"
 metadata/reach_target = true
 
-[node name="@CollisionShape3D@7207" type="CollisionShape3D" parent="SpineAccess_South_Gate_west_0_Landing_0" unique_id=1343114458]
+[node name="@CollisionShape3D@7019" type="CollisionShape3D" parent="SpineAccess_South_Gate_west_0_Landing_0" unique_id=1936144728]
 shape = SubResource("BoxShape3D_e8i4w")
 
-[node name="@MeshInstance3D@7208" type="MeshInstance3D" parent="SpineAccess_South_Gate_west_0_Landing_0" unique_id=1560705287]
+[node name="@MeshInstance3D@7020" type="MeshInstance3D" parent="SpineAccess_South_Gate_west_0_Landing_0" unique_id=312308910]
 material_override = SubResource("StandardMaterial3D_pdk57")
 mesh = SubResource("BoxMesh_qauvr")
 
-[node name="SpineAccessRunout" type="StaticBody3D" parent="." unique_id=112107422]
+[node name="SpineAccessRunout" type="StaticBody3D" parent="." unique_id=1518034408]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564.5, -60.15, 141.15)
 
-[node name="@CollisionShape3D@7211" type="CollisionShape3D" parent="SpineAccessRunout" unique_id=1451795693]
+[node name="@CollisionShape3D@7023" type="CollisionShape3D" parent="SpineAccessRunout" unique_id=636796018]
 shape = SubResource("BoxShape3D_2hgff")
 
-[node name="@MeshInstance3D@7212" type="MeshInstance3D" parent="SpineAccessRunout" unique_id=850910331]
+[node name="@MeshInstance3D@7024" type="MeshInstance3D" parent="SpineAccessRunout" unique_id=1141967610]
 material_override = SubResource("StandardMaterial3D_bxp5x")
 mesh = SubResource("BoxMesh_gcxi2")
 
-[node name="SpineAccess_South_Gate_east_0_Landing_0" type="StaticBody3D" parent="." unique_id=1955676348]
+[node name="SpineAccess_South_Gate_east_0_Landing_0" type="StaticBody3D" parent="." unique_id=1496084111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -60.15, 142.4)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:SpineAccess_South_Gate_east_0"
 metadata/reach_link_id = "Escalator:SpineAccess_South_Gate_east_0"
 metadata/reach_target = true
 
-[node name="@CollisionShape3D@7273" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_0_Landing_0" unique_id=14174755]
+[node name="@CollisionShape3D@7085" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_0_Landing_0" unique_id=1266207685]
 shape = SubResource("BoxShape3D_alnad")
 
-[node name="@MeshInstance3D@7274" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_0_Landing_0" unique_id=293826996]
+[node name="@MeshInstance3D@7086" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_0_Landing_0" unique_id=353828502]
 material_override = SubResource("StandardMaterial3D_vb1bw")
 mesh = SubResource("BoxMesh_8kydw")
 
-[node name="@StaticBody3D@7279" type="StaticBody3D" parent="." unique_id=468266956]
+[node name="@StaticBody3D@7091" type="StaticBody3D" parent="." unique_id=1577123217]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -60.15, 141.15)
 
-[node name="@CollisionShape3D@7277" type="CollisionShape3D" parent="@StaticBody3D@7279" unique_id=654955658]
+[node name="@CollisionShape3D@7089" type="CollisionShape3D" parent="@StaticBody3D@7091" unique_id=307267544]
 shape = SubResource("BoxShape3D_3g623")
 
-[node name="@MeshInstance3D@7278" type="MeshInstance3D" parent="@StaticBody3D@7279" unique_id=1682297369]
+[node name="@MeshInstance3D@7090" type="MeshInstance3D" parent="@StaticBody3D@7091" unique_id=972966398]
 material_override = SubResource("StandardMaterial3D_qh87o")
 mesh = SubResource("BoxMesh_aeich")
