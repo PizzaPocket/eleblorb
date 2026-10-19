@@ -91,7 +91,7 @@ static func _block_tower_exterior() -> StaticBody3D:
 	var width := right - left; var depth := back - front
 	var cfg: Dictionary = PLAN.BLOCK_TOWER
 	var root := StaticBody3D.new()
-	root.name = "BLOCK_Tower_Exterior"
+	root.name = "Building_13_BLOCK_tower"
 	root.collision_layer = 1; root.collision_mask = 1
 	root.position = Vector3(center.x, DATUM, center.y)
 	var dark := Color("#171b27"); var ceramic := Color("#252b3a")

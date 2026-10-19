@@ -88,6 +88,9 @@ const MOY_MANIFEST_PATH := "res://assets/generated/moy_city/manifest.json"
 const MOY_REQUEST_RADIUS := 520.0
 const MOY_ACTIVATE_RADIUS := 390.0
 const MOY_RELEASE_RADIUS := 455.0
+## Hotel interiors are requested before their 48 m activation edge, leaving
+## 92 m of lead for a 52 m rope plus travel margin without caching them citywide.
+const MOY_HOTEL_REQUEST_RADIUS := 140.0
 const MOY_HOTEL_ACTIVATE_RADIUS := 48.0
 const MOY_HOTEL_RELEASE_RADIUS := 72.0
 const MOY_HOTEL_CENTER := Vector2(-457.0, -68.0)
@@ -99,12 +102,17 @@ var _moy_launch_requested := false
 var _moy_launch_active: Node3D
 var _moy_active: Dictionary = {}
 var _moy_requested := {}
+var _moy_requested_at_usec: Dictionary = {}
 var _moy_unload_queue: Array[String] = []
 var _moy_actors_added := false
 var _moy_silhouette: Node3D
 var _moy_block_tower_inside: Node3D
 var _moy_activation_frame_pending := false
 var _moy_activation_count := 0
+var _moy_activation_pending_path := ""
+var _moy_stage_records: Array[Dictionary] = []
+var _moy_activation_frame_records: Array[Dictionary] = []
+var _moy_release_records: Array[Dictionary] = []
 var _moy_resident_index := 0
 var _moy_shop_added := false
 var _moy_resident_points := [Vector2(-600,0),Vector2(-600,-54),Vector2(-600,54),Vector2(-700,2),Vector2(-690,-40),Vector2(-695,-63),Vector2(-743,20),Vector2(-720,60),Vector2(-620,-94),Vector2(-600,120),Vector2(-450,-18),Vector2(-360,2)]
@@ -119,6 +127,11 @@ func _rebuild() -> void:
 func _process(delta: float) -> void:
 	if _moy_activation_frame_pending:
 		print("MOY_ACTIVATION_FRAME delta_ms=", delta * 1000.0, " active_packs=", _moy_active.size(), " bodies=", _count_physics_bodies(self))
+		var player := get_node_or_null("../Player") as Node3D
+		var position := player.global_position if player else Vector3.ZERO
+		_moy_activation_frame_records.append({"delta_ms":delta * 1000.0,"active_packs":_moy_active.size(),
+			"bodies":_count_physics_bodies(self),"path":_moy_activation_pending_path,
+			"position":[position.x,position.y,position.z]})
 		_moy_activation_frame_pending = false
 	_stream_moy_city()
 
@@ -174,9 +187,13 @@ func _stream_moy_city() -> void:
 			_moy_silhouette.queue_free(); _moy_silhouette=null
 	if distance <= MOY_REQUEST_RADIUS:
 		for path in _moy_paths:
+			if _moy_hotel_paths.has(path) and not force_hotel and hotel_distance > MOY_HOTEL_REQUEST_RADIUS: continue
 			if _moy_requested.has(path) or _moy_active.has(path): continue
+			var request_started := Time.get_ticks_usec()
 			var err := ResourceLoader.load_threaded_request(path, "", false, ResourceLoader.CACHE_MODE_REUSE)
-			if err == OK or err == ERR_BUSY: _moy_requested[path] = true
+			if err == OK or err == ERR_BUSY:
+				_moy_requested[path] = true
+				_moy_requested_at_usec[path] = request_started
 			else: push_warning("Moy pack request failed: %s (%s)" % [path, error_string(err)])
 	if distance <= MOY_ACTIVATE_RADIUS:
 		for path in _moy_paths:
@@ -184,19 +201,32 @@ func _stream_moy_city() -> void:
 			if _moy_active.has(path): continue
 			var state := ResourceLoader.load_threaded_get_status(path)
 			if state == ResourceLoader.THREAD_LOAD_LOADED:
+				var ready_usec := Time.get_ticks_usec()
+				var get_started := ready_usec
 				var packed := ResourceLoader.load_threaded_get(path) as PackedScene
+				var get_ms := float(Time.get_ticks_usec() - get_started) / 1000.0
 				if packed:
-					var started := Time.get_ticks_usec()
+					var instantiate_started := Time.get_ticks_usec()
 					var instance := packed.instantiate() as Node3D
+					var instantiate_ms := float(Time.get_ticks_usec() - instantiate_started) / 1000.0
+					var registration_started := Time.get_ticks_usec()
 					add_child(instance)
+					var registration_ms := float(Time.get_ticks_usec() - registration_started) / 1000.0
 					_moy_active[path] = instance
 					_moy_activation_count += 1
 					_moy_activation_frame_pending = true
-					print("MOY_ACTIVATE path=", path.get_file(), " instantiate_add_ms=", (Time.get_ticks_usec()-started)/1000.0, " bodies=", _count_physics_bodies(instance), " activation=", _moy_activation_count)
+					var request_ms := float(ready_usec - int(_moy_requested_at_usec.get(path, ready_usec))) / 1000.0
+					print("MOY_STREAM_STAGE phase=activate path=", path.get_file(), " request_to_ready_ms=", request_ms, " resource_get_ms=", get_ms, " instantiate_ms=", instantiate_ms, " registration_ms=", registration_ms, " bodies=", _count_physics_bodies(instance), " activation=", _moy_activation_count)
+					_moy_activation_pending_path = path.get_file()
+					_moy_stage_records.append({"phase":"activate","path":path.get_file(),
+						"request_to_ready_ms":request_ms,"resource_get_ms":get_ms,
+						"instantiate_ms":instantiate_ms,"registration_ms":registration_ms,
+						"physics_bodies":_count_physics_bodies(instance),"active_packs":_moy_active.size()})
 					_moy_requested.erase(path)
+					_moy_requested_at_usec.erase(path)
 					break
 			elif state == ResourceLoader.THREAD_LOAD_FAILED:
-				push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path)
+				push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path); _moy_requested_at_usec.erase(path)
 	elif distance >= MOY_RELEASE_RADIUS and _moy_active.size() > 0:
 		if _moy_unload_queue.is_empty():
 			for path in _moy_active.keys(): _moy_unload_queue.append(String(path))
@@ -204,15 +234,22 @@ func _stream_moy_city() -> void:
 			var path: String = String(_moy_unload_queue.pop_back())
 			var node: Node3D = _moy_active[path]
 			_moy_active.erase(path)
+			var release_started := Time.get_ticks_usec()
+			node.tree_exited.connect(_log_moy_pack_release.bind(path, release_started), CONNECT_ONE_SHOT)
 			node.queue_free()
 			_moy_requested.erase(path)
+			_moy_requested_at_usec.erase(path)
 	if not force_hotel and hotel_distance >= MOY_HOTEL_RELEASE_RADIUS:
 		for path in _moy_hotel_paths:
 			if _moy_active.has(path):
 				var hotel_node: Node3D = _moy_active[path]
 				_moy_active.erase(path)
 				hotel_node.queue_free()
-				_moy_requested.erase(path)
+			# A request can still be pending (or have finished before activation)
+			# when the player leaves the hotel radius. Drop its tracking state too,
+			# otherwise it remains counted as a retained pack after city unload.
+			_moy_requested.erase(path)
+			_moy_requested_at_usec.erase(path)
 	if distance <= MOY_ACTIVATE_RADIUS and _moy_required_packs_active() and not _moy_actors_added:
 		_add_moy_actors()
 	elif distance >= MOY_RELEASE_RADIUS and _moy_active.is_empty():
@@ -285,6 +322,11 @@ func _count_physics_bodies(node: Node) -> int:
 	var count := 1 if node is CollisionObject3D else 0
 	for child in node.get_children(): count += _count_physics_bodies(child)
 	return count
+
+func _log_moy_pack_release(path: String, started_usec: int) -> void:
+	var release_ms := float(Time.get_ticks_usec() - started_usec) / 1000.0
+	_moy_release_records.append({"path":path.get_file(),"deferred_release_ms":release_ms})
+	print("MOY_STREAM_STAGE phase=release path=", path.get_file(), " deferred_release_ms=", release_ms)
 
 
 func moy_packs_ready() -> bool:
