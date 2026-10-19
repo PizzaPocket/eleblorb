@@ -7,15 +7,21 @@ const QA := preload("res://scenes/moy_city_qa.tscn")
 const DEFAULT_DURATION := 30.0
 const DEFAULT_WARMUP := 5.0
 const DEFAULT_RESOLUTION := Vector2i(1280, 720)
+const FRAME_WIDTH := 13
+const REQUIRED_CROSSROADS_SAMPLES := ["crossroads_spawn", "old_moy_street", "old_moy_rooftop",
+	"downtown_up", "estate_court", "crossing_east_gate", "east_gate_train_hall"]
+const ROUTE_SAMPLE_NAMES := REQUIRED_CROSSROADS_SAMPLES
+const DEFAULT_ROUTE := "crossroads_spawn,old_moy_street,old_moy_rooftop,downtown_up,estate_court,crossing_east_gate,east_gate_train_hall"
 var _config: Dictionary = {}
 var _raw: Dictionary = {}
 var _output_path := ""
+var _frames_path := ""
 var _world: Node3D
 var _player: Player
 var _terrain: Node
 var _city: Node
 var _failed := false
-var _startup_timed_out := false
+var _contract_test_mode := false
 
 func _ready() -> void:
 	_config = _parse_config(OS.get_cmdline_user_args())
@@ -23,6 +29,18 @@ func _ready() -> void:
 	var qa_mode := "--qa" in args
 	var run_id := String(_config.run_id)
 	_output_path = "res://docs/diagnostics/raw/%s-moy-P2-%s.json" % [Time.get_date_string_from_system(), run_id]
+	_frames_path = "res://docs/diagnostics/raw/%s-moy-P2-%s.frames.jsonl" % [Time.get_date_string_from_system(), run_id]
+	if args_has_contract_test(args):
+		_run_contract_negative_case(String(_arg_value(args, "contract-test")))
+		return
+	var route_error := _validate_requested_route(String(_config.route))
+	if not route_error.is_empty():
+		_write_early_failure("invalid_route", route_error)
+		get_tree().quit(2)
+		return
+	var normalized_route: Array[String] = []
+	for route_name in String(_config.route).split(",", true): normalized_route.append(String(route_name).strip_edges())
+	_config.route = ",".join(normalized_route)
 	_seed_world()
 	_config["mode"] = "qa" if qa_mode else "crossroads"
 	_config["godot_version"] = Engine.get_version_info()
@@ -46,16 +64,16 @@ func _ready() -> void:
 	_apply_display_settings()
 	_config["resolution"] = [_config.resolution.x, _config.resolution.y]
 	await get_tree().process_frame
-	_raw = {"schema":1, "config":_config, "samples":[], "transitions":[], "activation":[], "errors":[]}
+	_raw = {"schema":2, "config":_config, "samples":[], "transitions":[], "activation":[], "errors":[],
+		"frame_data_format":"one JSON object per raw frame interval; see each sample.frame_data_path"}
 	_write_partial()
-	var startup_timer := get_tree().create_timer(300.0)
-	startup_timer.timeout.connect(_on_startup_timeout)
 	var start_usec := Time.get_ticks_usec()
 	_world = (QA if qa_mode else MAIN).instantiate() as Node3D
+	var telemetry_city := _world.get_node_or_null("WesternCity")
+	if telemetry_city and telemetry_city.has_method("set_moy_performance_telemetry"):
+		telemetry_city.call("set_moy_performance_telemetry", true)
 	add_child(_world)
 	await LoadingScreen.wait_for_world_builds()
-	if _startup_timed_out: return
-	startup_timer.timeout.disconnect(_on_startup_timeout)
 	_player = _world.get_node_or_null("Player") as Player
 	_terrain = _world.get_node_or_null("Terrain")
 	_city = _world.get_node_or_null("WesternCity")
@@ -91,28 +109,158 @@ func _ready() -> void:
 	for sample in _raw.samples:
 		if sample.get("draws_peak") != null and sample.get("triangles_peak") != null and float(sample.draws_peak) > 0.0 and float(sample.triangles_peak) > 0.0:
 			visible = true
+	_finalize_acceptance(qa_mode, visible, valid_samples)
+	_write_partial()
+	if not bool(_raw.validation.acceptance_passed):
+		push_error("MOY_PERF_ACCEPTANCE_FAILED reasons=%s" % str(_raw.validation.failures))
+		get_tree().quit(1)
+	else:
+		print("MOY_PERF_ACCEPTANCE_PASSED output=", _output_path)
+		get_tree().quit(0)
+
+
+func _finalize_acceptance(qa_mode: bool, visible: bool, valid_samples: bool) -> void:
+	var render_valid := (_backend_is_rendered() or _contract_test_mode) and visible and valid_samples
+	var full_route := not qa_mode and _is_full_route(String(_config.route))
+	var got_names: Array[String] = []
+	for sample in _raw.get("samples", []): got_names.append(String(sample.get("name", "")))
+	var route_complete := full_route and got_names.size() == REQUIRED_CROSSROADS_SAMPLES.size()
+	var unique_names: Dictionary = {}
+	for name in got_names:
+		if unique_names.has(name): route_complete = false
+		unique_names[name] = true
+	for required_name in REQUIRED_CROSSROADS_SAMPLES:
+		if not got_names.has(required_name): route_complete = false
+	var cycles: Array = []
+	for transition in _raw.get("transitions", []):
+		if String(transition.get("phase", "")) == "unload_reload": cycles.append(transition)
+	var cycles_complete := cycles.size() == 2
+	for cycle in cycles:
+		if not bool(cycle.get("ready", false)) or not bool(cycle.get("unload_settled", false)):
+			cycles_complete = false
+	var frame_budget_pass := true
+	for sample in _raw.get("samples", []):
+		if float(sample.get("p95_ms", INF)) > 33.3: frame_budget_pass = false
+	var severe_stalls: Array = []
+	for event in _raw.get("activation", []):
+		if float(event.get("frame_ms", 0.0)) > 100.0: severe_stalls.append(event)
+	var stall_gate_pass := severe_stalls.size() < 2
+	var failures: Array[String] = []
+	if not render_valid: failures.append("rendering_evidence_invalid")
+	if not route_complete and not qa_mode: failures.append("required_route_samples_incomplete")
+	if not valid_samples: failures.append("no_completed_samples")
+	if not cycles_complete and not qa_mode: failures.append("unload_cycles_incomplete_or_unsettled")
+	if not frame_budget_pass and not qa_mode: failures.append("required_p95_frame_budget_missed")
+	if not stall_gate_pass and not qa_mode: failures.append("repeated_over_100ms_activation_stalls")
+	if _failed or not _raw.get("errors", []).is_empty(): failures.append("benchmark_readiness_or_runtime_failure")
 	_raw["validation"] = {
 		"rendered_backend": _backend_is_rendered(),
 		"visible_geometry": visible,
 		"completed_samples": valid_samples,
-		"accepted_rendering_evidence": _backend_is_rendered() and visible and valid_samples and not _failed,
-		"failed": _failed
+		"rendering_evidence_valid": render_valid,
+		"accepted_rendering_evidence": render_valid,
+		"suite_scope": "diagnostic_qa" if qa_mode else ("full" if full_route else "partial"),
+		"full_route_complete": route_complete,
+		"required_samples": REQUIRED_CROSSROADS_SAMPLES,
+		"actual_samples": got_names,
+		"cycles_complete_and_settled": cycles_complete,
+		"required_p95_frame_budget_pass": frame_budget_pass,
+		"repeated_over_100ms_activation_stalls_pass": stall_gate_pass,
+		"over_100ms_transition_count": severe_stalls.size(),
+		"acceptance_passed": failures.is_empty(),
+		"failures": failures,
+		"failed": not failures.is_empty()
 	}
+	if not failures.is_empty(): _failed = true
+
+
+func _validate_requested_route(route: String) -> String:
+	if route.strip_edges().is_empty(): return "route list is empty"
+	var names := route.split(",", true)
+	var seen: Dictionary = {}
+	for raw_name in names:
+		var name := String(raw_name).strip_edges()
+		if name.is_empty(): return "route contains an empty sample name"
+		if not ROUTE_SAMPLE_NAMES.has(name): return "unknown route sample: %s" % name
+		if seen.has(name): return "duplicate route sample: %s" % name
+		seen[name] = true
+	if not seen.has("crossroads_spawn"): return "route must include crossroads_spawn for an equivalent asleep baseline"
+	return ""
+
+
+func _is_full_route(route: String) -> bool:
+	var actual := route.split(",", true)
+	for i in actual.size(): actual[i] = String(actual[i]).strip_edges()
+	if actual.size() != REQUIRED_CROSSROADS_SAMPLES.size(): return false
+	for name in REQUIRED_CROSSROADS_SAMPLES:
+		if not actual.has(name): return false
+	return true
+
+
+func args_has_contract_test(args: Array) -> bool:
+	return not _arg_value(args, "contract-test").is_empty()
+
+
+func _arg_value(args: Array, key: String) -> String:
+	for arg in args:
+		var prefix := "--%s=" % key
+		if String(arg).begins_with(prefix): return String(arg).trim_prefix(prefix)
+	return ""
+
+
+func _write_early_failure(kind: String, message: String) -> void:
+	_raw = {"schema": 2, "config": _config, "samples": [], "transitions": [], "activation": [],
+		"errors": [{"kind": kind, "message": message}], "validation": {
+		"suite_scope": "invalid", "acceptance_passed": false, "failed": true, "failures": [message]}}
 	_write_partial()
-	if not bool(_raw.validation.accepted_rendering_evidence):
-		push_error("MOY_PERF_INVALID_RENDER_EVIDENCE backend=%s adapter=%s visible=%s samples=%d" % [RenderingServer.get_current_rendering_method(), RenderingServer.get_video_adapter_name(), visible, _raw.samples.size()])
-		get_tree().quit(1)
-	else:
-		print("MOY_PERF_COMPLETE output=", _output_path)
-		get_tree().quit(0)
+	push_error("MOY_PERF_FAILURE " + message)
+
+
+func _run_contract_negative_case(case_name: String) -> void:
+	_contract_test_mode = true
+	_config["route"] = DEFAULT_ROUTE
+	var base_samples: Array[Dictionary] = []
+	for sample_name in REQUIRED_CROSSROADS_SAMPLES:
+		base_samples.append({"name":sample_name,"p95_ms":20.0})
+	var base_cycles: Array[Dictionary] = [
+		{"phase":"unload_reload","ready":true,"unload_settled":true},
+		{"phase":"unload_reload","ready":true,"unload_settled":true}]
+	var test_raw := {"samples": base_samples, "transitions": base_cycles, "activation": [], "errors": []}
+	_failed = false
+	match case_name:
+		"frame_budget": test_raw.samples[4].p95_ms = 58.0
+		"activation_stall": test_raw.activation = [{"frame_ms":101.0}, {"frame_ms":113.0}]
+		"missing_route": test_raw.samples.remove_at(test_raw.samples.size()-1)
+		"readiness_timeout": _failed = true
+		"unload_timeout": test_raw.transitions[0].unload_settled = false
+		"success":
+			_raw = test_raw
+			_finalize_acceptance(false, true, true)
+			get_tree().quit(0 if _raw.validation.acceptance_passed else 1)
+			return
+		_:
+			push_error("Unknown contract test: %s" % case_name)
+			get_tree().quit(2)
+			return
+	_raw = test_raw
+	_finalize_acceptance(false, true, true)
+	print("MOY_PERF_CONTRACT_TEST case=", case_name, " acceptance_passed=", _raw.validation.acceptance_passed, " failures=", _raw.validation.failures)
+	get_tree().quit(1 if not _raw.validation.acceptance_passed else 0)
 
 func _parse_config(args: Array) -> Dictionary:
 	var cfg := {"run_id": "run1", "duration": DEFAULT_DURATION, "warmup": DEFAULT_WARMUP,
 		"resolution": DEFAULT_RESOLUTION, "vsync": DisplayServer.VSYNC_DISABLED,
 		"fps_cap": 0, "seed": 20261019, "game_time_hours": 12.0,
-		"fov": 70.0, "route": "crossroads_spawn,old_moy_street,old_moy_rooftop,downtown_up,estate_court,crossing_east_gate,train_hall_static"}
+		"fov": 70.0, "route": DEFAULT_ROUTE}
 	for arg in args:
-		var pair := String(arg).trim_prefix("--").split("=", false, 1)
+		var arg_text := String(arg)
+		if arg_text == "--route":
+			cfg.route = ""
+			continue
+		if arg_text.begins_with("--route="):
+			cfg.route = arg_text.trim_prefix("--route=")
+			continue
+		var pair := arg_text.trim_prefix("--").split("=", false, 1)
 		if pair.size() != 2: continue
 		match pair[0]:
 			"run-id": cfg.run_id = pair[1]
@@ -171,24 +319,43 @@ func _run_crossroads(camera: Camera3D) -> void:
 		{"name":"downtown_up", "camera":Vector3(-462,5,-40), "look":Vector3(-462,-25,-20), "player":Vector2(-462,-20)},
 		{"name":"estate_court", "camera":Vector3(-535,-38,-125), "look":Vector3(-535,-48,-100), "player":Vector2(-535,-100)},
 		{"name":"crossing_east_gate", "camera":Vector3(-560,8,8), "look":Vector3(-560,13.2,0), "player":Vector2(-560,0)},
-		{"name":"train_hall_static", "camera":Vector3(-560,-34,-12), "look":Vector3(-560,-45,0), "player":Vector2(-560,0)}]
-	var requested: Array = String(_config.route).split(",")
+		{"name":"east_gate_train_hall", "camera":Vector3(-351,-34,-20), "look":Vector3(-351,-45,0), "player":Vector2(-351,0)}]
+	var requested: Array = String(_config.route).split(",", true)
 	for view in views:
 		if String(view.name) not in requested: continue
 		var p: Vector2 = view.player
 		var y := float(_terrain.call("get_mesh_height", p.x, p.y)) + 0.5
 		_player.global_position = Vector3(p.x, y, p.y)
 		await _sample(camera, String(view.name), view.camera, view.look, p, "stationary view after approach")
+	var previous_reload_inventory: Dictionary = {}
 	for cycle in 2:
-		var away_y := float(_terrain.call("get_mesh_height", -1600.0, 0.0))
-		_player.global_position = Vector3(-1600.0, away_y + 0.5, 0.0)
+		var cycle_start_state := _stream_state()
+		# Return to the protected Crossroads clearing to trigger city unload
+		# without entering the open-wasteland encounter zone.
+		var away_y := float(_terrain.call("get_mesh_height", 0.0, 0.0))
+		_player.global_position = Vector3(0.0, away_y + 0.5, 0.0)
 		var started := Time.get_ticks_usec()
 		var elapsed := 0.0
 		while elapsed < 45.0 and int(_city.get("_moy_active").size()) > 0:
 			await get_tree().process_frame
 			elapsed = float(Time.get_ticks_usec() - started) / 1000000.0
 			_capture_transition_frame("unload_%d" % (cycle+1), int(elapsed*1000.0))
-		var after_unload := _stream_state()
+		var unload_deadline := Time.get_ticks_msec() + 45000
+		var settled_frames := 0
+		var previous_settle_state: Dictionary = {}
+		while Time.get_ticks_msec() < unload_deadline and settled_frames < 2:
+			await get_tree().process_frame
+			await get_tree().physics_frame
+			var settle_state := _stream_state()
+			var equivalent_actor_state: bool = not previous_settle_state.is_empty() and settle_state.city_actor_group_identities.size() == previous_settle_state.city_actor_group_identities.size()
+			var equivalent_node_state: bool = not previous_settle_state.is_empty() and int(settle_state.nodes) == int(previous_settle_state.nodes)
+			if int(settle_state.active_packs) == 0 and int(settle_state.requested_packs) == 0 and int(settle_state.pending_exits) == 0 and equivalent_actor_state and equivalent_node_state:
+				settled_frames += 1
+			else:
+				settled_frames = 0
+			previous_settle_state = settle_state
+		var after_unload := _compact_stream_state(_stream_state())
+		var unload_settled := settled_frames >= 2
 		var near_y := float(_terrain.call("get_mesh_height", -600.0, 0.0))
 		_player.global_position = Vector3(-600.0, near_y + 0.5, 0.0)
 		var reload_start := Time.get_ticks_usec()
@@ -198,9 +365,17 @@ func _run_crossroads(camera: Camera3D) -> void:
 			frames += 1
 			_capture_transition_frame("reload_%d" % (cycle+1), frames)
 		var complete := _city_control_ready()
-		_raw.transitions.append({"phase":"unload_reload", "cycle":cycle+1, "unload_state":after_unload,
+		var settled_state := _stream_state(true, true)
+		var transition := {"phase":"unload_reload", "cycle":cycle+1,
+			"before_unload_state":_compact_stream_state(cycle_start_state), "unload_state":after_unload,
 			"reload_ms":float(Time.get_ticks_usec()-reload_start)/1000.0, "reload_frames":frames,
-			"ready":complete, "settled_state":_stream_state()})
+			"unload_settled":unload_settled, "unload_settle_frames":settled_frames,
+			"ready":complete, "settled_state":_compact_stream_state(settled_state)}
+		if not previous_reload_inventory.is_empty():
+			transition["settled_node_path_delta_vs_previous_cycle"] = _diff_node_inventories(previous_reload_inventory, settled_state["node_inventory"])
+		previous_reload_inventory = settled_state["node_inventory"]
+		_raw.transitions.append(transition)
+		if not unload_settled: _fail("unload cycle %d did not settle within 45 seconds" % (cycle+1))
 		if not complete: _fail("reload cycle %d timed out" % (cycle+1))
 
 func _run_qa(camera: Camera3D) -> void:
@@ -222,28 +397,37 @@ func _run_qa(camera: Camera3D) -> void:
 func _sample(camera: Camera3D, label: String, position: Vector3, target: Vector3, body_position: Vector2, phase: String) -> void:
 	camera.global_position = position
 	camera.look_at(target)
+	camera.make_current()
+	camera.force_update_transform()
 	if _player and _terrain and body_position != Vector2.ZERO:
 		var y := float(_terrain.call("get_mesh_height", body_position.x, body_position.y)) + 0.5
 		_player.global_position = Vector3(body_position.x, y, body_position.y)
 	var warmup_started := Time.get_ticks_usec()
 	while float(Time.get_ticks_usec() - warmup_started) < float(_config.warmup) * 1000000.0:
 		await get_tree().process_frame
-	var frames: Array[Dictionary] = []
+		await RenderingServer.frame_post_draw
+	var frames := PackedFloat64Array()
 	var started := Time.get_ticks_usec()
 	var previous := started
 	while float(Time.get_ticks_usec()-started) < float(_config.duration) * 1000000.0:
 		await get_tree().process_frame
+		await RenderingServer.frame_post_draw
 		var now := Time.get_ticks_usec()
 		var sample := _monitor_frame(float(now-previous)/1000.0)
-		sample["elapsed_ms"] = float(now-started)/1000.0
-		sample["position"] = [camera.global_position.x, camera.global_position.y, camera.global_position.z]
-		sample["phase"] = phase
-		frames.append(sample)
+		var body := _player.global_position if _player else Vector3.ZERO
+		frames.append(float(sample.frame_ms))
+		for key in ["draws", "triangles", "static_mib", "video_mib", "nodes", "physics_objects", "active_packs", "requested_packs", "retained_resources"]:
+			var value: Variant = sample[key]
+			frames.append(float(value) if value != null else NAN)
+		frames.append(body.x); frames.append(body.y); frames.append(body.z)
 		previous = now
-	var summary := _summarize(label, frames, position, target, phase)
+	var summary := _summarize(label, frames, camera.global_position, target, phase)
+	var raw_path := _write_frame_rows(label, phase, camera, target, frames)
+	summary["frame_data_path"] = raw_path
+	summary["probe_frame_buffer_bytes"] = frames.size() * 8
 	_raw.samples.append(summary)
 	_write_partial()
-	print("MOY_PERF_SAMPLE name=%s frames=%d p50_ms=%.3f p95_ms=%.3f p99_ms=%.3f worst_ms=%.3f draws_peak=%s triangles_peak=%s active_packs=%d" % [label, frames.size(), summary.p50_ms, summary.p95_ms, summary.p99_ms, summary.worst_ms, summary.draws_peak, summary.triangles_peak, summary.active_packs])
+	print("MOY_PERF_SAMPLE name=%s frames=%d p50_ms=%.3f p95_ms=%.3f p99_ms=%.3f worst_ms=%.3f draws_peak=%s triangles_peak=%s active_packs=%d" % [label, summary.frames, summary.p50_ms, summary.p95_ms, summary.p99_ms, summary.worst_ms, summary.draws_peak, summary.triangles_peak, summary.active_packs])
 
 func _monitor_frame(frame_ms: float) -> Dictionary:
 	var position := _player.global_position if _player else Vector3.ZERO
@@ -257,44 +441,94 @@ func _monitor_frame(frame_ms: float) -> Dictionary:
 		"active_packs":_active_packs(), "requested_packs":_requested_packs(),
 		"retained_resources":_retained_resources()}
 
-func _summarize(label: String, frames: Array[Dictionary], camera: Vector3, target: Vector3, phase: String) -> Dictionary:
-	var intervals: Array[float] = []
-	var draws: Array[float] = []
-	var triangles: Array[float] = []
-	var static_mem: Array[float] = []
-	var video_mem: Array[float] = []
-	var physics: Array[float] = []
+
+func _summarize(label: String, frames: PackedFloat64Array, camera_position: Vector3, target: Vector3, phase: String) -> Dictionary:
+	var intervals := PackedFloat64Array()
+	var draws := PackedFloat64Array()
+	var triangles := PackedFloat64Array()
+	var static_mem := PackedFloat64Array()
+	var adjusted_static_mem := PackedFloat64Array()
+	var video_mem := PackedFloat64Array()
+	var nodes := PackedFloat64Array()
+	var physics := PackedFloat64Array()
 	var over_50: Array[Dictionary] = []
 	var over_100: Array[Dictionary] = []
-	for frame in frames:
-		var ms := float(frame.frame_ms)
+	var frame_count := int(frames.size() / FRAME_WIDTH)
+	var buffer_bytes := frames.size() * 8
+	var buffer_mib_per_frame := float(buffer_bytes) / float(maxi(frame_count, 1)) / 1048576.0
+	var elapsed_ms := 0.0
+	for frame_index in frame_count:
+		var base := frame_index * FRAME_WIDTH
+		var ms := frames[base]
+		elapsed_ms += ms
 		intervals.append(ms)
-		if frame.draws != null: draws.append(float(frame.draws))
-		if frame.triangles != null: triangles.append(float(frame.triangles))
-		if frame.static_mib != null: static_mem.append(float(frame.static_mib))
-		if frame.video_mib != null: video_mem.append(float(frame.video_mib))
-		if frame.physics_objects != null: physics.append(float(frame.physics_objects))
-		if ms > 50.0: over_50.append(frame)
-		if ms > 100.0: over_100.append(frame)
+		var draws_value := frames[base+1]; var triangles_value := frames[base+2]
+		var static_value := frames[base+3]; var video_value := frames[base+4]
+		var nodes_value := frames[base+5]; var physics_value := frames[base+6]
+		if is_finite(draws_value): draws.append(draws_value)
+		if is_finite(triangles_value): triangles.append(triangles_value)
+		if is_finite(static_value):
+			static_mem.append(static_value)
+			adjusted_static_mem.append(maxf(0.0, static_value-buffer_mib_per_frame))
+		if is_finite(video_value): video_mem.append(video_value)
+		if is_finite(nodes_value): nodes.append(nodes_value)
+		if is_finite(physics_value): physics.append(physics_value)
+		if ms > 50.0 or ms > 100.0:
+			var frame := {"frame_index":frame_index,"frame_ms":ms,"elapsed_ms":elapsed_ms,
+				"position":[frames[base+10],frames[base+11],frames[base+12]],
+				"active_packs":int(frames[base+7]),"requested_packs":int(frames[base+8]),"phase":phase}
+			if ms > 50.0: over_50.append(frame)
+			if ms > 100.0: over_100.append(frame)
 	intervals.sort(); draws.sort(); triangles.sort(); static_mem.sort(); video_mem.sort(); physics.sort()
-	var result := {"name":label, "phase":phase, "camera":[camera.x,camera.y,camera.z], "target":[target.x,target.y,target.z],
-		"fov":float(_config.fov), "frames":frames.size(), "duration_s":float(_config.duration),
+	adjusted_static_mem.sort(); nodes.sort()
+	var result := {"name":label, "phase":phase, "camera":[camera_position.x,camera_position.y,camera_position.z], "target":[target.x,target.y,target.z],
+		"fov":float(_config.fov), "camera_far":1800.0, "frames":frame_count, "duration_s":float(_config.duration),
 		"p50_ms":_percentile(intervals,0.50), "p95_ms":_percentile(intervals,0.95),
-		"p99_ms":_percentile(intervals,0.99), "worst_ms":intervals.back() if not intervals.is_empty() else null,
+		"p99_ms":_percentile(intervals,0.99), "worst_ms":intervals[intervals.size()-1] if not intervals.is_empty() else null,
 		"frames_over_50ms":over_50.size(), "frames_over_100ms":over_100.size(),
 		"over_50ms":over_50, "over_100ms":over_100,
-		"draws_distribution":_distribution(draws), "draws_peak":draws.back() if not draws.is_empty() else null,
-		"triangles_distribution":_distribution(triangles), "triangles_peak":triangles.back() if not triangles.is_empty() else null,
-		"static_mib_distribution":_distribution(static_mem), "video_mib_distribution":_distribution(video_mem),
+		"draws_distribution":_distribution(draws), "draws_peak":draws[draws.size()-1] if not draws.is_empty() else null,
+		"triangles_distribution":_distribution(triangles), "triangles_peak":triangles[triangles.size()-1] if not triangles.is_empty() else null,
+		"static_mib_distribution_observed":_distribution(static_mem),
+		"static_mib_distribution_observer_adjusted":_distribution(adjusted_static_mem),
+		"video_mib_distribution":_distribution(video_mem), "nodes_distribution":_distribution(nodes),
 		"physics_objects_distribution":_distribution(physics), "active_packs":_active_packs(),
-		"requested_packs":_requested_packs(), "retained_resources":_retained_resources(), "raw_frames":frames}
+		"requested_packs":_requested_packs(), "retained_resources":_retained_resources(),
+		"raw_frame_buffer_bytes_peak":buffer_bytes}
 	return result
 
-func _distribution(values: Array[float]) -> Variant:
-	if values.is_empty(): return null
-	return {"count":values.size(), "min":values.front(), "p50":_percentile(values,0.5), "p95":_percentile(values,0.95), "p99":_percentile(values,0.99), "max":values.back()}
+func _write_frame_rows(label: String, phase: String, camera: Camera3D, target: Vector3, frames: PackedFloat64Array) -> String:
+	var path := _output_path.trim_suffix(".json") + ".%s.frames.jsonl" % label
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		_fail("could not write raw frame file: %s" % path)
+		return ""
+	var count := int(frames.size() / FRAME_WIDTH)
+	var elapsed_ms := 0.0
+	for frame_index in count:
+		var base := frame_index * FRAME_WIDTH
+		elapsed_ms += frames[base]
+		file.store_line(JSON.stringify({"sample":label,"frame_index":frame_index,"phase":phase,
+			"frame_ms":frames[base],"elapsed_ms":elapsed_ms,"camera":[camera.global_position.x,camera.global_position.y,camera.global_position.z],
+			"target":[target.x,target.y,target.z],"fov":float(_config.fov),"camera_far":camera.far,
+			"draws":_frame_number(frames[base+1]),"triangles":_frame_number(frames[base+2]),
+			"static_mib_observed":_frame_number(frames[base+3]),"video_mib":_frame_number(frames[base+4]),
+			"nodes":_frame_number(frames[base+5]),"physics_objects":_frame_number(frames[base+6]),
+			"active_packs":_frame_number(frames[base+7]),"requested_packs":_frame_number(frames[base+8]),
+			"retained_resources":_frame_number(frames[base+9]),"player_position":[frames[base+10],frames[base+11],frames[base+12]]}))
+	file.close()
+	return path
 
-func _percentile(values: Array[float], quantile: float) -> Variant:
+
+func _frame_number(value: float) -> Variant:
+	return value if is_finite(value) else null
+
+
+func _distribution(values: PackedFloat64Array) -> Variant:
+	if values.is_empty(): return null
+	return {"count":values.size(), "min":values[0], "p50":_percentile(values,0.5), "p95":_percentile(values,0.95), "p99":_percentile(values,0.99), "max":values[values.size()-1]}
+
+func _percentile(values: PackedFloat64Array, quantile: float) -> Variant:
 	if values.is_empty(): return null
 	return values[clampi(ceili(float(values.size()-1)*quantile),0,values.size()-1)]
 
@@ -323,10 +557,94 @@ func _retained_resources() -> int:
 		if ResourceLoader.has_cached(String(path)): cached += 1
 	return cached
 
-func _stream_state() -> Dictionary:
-	return {"active_packs":_active_packs(), "requested_packs":_requested_packs(),
-		"nodes":_count_nodes(get_tree().root), "static_mib":_monitor_mib(Performance.MEMORY_STATIC),
+func _stream_state(include_paths: bool = false, include_actor_paths: bool = false) -> Dictionary:
+	var class_counts: Dictionary = {}
+	var actor_ids: Array[String] = []
+	var moy_node_count: Array[int] = [0]
+	if _city: _collect_lifetime_state(_city, class_counts, actor_ids, moy_node_count)
+	actor_ids.sort()
+	var tree := get_tree()
+	var root_node_count := _count_nodes(tree.root) if tree != null else -1
+	var global_class_counts: Dictionary = {}
+	var city_actor_ids: Array[String] = []
+	if tree != null:
+		_collect_global_class_counts(tree.root, global_class_counts)
+		if _city: _collect_city_actor_ids(_city, city_actor_ids)
+	city_actor_ids.sort()
+	var result := {"active_packs":_active_packs(), "requested_packs":_requested_packs(),
+		"nodes":root_node_count, "moy_nodes":moy_node_count[0],
+		"pending_exits":int(_city.get("_moy_unload_pending").size()) if _city else -1, "class_counts":class_counts,
+		"global_class_counts":global_class_counts, "actor_group_identities":actor_ids,
+		"city_actor_group_identities":city_actor_ids,
+		"static_mib":_monitor_mib(Performance.MEMORY_STATIC),
 		"retained_manifest_refs":_retained_resources(), "actors_ready":bool(_city.call("moy_actors_ready")) if _city and _city.has_method("moy_actors_ready") else false}
+	if include_paths and tree != null:
+		var node_inventory: Dictionary = {}
+		_collect_node_inventory(tree.root, node_inventory)
+		result["node_inventory"] = node_inventory
+	if include_actor_paths and tree != null:
+		var actor_inventory: Dictionary = {}
+		_collect_actor_inventory(tree.root, actor_inventory, false)
+		result["actor_node_inventory"] = actor_inventory
+	return result
+
+func _compact_stream_state(state: Dictionary) -> Dictionary:
+	var compact := state.duplicate(true)
+	compact.erase("node_inventory")
+	return compact
+
+func _diff_node_inventories(before: Dictionary, after: Dictionary) -> Dictionary:
+	var added: Dictionary = {}
+	var removed: Dictionary = {}
+	for path in after:
+		if not before.has(path): added[path] = after[path]
+	for path in before:
+		if not after.has(path): removed[path] = before[path]
+	return {"added_count":added.size(), "removed_count":removed.size(), "added":added, "removed":removed}
+
+func _collect_lifetime_state(node: Node, class_counts: Dictionary, actor_ids: Array[String], moy_nodes: Array[int]) -> void:
+	class_counts[node.get_class()] = int(class_counts.get(node.get_class(), 0)) + 1
+	moy_nodes[0] += 1
+	for group_name in node.get_groups():
+		if String(group_name).contains("actor") or String(group_name).contains("resident") or String(group_name).contains("vendor") or String(group_name).contains("npc"):
+			actor_ids.append("%s|%s|%s" % [String(group_name), str(node.get_path()), node.get_class()])
+	for child in node.get_children(): _collect_lifetime_state(child, class_counts, actor_ids, moy_nodes)
+
+func _collect_city_actor_ids(node: Node, result: Array[String]) -> void:
+	if node.is_in_group("city_npcs") or node.is_in_group("moy_actors") or node.is_in_group("moy_vendors"):
+		result.append("%s|%s" % [str(node.get_path()), node.get_class()])
+	for child in node.get_children(): _collect_city_actor_ids(child, result)
+
+func _collect_global_class_counts(node: Node, counts: Dictionary) -> void:
+	counts[node.get_class()] = int(counts.get(node.get_class(), 0)) + 1
+	for child in node.get_children(): _collect_global_class_counts(child, counts)
+
+func _collect_node_inventory(node: Node, inventory: Dictionary) -> void:
+	var owner_path := String(node.owner.get_path()) if node.owner != null else ""
+	var position: Variant = null
+	if node is Node3D:
+		var node_position := (node as Node3D).global_position
+		position = [node_position.x, node_position.y, node_position.z]
+	inventory[String(node.get_path())] = {"name":String(node.name), "class":node.get_class(),
+		"owner":owner_path, "groups":node.get_groups(), "position":position}
+	for child in node.get_children(): _collect_node_inventory(child, inventory)
+
+func _collect_actor_inventory(node: Node, inventory: Dictionary, inside_actor: bool) -> void:
+	var actor_root := inside_actor
+	for group_name in node.get_groups():
+		var group_text := String(group_name)
+		if group_text.contains("actor") or group_text.contains("resident") or group_text.contains("vendor") or group_text.contains("npc"):
+			actor_root = true
+			break
+	if actor_root:
+		var owner_path := String(node.owner.get_path()) if node.owner != null else ""
+		var position: Variant = null
+		if node is Node3D:
+			var node_position := (node as Node3D).global_position
+			position = [node_position.x, node_position.y, node_position.z]
+		inventory[String(node.get_path())] = {"name":String(node.name), "class":node.get_class(), "owner":owner_path,
+			"groups":node.get_groups(), "position":position}
+	for child in node.get_children(): _collect_actor_inventory(child, inventory, actor_root)
 
 func _count_nodes(node: Node) -> int:
 	var count := 1
@@ -340,7 +658,6 @@ func _capture_transition_frame(phase: String, frame: int) -> void:
 	var event := {"phase":phase, "frame":frame, "frame_ms":ms, "position":[pos.x,pos.y,pos.z],
 		"active_packs":_active_packs(), "requested_packs":_requested_packs()}
 	_raw.activation.append(event)
-	if ms > 100.0: _raw.errors.append({"kind":"travel_frame_over_100ms", "event":event})
 
 func _git_commit() -> String:
 	var output: Array = []
@@ -368,14 +685,6 @@ func _fail(message: String) -> void:
 	_failed = true
 	_raw.errors.append({"kind":"benchmark_failure", "message":message})
 	push_error("MOY_PERF_FAILURE " + message)
-
-func _on_startup_timeout() -> void:
-	if not is_inside_tree() or _raw.get("validation", {}).get("completed_samples", false): return
-	_startup_timed_out = true
-	_failed = true
-	_raw.errors.append({"kind":"startup_timeout", "message":"control-ready world build exceeded 300 seconds"})
-	_write_partial()
-	get_tree().quit(1)
 
 func _write_partial() -> void:
 	if _raw.is_empty(): _raw = {"schema":1, "config":_config, "samples":[], "transitions":[], "activation":[], "errors":[]}

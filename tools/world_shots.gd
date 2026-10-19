@@ -10,6 +10,14 @@ const STANDARD_VIEWS := {
 	"under_civic_north_flight": {"camera": Vector3(-482, -58.5, -14), "at": Vector3(-487, -54.5, -14)},
 	"under_civic_south_flight": {"camera": Vector3(-482, -58.5, 14), "at": Vector3(-487, -54.5, 14)},
 }
+const P2_BENCHMARK_VIEWS := {
+	"old_moy_street": {"camera": Vector3(-704, -54, -24), "at": Vector3(-700, -58, 0)},
+	"old_moy_rooftop": {"camera": Vector3(-704, -29, -24), "at": Vector3(-700, -42, 0)},
+	"downtown_up": {"camera": Vector3(-462, 5, -40), "at": Vector3(-462, -25, -20)},
+	"estate_court": {"camera": Vector3(-535, -38, -125), "at": Vector3(-535, -48, -100)},
+	"crossing_east_gate": {"camera": Vector3(-560, 8, 8), "at": Vector3(-560, 13.2, 0)},
+	"east_gate_train_hall": {"camera": Vector3(-351, -34, -20), "at": Vector3(-351, -45, 0)},
+}
 
 func _ready() -> void:
 	call_deferred("_render_set")
@@ -32,15 +40,22 @@ func _render_set() -> void:
 	while city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec() < deadline:
 		await get_tree().create_timer(0.25).timeout
 	await get_tree().physics_frame
-	var reach_helper := _prepare_reach_helper(root, player)
-	_add_flight_views(views, city, reach_helper)
+	if package != "P2":
+		var reach_helper := _prepare_reach_helper(root, player)
+		_add_flight_views(views, city, reach_helper)
 	var camera := Camera3D.new()
 	camera.current = true
-	camera.fov = 52.0
+	camera.fov = 70.0 if package == "P2" else 52.0
 	root.add_child(camera)
 	get_viewport().size = Vector2i(1280, 720)
 	var out_dir := "res://docs/diagnostics/images/%s-%s" % [date, package]
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(out_dir))
+	var manifest := {"schema": 1, "package": package, "date": date,
+		"run_id": String(args.get("run-id", "world-shots")), "commit": _git_commit(),
+		"source_hashes": _source_hashes(), "godot_version": Engine.get_version_info(),
+		"renderer": RenderingServer.get_current_rendering_method(),
+		"adapter": RenderingServer.get_video_adapter_name(), "resolution": [1280, 720],
+		"lighting_sets": ["noon", "dusk"], "screenshots": []}
 	for view_name in views:
 		var view: Dictionary = views[view_name]
 		camera.global_position = view.camera
@@ -60,9 +75,18 @@ func _render_set() -> void:
 				get_tree().quit(1)
 				return
 			print("WORLD_SHOT ", path)
+			manifest.screenshots.append({"name": view_name, "lighting": lighting,
+				"path": path, "camera": [view.camera.x, view.camera.y, view.camera.z],
+				"target": [view.at.x, view.at.y, view.at.z], "fov": camera.fov,
+				"controlled_body": [player.global_position.x, player.global_position.y, player.global_position.z] if player else null})
+	var manifest_file := FileAccess.open("%s/shot-manifest.json" % out_dir, FileAccess.WRITE)
+	if manifest_file:
+		manifest_file.store_string(JSON.stringify(manifest, "\t"))
+		manifest_file.close()
 	get_tree().quit(0)
 
 func _package_views(package:String)->Dictionary:
+	if package == "P2": return P2_BENCHMARK_VIEWS.duplicate(true)
 	var available := _read_places()
 	var selected:Dictionary = STANDARD_VIEWS.duplicate(true)
 	for standard_id in ["overview"]:
@@ -79,6 +103,24 @@ func _package_views(package:String)->Dictionary:
 		var id := match_view.get_string(1)
 		if available.has(id): selected[id] = available[id]
 	return selected
+
+func _git_commit() -> String:
+	var output: Array = []
+	var code := OS.execute("git", ["rev-parse", "HEAD"], output, true)
+	return String(output[0]).strip_edges() if code == 0 and not output.is_empty() else "unavailable"
+
+func _source_hashes() -> Dictionary:
+	var result: Dictionary = {}
+	for path in ["res://tools/world_shots.gd", "res://tools/moy_performance_probe.gd", "res://scripts/city_generator.gd"]:
+		var file := FileAccess.open(path, FileAccess.READ)
+		if file == null:
+			result[path] = "missing"
+			continue
+		var hash := HashingContext.new()
+		hash.start(HashingContext.HASH_SHA256)
+		hash.update(file.get_buffer(file.get_length()))
+		result[path] = hash.finish().hex_encode()
+	return result
 
 func _prepare_reach_helper(root:Node3D, player:Node3D)->Node:
 	var helper := (load("res://tools/world_checks.gd") as Script).new() as Node

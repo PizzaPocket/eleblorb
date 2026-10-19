@@ -86,11 +86,13 @@ var _city_skyline_visible := false
 const MOY_PLAN := preload("res://scripts/city_plan.gd")
 const MOY_MANIFEST_PATH := "res://assets/generated/moy_city/manifest.json"
 const MOY_REQUEST_RADIUS := 520.0
+const MOY_REQUEST_RELEASE_RADIUS := 560.0
 const MOY_ACTIVATE_RADIUS := 390.0
 const MOY_RELEASE_RADIUS := 455.0
 ## Hotel interiors are requested before their 48 m activation edge, leaving
 ## 92 m of lead for a 52 m rope plus travel margin without caching them citywide.
 const MOY_HOTEL_REQUEST_RADIUS := 140.0
+const MOY_HOTEL_REQUEST_RELEASE_RADIUS := 160.0
 const MOY_HOTEL_ACTIVATE_RADIUS := 48.0
 const MOY_HOTEL_RELEASE_RADIUS := 72.0
 const MOY_HOTEL_CENTER := Vector2(-457.0, -68.0)
@@ -102,14 +104,16 @@ var _moy_launch_requested := false
 var _moy_launch_active: Node3D
 var _moy_active: Dictionary = {}
 var _moy_requested := {}
-var _moy_requested_at_usec: Dictionary = {}
 var _moy_unload_queue: Array[String] = []
+var _moy_unload_pending: Dictionary = {}
 var _moy_actors_added := false
 var _moy_silhouette: Node3D
 var _moy_block_tower_inside: Node3D
 var _moy_activation_frame_pending := false
 var _moy_activation_count := 0
 var _moy_activation_pending_path := ""
+var _moy_performance_telemetry := false
+const MOY_TELEMETRY_RECORD_LIMIT := 8192
 var _moy_stage_records: Array[Dictionary] = []
 var _moy_activation_frame_records: Array[Dictionary] = []
 var _moy_release_records: Array[Dictionary] = []
@@ -124,14 +128,24 @@ func _ready() -> void:
 func _rebuild() -> void:
 	_load_moy_manifest()
 
+
+func set_moy_performance_telemetry(enabled: bool) -> void:
+	_moy_performance_telemetry = enabled
+	if not enabled:
+		_moy_stage_records.clear()
+		_moy_activation_frame_records.clear()
+		_moy_release_records.clear()
+
+
 func _process(delta: float) -> void:
 	if _moy_activation_frame_pending:
-		print("MOY_ACTIVATION_FRAME delta_ms=", delta * 1000.0, " active_packs=", _moy_active.size(), " bodies=", _count_physics_bodies(self))
-		var player := get_node_or_null("../Player") as Node3D
-		var position := player.global_position if player else Vector3.ZERO
-		_moy_activation_frame_records.append({"delta_ms":delta * 1000.0,"active_packs":_moy_active.size(),
-			"bodies":_count_physics_bodies(self),"path":_moy_activation_pending_path,
-			"position":[position.x,position.y,position.z]})
+		if _moy_performance_telemetry:
+			var player := get_node_or_null("../Player") as Node3D
+			var position := player.global_position if player else Vector3.ZERO
+			var event := {"delta_ms":delta * 1000.0,"active_packs":_moy_active.size(),
+				"path":_moy_activation_pending_path,"position":[position.x,position.y,position.z]}
+			if _moy_activation_frame_records.size() < MOY_TELEMETRY_RECORD_LIMIT:
+				_moy_activation_frame_records.append(event)
 		_moy_activation_frame_pending = false
 	_stream_moy_city()
 
@@ -192,9 +206,34 @@ func _stream_moy_city() -> void:
 			var request_started := Time.get_ticks_usec()
 			var err := ResourceLoader.load_threaded_request(path, "", false, ResourceLoader.CACHE_MODE_REUSE)
 			if err == OK or err == ERR_BUSY:
-				_moy_requested[path] = true
-				_moy_requested_at_usec[path] = request_started
+				_moy_requested[path] = {"requested_usec":request_started,"loaded_usec":0}
 			else: push_warning("Moy pack request failed: %s (%s)" % [path, error_string(err)])
+	# Observe actual ResourceLoader completion separately from when a pack becomes
+	# eligible to activate. This poll is opt-in because it adds one status query
+	# per pending pack per frame during the benchmark.
+	if _moy_performance_telemetry or distance >= MOY_REQUEST_RADIUS or hotel_distance >= MOY_HOTEL_REQUEST_RADIUS:
+		var poll_started_usec := Time.get_ticks_usec()
+		for requested_path_variant in _moy_requested.keys():
+			var requested_path := String(requested_path_variant)
+			var request_record: Dictionary = _moy_requested[requested_path]
+			var load_state := ResourceLoader.load_threaded_get_status(requested_path)
+			if load_state == ResourceLoader.THREAD_LOAD_LOADED and int(request_record.get("loaded_usec", 0)) == 0:
+				request_record["loaded_usec"] = Time.get_ticks_usec()
+				_moy_requested[requested_path] = request_record
+			elif load_state == ResourceLoader.THREAD_LOAD_FAILED:
+				push_error("Moy pack failed to load: %s" % requested_path)
+				_moy_requested.erase(requested_path)
+			# In-flight requests stay tracked through the hysteresis band. Once
+			# loaded beyond that path class's release radius, consume the result and
+			# drop the final local handle safely.
+			var release_radius := MOY_HOTEL_REQUEST_RELEASE_RADIUS if _moy_hotel_paths.has(requested_path) else MOY_REQUEST_RELEASE_RADIUS
+			var request_distance := hotel_distance if _moy_hotel_paths.has(requested_path) else distance
+			if request_distance >= release_radius and load_state == ResourceLoader.THREAD_LOAD_LOADED:
+				var discard: Resource = ResourceLoader.load_threaded_get(requested_path)
+				discard = null
+				_moy_requested.erase(requested_path)
+		if _moy_performance_telemetry:
+			set_meta("moy_request_status_poll_us", int(get_meta("moy_request_status_poll_us", 0)) + Time.get_ticks_usec() - poll_started_usec)
 	if distance <= MOY_ACTIVATE_RADIUS:
 		for path in _moy_paths:
 			if _moy_hotel_paths.has(path) and not force_hotel and hotel_distance > MOY_HOTEL_ACTIVATE_RADIUS: continue
@@ -202,6 +241,11 @@ func _stream_moy_city() -> void:
 			var state := ResourceLoader.load_threaded_get_status(path)
 			if state == ResourceLoader.THREAD_LOAD_LOADED:
 				var ready_usec := Time.get_ticks_usec()
+				if _moy_requested.has(path):
+					var request_record: Dictionary = _moy_requested[path]
+					if int(request_record.get("loaded_usec", 0)) == 0:
+						request_record["loaded_usec"] = ready_usec
+						_moy_requested[path] = request_record
 				var get_started := ready_usec
 				var packed := ResourceLoader.load_threaded_get(path) as PackedScene
 				var get_ms := float(Time.get_ticks_usec() - get_started) / 1000.0
@@ -215,18 +259,22 @@ func _stream_moy_city() -> void:
 					_moy_active[path] = instance
 					_moy_activation_count += 1
 					_moy_activation_frame_pending = true
-					var request_ms := float(ready_usec - int(_moy_requested_at_usec.get(path, ready_usec))) / 1000.0
-					print("MOY_STREAM_STAGE phase=activate path=", path.get_file(), " request_to_ready_ms=", request_ms, " resource_get_ms=", get_ms, " instantiate_ms=", instantiate_ms, " registration_ms=", registration_ms, " bodies=", _count_physics_bodies(instance), " activation=", _moy_activation_count)
 					_moy_activation_pending_path = path.get_file()
-					_moy_stage_records.append({"phase":"activate","path":path.get_file(),
-						"request_to_ready_ms":request_ms,"resource_get_ms":get_ms,
-						"instantiate_ms":instantiate_ms,"registration_ms":registration_ms,
-						"physics_bodies":_count_physics_bodies(instance),"active_packs":_moy_active.size()})
+					var request_record: Dictionary = _moy_requested.get(path, {})
+					var requested_usec := int(request_record.get("requested_usec", ready_usec))
+					var loaded_usec := int(request_record.get("loaded_usec", ready_usec))
+					var stage_record := {"phase":"activate","path":path.get_file(),
+						"request_to_loaded_ms":float(loaded_usec-requested_usec)/1000.0,
+						"loaded_wait_eligibility_ms":float(ready_usec-loaded_usec)/1000.0,
+						"resource_get_sync_ms":get_ms,"instantiate_sync_ms":instantiate_ms,
+						"add_child_sync_ms":registration_ms,"active_packs":_moy_active.size()}
+					if _moy_performance_telemetry:
+						stage_record["collision_objects_after_add_child"] = _count_physics_bodies(instance)
+						if _moy_stage_records.size() < MOY_TELEMETRY_RECORD_LIMIT: _moy_stage_records.append(stage_record)
 					_moy_requested.erase(path)
-					_moy_requested_at_usec.erase(path)
 					break
 			elif state == ResourceLoader.THREAD_LOAD_FAILED:
-				push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path); _moy_requested_at_usec.erase(path)
+				push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path)
 	elif distance >= MOY_RELEASE_RADIUS and _moy_active.size() > 0:
 		if _moy_unload_queue.is_empty():
 			for path in _moy_active.keys(): _moy_unload_queue.append(String(path))
@@ -236,20 +284,18 @@ func _stream_moy_city() -> void:
 			_moy_active.erase(path)
 			var release_started := Time.get_ticks_usec()
 			node.tree_exited.connect(_log_moy_pack_release.bind(path, release_started), CONNECT_ONE_SHOT)
+			_moy_unload_pending[path] = true
 			node.queue_free()
 			_moy_requested.erase(path)
-			_moy_requested_at_usec.erase(path)
 	if not force_hotel and hotel_distance >= MOY_HOTEL_RELEASE_RADIUS:
 		for path in _moy_hotel_paths:
 			if _moy_active.has(path):
 				var hotel_node: Node3D = _moy_active[path]
 				_moy_active.erase(path)
+				var hotel_release_started := Time.get_ticks_usec()
+				hotel_node.tree_exited.connect(_log_moy_pack_release.bind(path, hotel_release_started), CONNECT_ONE_SHOT)
+				_moy_unload_pending[path] = true
 				hotel_node.queue_free()
-			# A request can still be pending (or have finished before activation)
-			# when the player leaves the hotel radius. Drop its tracking state too,
-			# otherwise it remains counted as a retained pack after city unload.
-			_moy_requested.erase(path)
-			_moy_requested_at_usec.erase(path)
 	if distance <= MOY_ACTIVATE_RADIUS and _moy_required_packs_active() and not _moy_actors_added:
 		_add_moy_actors()
 	elif distance >= MOY_RELEASE_RADIUS and _moy_active.is_empty():
@@ -307,7 +353,8 @@ func _stream_moy_launch_site(player: Node3D) -> void:
 				var started := Time.get_ticks_usec()
 				_moy_launch_active = packed.instantiate() as Node3D
 				add_child(_moy_launch_active)
-				print("MOY_LAUNCH_ACTIVATE instantiate_add_ms=", (Time.get_ticks_usec() - started) / 1000.0, " bodies=", _count_physics_bodies(_moy_launch_active))
+				if _moy_performance_telemetry:
+					print("MOY_LAUNCH_ACTIVATE instantiate_add_sync_ms=", (Time.get_ticks_usec() - started) / 1000.0)
 			_moy_launch_requested = false
 		elif state == ResourceLoader.THREAD_LOAD_FAILED:
 			push_error("Moy launch approach failed to load: %s" % _moy_launch_path)
@@ -324,9 +371,11 @@ func _count_physics_bodies(node: Node) -> int:
 	return count
 
 func _log_moy_pack_release(path: String, started_usec: int) -> void:
+	_moy_unload_pending.erase(path)
+	if not _moy_performance_telemetry: return
 	var release_ms := float(Time.get_ticks_usec() - started_usec) / 1000.0
-	_moy_release_records.append({"path":path.get_file(),"deferred_release_ms":release_ms})
-	print("MOY_STREAM_STAGE phase=release path=", path.get_file(), " deferred_release_ms=", release_ms)
+	if _moy_release_records.size() < MOY_TELEMETRY_RECORD_LIMIT:
+		_moy_release_records.append({"path":path.get_file(),"tree_exit_after_queue_free_ms":release_ms})
 
 
 func moy_packs_ready() -> bool:
