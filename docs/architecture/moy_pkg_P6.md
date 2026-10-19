@@ -10,7 +10,7 @@ massing pass. The plan-data schedule and this brief supersede the scope draft.
   routes. Simple planting/colour makes the design legible; final dressing is later.
 - **Depends on:** P0 checks and existing shared lifts/collision; integrate
   P3/P4 correctness fixes and P5 sequentially before touching shared builders.
-- **Binding data:** `CityPlan.DOWNTOWN` (47 part templates, 16 joins), plus
+- **Binding data:** `CityPlan.DOWNTOWN` (50 part templates, 17 joins), plus
   existing `LOTS`, `TOWER_SITE`, `COURT_WAYS`, `DECK`, heights and crowns.
 - **Model:** `docs/drawings/moy_downtown_3d.html`, overview, tower, street,
   garden and wind-gap views; separate podium/member section beside game hero.
@@ -170,7 +170,7 @@ and above each opening contain perimeter beams and core braces. Keep the
 west–east air passages beside the core open. No whole-shaft collider across
 these slots. Prove supports and bearing surfaces in close-ups.
 
-Terracotta fins, 0.24 × 0.6 m section, follow every third sample of the
+Brushed aluminium fins, 0.24 × 0.6 m section, follow every third sample of the
 27-point rounded triangle profile. Use clipped segments with shared end
 planes. Stop facade fins at slot boundaries. Pale fritted glass is recessed
 behind the fins; transfer structure belongs to the pale structural family.
@@ -193,6 +193,18 @@ private and have no false open landing doors.
 Observation deck at +258.4: continuous guarded perimeter, 1.2 m parapet,
 clear circulation at least 2 m outside the core. The shaft above it ends
 +262; open steel crown rises to +274 and its vertical-axis spire to +280.
+The frame is seated at the shaft roof +262, with closed perimeter ties at
++262/+268/+274 and profile scales 1/0.85/0.7. Nine evenly spaced 0.3 m posts (equal perimeter intervals) and
+0.24 m diagonal braces connect those ties; 0.4 m ring members share their
+nodes. The central 0.45 m mast is rooted on the core and reaches +280.
+The vertical-axis rotor is centred at local x=z=0, y=276.6: three 4.4 m
+vertical blades at 1.5 m radius, radial 0.18 m arms at +274.4 and +278.8.
+It is a separate assembly from the horizontal-axis wind-gap rotors; never
+reuse their z=−7.5 placement or blade orientation for the crown. Its swept
+volume stays above the frame. Use neutral aluminium for fins, crown and
+observation guard, with no red trim. South screens and pergola are also
+neutral metal; capsule colours remain unchanged.
+
 Cap/seat crown posts into shaft structure. Provide a plain accessible view
 space; no office interiors, text signs or new NPCs. Wind gaps are exterior
 climbing/maintenance ledges, not additional lift destinations in P6.
@@ -250,7 +262,7 @@ Screens sit behind that route. All profiles remain inside the 26 m envelope.
 Terraces +142.5, +146.25, +150. For j>37 multiply balcony profile by
 `1−0.07*(j−37)`. Inner facade steps to 17 m between +142.5/+146.25 and
 14 m between +146.25/+150; it must not project through the stepped terraces.
-Pale sand ceramic slabs, recessed dark glazing, terracotta screens and planted
+Pale sand ceramic slabs, recessed dark glazing, muted champagne-metal screens and planted
 terraces. No apartment or Tanglewire interiors. Ground colonnade opens to
 recorded gardens/pergola; nursery and residents' room are closed shells.
 Pergola top +3.6; posts seat under its lattice. No new private lift route.
@@ -258,7 +270,7 @@ Pergola top +3.6; posts seat under its lattice. No new private lift route.
 ## 8. Parts, joins and formation
 
 `DOWNTOWN.parts` and `.joins` are binding, not optional illustrations. The
-model displays all 47 part-template definitions and 16 join rules. The build
+model displays all 50 part-template definitions and 17 join rules. The build
 report accounts for each part with implemented owner(s), geometry/collision
 builder and screenshot, or a precise blocked reason. Account for each join
 with its shared planes and a close-up. No generic box proxy counts as a part.
@@ -328,7 +340,7 @@ climbing ledge is different from an inescapable trap inside architectural seams.
   ownership/cancellation; no enlarged timeout to disguise failure.
 
 Write `docs/diagnostics/<date>-moy-P6.md`: exact owner reconciliation; all
-47 parts and 16 joins; geometry/winding/collision evidence; actual two-rig
+50 parts and 17 joins; geometry/winding/collision evidence; actual two-rig
 route results; before/after audits; performance and unload data; limitations.
 Separate implemented, verified, failed and unrun. Partial work stays partial.
 
@@ -346,7 +358,7 @@ checks, reference images and explicit runtime checks still owed by the build.
 
 Build prompt: Pull latest main. Read AGENTS.md, CLAUDE.md and the Moy
 roadmap. After earlier district fixes integrate, implement P6 from this brief
-and the Downtown model, accounting for all 47 parts and 16 joins. Preserve
+and the Downtown model, accounting for all 50 parts and 17 joins. Preserve
 the authorized revision-2 layout and other packages. Run the specified checks and write the
 P6 implementation diagnostic with actual hero/Xiao route evidence. Commit
 and push; report any incomplete item explicitly.
@@ -360,8 +372,12 @@ and push; report any incomplete item explicitly.
   minimum shaft width 12 m and mutual gap 8 m. Preserve the six-metre P17
   interface. Continuous cores, 1.4 m aligned piers and deep girders replace
   the misleading base model, including the south tower's former small posts.
-  Current binding schedule: 47 part templates, 16 joins. All prior P6 build
+  Current binding schedule: 50 part templates, 17 joins. All prior P6 build
   prompts must be read against revision 2, not the withdrawn first layout.
 
 - User palette revision: medium-sized buildings use conventional muted glass,
   metal and stone finishes. Landmark colours remain unchanged.
+
+- User crown/trim refinement: remove remaining red landmark trim; rebuild
+  the disconnected Windspire crown as a tied and braced frame with a centred
+  vertical-axis rotor. Add crown close-up and binding assembly checks.

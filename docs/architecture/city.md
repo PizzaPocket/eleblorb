@@ -1887,7 +1887,7 @@ see `moy_pkg_P6.md` revision 2 and its street-level/structural sections.
   - three **wind gaps**, at the sky lobbies on floors 20, 40 and 60: open
     slots straight through the tower, where large turbines spin in the west
     wind, visible from the whole city;
-  - pale fritted glass behind vertical terracotta fins, which shade the
+  - pale fritted glass behind vertical brushed-aluminium fins, which shade the
     west face from the afternoon sun.
 - **Structure through the gaps** (revised 2026-10-14: the first model read
   as a tower balanced on thin poles). Each wind gap is a slot open west to

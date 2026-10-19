@@ -35,7 +35,7 @@ Every drawing is updated whenever the plan it shows changes, and republished to 
 `moy_downtown_3d.html` — ten consolidated mid-rise sites replacing 23 source plots and the Windspire, north
 and south tower exteriors, drawn from `CityPlan.DOWNTOWN`. Includes tower,
 street, sky-garden, wind-gap and dusk views, a podium/member section beside
-the exported hero, and the binding 47-part/16-join schedule. Browser labels
+the exported hero, and the binding 50-part/17-join schedule. Browser labels
 are technical notation; no printed letters or numbers appear on architecture.
 Local page; external artifact publication pending. Brief: `../architecture/moy_pkg_P6.md`.
 
@@ -49,3 +49,7 @@ P6 revision-2 references: `references/moy_downtown_overview.png`,
 
 P6 medium-sized buildings use muted glass, metal and grey stone finishes;
 the three landmark palettes retain their accepted colours.
+
+Windspire crown refinement: connected closed ties and braces on the shaft
+roof, with a centred vertical-axis rotor. `references/moy_downtown_crown.png`
+shows the new assembly. Red landmark trim has been replaced by neutral metal.

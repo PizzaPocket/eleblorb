@@ -19,7 +19,7 @@ This is architectural planning verification; runtime P6 is not implemented.
   frontage and selected public openings replace the all-open perimeter posts.
 - South landmark now also has a continuous 6 × 8 m core and 1.4 m primary
   frame on a 5.333 m grid, with girders below the +7.5 m first balcony.
-- Binding schedule: 47 part templates, 16 joins. These establish a credible
+- Binding schedule: 50 part templates, 17 joins. These establish a credible
   architectural load path for the game, not engineering certification.
 
 ## Preserved interfaces
@@ -73,3 +73,21 @@ keys and model now use those finishes. Landmark palette entries and all
 wind/north/south parameters were compared with the previous commit and are
 unchanged, as are site geometry, parts/joins and geometric checks. Updated
 reference images replace the earlier bright-trim renders.
+
+## Windspire crown and remaining trim correction
+
+User reported remaining red trim and a disjointed crown. The old preview
+reused the horizontal-axis wind-gap rotor at local z=−7.5 for the crown;
+its axis and position were wrong. Nine struts also lacked frame ties.
+Replaced this with closed base/mid/top ties, connected posts and diagonal
+braces seated at shaft roof +262, and a central mast rooted on the core.
+The separate vertical-axis rotor is centred at x=z=0, y=276.6, with radial
+arms at both blade ends. New checks enforce level ordering, bearing,
+centering and rotor clearance above the frame. Added a crown close-up.
+
+Windspire fins, guard and crown use aluminium. South screens and pergola
+use neutral metal. Capsule shells retain their accepted colours. The
+schedule now has 50 part templates and 17 joins, including crown-ring,
+brace and rotor-arm definitions. Crown geometry/appearance is verified in
+the planning browser model; production collision, motion and mesh joins
+remain implementation acceptance requirements.

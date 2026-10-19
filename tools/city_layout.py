@@ -3908,14 +3908,16 @@ DOWNTOWN=dict(version=2,datum=-60.0,printed_marks=False,
     wind=dict(top=262.0,crown=280.0,turn=90.0,radius=13.8,corner=0.2,
         storey=3.6,gaps=[72.0,144.0,216.0],gap_h=7.2,transfer=3.6,
         core=(4.0,6.0),column=1.2,deck=258.4,stops=[0.0,6.5,258.4],
-        cabin=(2.0,2.4),shaft=(2.8,3.2),rotor_z=-7.5,rotor_sweep=4.0,fin=(0.24,0.6),fin_every=3),
+        cabin=(2.0,2.4),shaft=(2.8,3.2),rotor_z=-7.5,rotor_sweep=4.0,fin=(0.24,0.6),fin_every=3,fin_material='aluminium',crown_material='aluminium',
+        crown_frame=dict(base=262.0,mid=268.0,top=274.0,scales=[1.0,0.85,0.7],ring_samples=36,posts=9,
+            mast_top=280.0,rotor_y=276.6,rotor_radius=1.5,rotor_height=4.4,rotor_x=0.0,rotor_z=0.0)),
     north=dict(top=175.0,storeys=45,storey=175.0/45,core=(6.0,8.0),
         start=2*175.0/45,garden=(22*175.0/45,24*175.0/45),
         side_mode='alternating_opposite_faces',capsule_w=6.4,capsule_d=[6.0,7.5,9.0],capsule_h=3.5,
         stops=[0.0,22*175.0/45],cabin=(2.0,2.4),shaft=(2.8,3.2)),
     south=dict(top=150.0,storeys=40,storey=3.75,colonnade=7.5,
         core=(6.0,8.0),column=1.4,grid=[-8,-8/3,8/3,8],inner=20.0,outer=26.0,balcony_min=1.5,ripple=1.4,
-        terraces=[142.5,146.25,150.0],terrace_inner=[17.0,14.0],pergola_top=3.6),
+        terraces=[142.5,146.25,150.0],terrace_inner=[17.0,14.0],pergola_top=3.6,screen_material='champagne_metal',pergola_material='aluminium'),
     site=dict(post=0.24,canopy_top=3.6,bench=(2.2,0.48,0.6),planter=(2.0,0.6,1.2)))
 DK=DOWNTOWN
 DK['owners']=[]
@@ -3996,10 +3998,13 @@ dp('wind_core','continuous core; public lift apertures cut at stops','wall',(2.0
 dp('mega_column','three continuous sampled corner lines through gaps','clipped',(0.6,'segmentL/2',0.6),'solid','post',join='wind_structure')
 dp('transfer_beam','triangular transfer bands above/below each gap','clipped',('segmentL/2',0.3,0.3),'solid','beam',join='wind_structure')
 dp('transfer_diagonal','corner-to-core bracing in transfer band, clear of west-east slot','clipped',(0.24,'segmentL/2',0.24),'solid','beam',join='wind_structure')
-dp('wind_fin','terracotta fin following twist; 0.24 x 0.6 section','clipped',(0.12,'segmentL/2',0.3),'solid','beam',join='fin_chain')
+dp('wind_fin','brushed aluminium fin following twist; 0.24 x 0.6 section','clipped',(0.12,'segmentL/2',0.3),'solid','beam',join='fin_chain')
 dp('turbine_hub','one visible rotor hub per wind gap plus crown rotor','egg',(0.55,0.55,0.55),'solid',eps=(2.0,2.0))
 dp('turbine_blade','rounded rotor blade in gap with swept clearance','egg',(0.18,2.2,0.3),'solid',eps=(3.0,3.0))
-dp('crown_post','open observation crown from deck to +274; spire to +280','clipped',(0.15,'L/2',0.15),'solid','post',join='crown_bearing')
+dp('crown_post','connected crown frame seated at shaft top +262, tied at +268/+274; central mast to +280','clipped',(0.15,'L/2',0.15),'solid','post',join='crown_bearing',mast_semi=(0.225,'L/2',0.225))
+dp('crown_ring','closed perimeter ties at crown base/mid/top, same profile as supports','clipped',('segmentL/2',0.2,0.2),'solid','beam',join='crown_bearing')
+dp('crown_brace','diagonal lattice braces between adjacent frame nodes','clipped',(0.12,'segmentL/2',0.12),'solid','beam',join='crown_bearing')
+dp('rotor_arm','radial supports at upper/lower blade bearings on centred vertical axis','clipped',(0.09,'segmentL/2',0.09),'solid','beam',join='crown_rotor')
 dp('north_core','continuous core above open ground; lift and entry apertures','wall',(3.0,87.5,4.0),'solid','wall',outline='lift_opening')
 dp('capsule_shell','ceramic superellipse shell, recessed sealed studio glazing','egg',(3.2,1.75,'depth/2'),'solid')
 dp('capsule_socket','flat clipped bracket seated between core and capsule','clipped',(0.24,0.3,'L/2'),'solid','beam',join='capsule_seat')
@@ -4027,7 +4032,8 @@ dj('passage_cut','punched',['passage_wall','private_mass','foundation','portal']
 dj('guard_chain','chain',['guard','roof_cap','tower_floor'],'landing edges and route openings','continuous 1.2 guard; miter corners; cut guards at doors and landings')
 dj('wind_structure','chain',['mega_column','transfer_beam','transfer_diagonal','wind_core','wind_skin'],'sampled shared corner/core planes at gap and transfer levels','columns remain continuous; transfer bands 3.6 deep outside the 7.2 clear slot')
 dj('fin_chain','chain',['wind_fin','wind_skin'],'twist profile samples, omitted inside open gap','segments share cuts and end caps; no tapered pole ends or isolated rods')
-dj('crown_bearing','seated',['crown_post','tower_floor','turbine_hub','turbine_blade'],'observation +258.4; lattice +274; spire +280','crown rooted in shaft structure; rotor swept volume clear of lattice')
+dj('crown_bearing','seated',['crown_post','crown_ring','crown_brace','tower_floor'],'observation +258.4; frame bearing +262, ties +268/+274; mast +280','posts and braces meet closed ties on shared nodes; frame rooted in shaft roof, no disconnected struts')
+dj('crown_rotor','seated',['crown_post','rotor_arm','turbine_hub','turbine_blade'],'axis x=z=0; rotor centre +276.6; blade ends +274.4/+278.8','vertical-axis assembly is separate from wind-gap rotors; arms join each blade at both ends; swept volume clear above frame +274')
 dj('capsule_seat','seated',['capsule_shell','capsule_socket','north_core'],'capsule inner bearing plane against core','socket caps meet core and shell; capsule roof remains landable; no duplicate collision overlap')
 dj('garden_bearing','seated',['garden_column','north_core','tower_floor','capsule_socket'],'north garden floor 22 storeys, soffit 24 storeys minus slab','continuous core and four columns carry upper capsules; clear public garden and lift landing')
 dj('balcony_seat','meet',['dune_slab','south_skin','dune_screen','guard'],'south slab top at each 3.75 m level, min clear balcony 1.5','one slab owns surface; guard follows outer profile; screen stays behind circulation')
@@ -4093,6 +4099,11 @@ def _p6_geometry_checks():
                     if abs(rx)>14.00001 or abs(rz)>13.00001: problems.append(('P6: capsule outside shaft',j,side,bay))
                 if y+N['capsule_h']>N['top']: problems.append(('P6: capsule above envelope',j))
     W=DK['wind']
+    C=W['crown_frame']
+    if not (C['base']==W['top']<C['mid']<C['top']<C['rotor_y']-C['rotor_height']/2<C['rotor_y']+C['rotor_height']/2<C['mast_top']==W['crown']):
+        problems.append(('P6: crown bearing or rotor/frame clearance',))
+    if C['ring_samples']%C['posts']!=0: problems.append(('P6: crown frame samples do not share nodes',))
+    if C['rotor_x']!=0 or C['rotor_z']!=0 or C['scales']!=[1.0,0.85,0.7]: problems.append(('P6: crown rotor off centre or frame discontinuity',))
     if abs(W['rotor_z'])-W['rotor_sweep']<W['core'][1]/2+0.3: problems.append(('P6: rotor sweeps into core',))
     if DK['owners'][9]['lot']!=119 or DK['owners'][9]['passage'] is None: problems.append(('P6: court 8 passage missing',))
     if not {0.0,6.5,W['deck']}==set(W['stops']): problems.append(('P6: Windspire public stops drifted',))

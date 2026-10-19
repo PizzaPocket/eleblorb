@@ -299,22 +299,23 @@ locked plots, routes, heights and the three tower identities remain binding.
   flat roofs, recessed modular glazing, concrete/ceramic structure, deep
   shade, public colonnades and inhabited roof gardens. The shared Western
   city grammar supplies the street blocks, podiums and horizontal bands.
-- **Secondary, about 20 percent:** desert shading, applied to terracotta
+- **Secondary, about 20 percent:** desert shading, applied to brushed-metal
   fins, balcony screens and pale ceramic reveals. No imported pitched roofs,
   historic ornament or unrelated wall system.
 - **Landmark accent, about 5 percent:** the already planned tower systems:
   wind-driven twisting triangle, plug-in capsules and dune balcony profiles.
   These distinguish the three towers; ordinary mid-rises do not copy them.
-- **Palette:** pale ceramic/stone structure about 60 percent; recessed dark
-  blue-green glass and shade about 30; jade, terracotta, cobalt and restrained
-  gold/coral about 10. The north tower's capsules deliberately concentrate
-  colour. Use `DOWNTOWN.palette`, not an unrelated rainbow per building.
+- **Palette:** ordinary mid-rises use muted glass, aluminium/graphite or
+  champagne metal, and grey stone. Windspire uses pale structure and neutral
+  aluminium fins/crown; south uses sand ceramic and neutral metal screens.
+  The north tower's capsule shells deliberately concentrate colour. Use the
+  recorded per-site finishes and landmark material fields in `DOWNTOWN`.
 - **Kit:** flat 0.24 m slabs, 1.2 m parapets; fitted 3.6 m nominal facade
   bays; 0.36 m piers and 0.24 m shade heads; 0.6 m recess; square-ended
   exponent-5.5 SuperEgg structure; rounded modular openings from shared
   cutters. All parts and bearing/cutting joins live in `DOWNTOWN`.
 - **Hierarchy:** mid-rises form a repeated shaded base; Windspire is tallest
-  with terracotta verticals and open wind slots; north is stepped coloured
+  with brushed-metal verticals and open wind slots; north is stepped coloured
   ceramic; south is pale, horizontal and rippled. BLOCK stays P17's dark
   exception. Gardens/colonnades retain a public life at each tower's foot.
 - **Variation:** mid-rise owner data fixes single-pier, paired-pier or
@@ -344,8 +345,8 @@ The 0.36 m facade piers remain secondary. Primary support is continuous
 6 × 8 m (or recorded 4 × 6 m) core, 1.4 m aligned piers on at most 7.2 m
 spans and 0.8 × 1.2 m girders beneath the podium slab. Enclosed storefront
 and service shells alternate with explicit public openings; a completely
-open base on thin perimeter posts is excluded. `DOWNTOWN` now binds 47 part
-templates and 16 joins. These are architectural game-design dimensions.
+open base on thin perimeter posts is excluded. `DOWNTOWN` now binds 50 part
+templates and 17 joins. These are architectural game-design dimensions.
 
 ### Downtown mid-rise material palette clarification
 
@@ -355,3 +356,7 @@ graphite frames, neutral grey stone at piers and podiums. Keep saturation
 low and vary finish subtly by site. This supersedes the earlier coloured
 jade/terracotta/cobalt accents for these ten buildings only. Windspire,
 capsule tower and dune tower retain their accepted landmark palettes.
+
+Windspire and south tower trim refinement: use aluminium Windspire fins,
+observation guard and connected crown; neutral metal south screens and pergola.
+No red trim on those buildings. The capsule tower retains its coloured shells.
