@@ -391,3 +391,67 @@ by run; the shot sizes.
 **Decisions:**
 - 2026-10-19: P0 stays open for fixes 1 to 4 above. Until fix 2, read
   `underside` counts as unverified.
+
+## 12. Review of the P0 fixes 3 build (2026-10-19)
+
+Reviewed: `a563946`, diagnostic `docs/diagnostics/2026-10-19-moy-P0-fixes-3.md`,
+`checks/moy-2026-10-19.*`, the `2026-10-19-P0-fixes-3-P0` shots. Planning
+re-ran the fixtures and read the baseline's findings.
+**Result: done, with P0.2 follow-ups (small).** All five fixes of section 11
+are built, and the suite is now fit to gate on every check but `underside`.
+
+Checked:
+- The fixtures give 9/9 on a fresh run, including the partial-deck and
+  stepped-flight pairs.
+- `underside` is per cell; a finding records its first failing cell.
+- The baseline is of the post-P1 geometry (baked 07:41 to 07:42). Full Moy:
+  249 s. Against the earlier 10-19 audit: overlap 425 to 429 (flush with
+  terrain 97 to 109: the four rain gardens' 12), reach 120 to 112, headroom
+  36 to 38, underside 161 to 68, guard 2,669 to 2,645, reached cells 847,752
+  to 877,814.
+- The shots: 92 PNGs, all 1280 × 720. `under_high_line` is a street view with
+  the dome in it. No shot is blank.
+- The 22 skips with "no reached top cell" are real: the same flights are
+  `reach` findings (50 for the WestGate and City Hall flights and landings).
+  They are not a rig fault.
+
+**Follow-ups (P0.2; small, before `underside` gates a package):**
+1. **Make the baseline reproducible from the repository.** The commit holds
+   4 lines of the builder. The `underside_visual_only` tag sits in 65 packs
+   that are not committed (0 in `HEAD`), and the geometry the audit measured
+   is P1's builder and bake, also uncommitted.
+   - Commit P1's builder, validator and bake (with the tag) as P1's commit.
+   - Do not commit `build/web`.
+   - Remove `checks/moy-debug.*` and `checks/moy-probe*.*`, and restore
+     `checks/moy-2026-10-18.*`: a probe run overwrote that committed file
+     (56,767 lines became 21).
+2. **Triage the 56 helix `underside` findings.** The diagnostic names them
+   (`CrossingHand_00..03_{up,down}_{0..6}`, every segment of every hand) but
+   not whether they are faults. 34 of the 56 first failing cells stand at a
+   landing height (6.5, 14.2, 37.0 and the ground), the flat parts where a
+   hand meets a gallery; 22 are mid-flight.
+   - Report, per mesh, the failing cells (count, share, positions) and which
+     test fails, the face or the ray.
+   - Probe one landing cell and one mid-flight cell: is a down face missing,
+     or does the ray reach the gallery's collider instead of the hand's?
+   - A method fault gets fixed here. A missing face goes to P1, with the
+     cells listed.
+   - Name the meshes. All 56 paths end in `@MeshInstance3D@N`, an id that
+     changes every run; put the body's path in `other_path`.
+3. **Say what the 12 `deck_visual_missing` are.** `Deck_Park Deck_0` (3,033
+   cells) and `_2` (2,852), eight Clock Room arrival flights (5 cells each),
+   two City Hall F1 flights (12 each). For each: no visual, a visual more
+   than 8 cm off, or a seam cell. The park decks go to P8 or P12 if real.
+4. **Smaller.** Each fixture's line prints its own flags; the partial-deck
+   and stepped-flight flags repeat on all nine lines.
+
+**Report:** `docs/diagnostics/<date>-moy-P0-fixes-4.md`: the helix triage with
+its probe, the 12 explained, what was committed, and the baseline unchanged
+unless the method changed (then, the new counts).
+
+**Decisions:**
+- 2026-10-19: P0 done. `underside` stays blocking; its 56 helix findings read
+  as unverified until follow-up 2.
+- 2026-10-19: `checks/moy-2026-10-19.*` is the measured "now": the geometry of
+  07:42, before P1's fix 4 (the rain garden rebuild). It replaces
+  `moy-2026-10-18.*`.

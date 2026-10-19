@@ -476,3 +476,27 @@ Good, keep it:
 - 2026-10-19: P1 stays *fix*. The build's own *done* is reverted.
 - 2026-10-19: P1's gate is "no new blocking suite findings and every
   finding on its own elements triaged", not the whole city's baseline.
+
+**Added the same day, from the post-P1 baseline** (`checks/moy-2026-10-19.*`,
+after P0's fixes 3) and a look at all four shots:
+- **City Hall's front has 34 blocking `reach` findings:** flights F1 to F4
+  north and south (16 landings), the `CityHallSteps` escalators, and four lift
+  calls. None of City Hall's upper flights is reached from Civic Plaza, so
+  "every way in and out walkable" (L2) is not shown. Also 4 blocking
+  `headroom` on the `CityHallOuter` flights, 36 `overlap` (landings,
+  galleries, the rostrum lintel), 2 `deck_visual_missing`.
+- **The Crossing has 8 `reach` findings:** four `CrossingTowerLift_Call_deck_concourse`
+  with no walk cell within 2 m, and four Clock Room arrival landings. Also 56
+  helix `underside` (P0.2 follow-up 2), 8 `deck_visual_missing` (the arrival
+  flights), 152 `overlap` (41 the roof's, the rest lift landings and
+  platform bridges), 8 `headroom`.
+- The garden's flush-with-terrain count checks out: 97 before, 109 now.
+- The four shots show the beam, the helix band and City Hall's galleries as
+  described; the foot shot shows the garden's open edges (fix 1).
+
+Add to the fix list:
+7. **City Hall's flights.** Make F1 to F4 and the `CityHallSteps` escalators
+   reached from the plaza (their landings, lift calls and links), or show in
+   the diagnostic which of the 34 belongs to a later package and why. The four
+   lift calls with no walk cell in 2 m (Crossing) are the same kind: link or
+   move them.
