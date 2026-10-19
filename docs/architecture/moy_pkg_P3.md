@@ -296,6 +296,52 @@ Write `docs/diagnostics/<date>-moy-P3.md` with:
 - the schedule as built: each part and join, and where the build departs
   from it.
 
+## First build review — 2026-10-19: fix
+
+Reviewed the P3 implementation inside `fdbc8f8` (the commit titled P4),
+including `_market_house`, `_add_market_streets` and the live Lamp Lane
+Helmsmith. No separate P3 diagnostic, area audit, required viewpoint set or
+66-part/15-join as-built table is present on main. **P3 is not accepted at L2.**
+
+Keep the market owner coverage and the Helmsmith's move to building 38;
+do not replace this with another massing pass. The following work is required:
+
+1. Implement the binding 66-part/15-join schedule and the P3 reference model.
+   The current whole-house blockers, box balconies/rails, rectangular facade
+   overlays and straight arcade ribs are proxies, not the specified kit.
+   Build the boom/tile/lock-up distinctions, fitted openings/trim, gallery
+   details, shop bays, roof variants, arcade arch profiles and Lamp Lane from
+   the authored parts. Preserve exact footprints, heights, paired cores and
+   the real Helmsmith shop/service; no lettering or printed numerals in-world.
+2. Fix market passages as actual clear geometry. In `_market_house`,
+   passage lots split the ground wall, then a full-footprint 0.6 m plinth
+   fills the bottom of that opening. Cut the foundation/plinth consistently;
+   prove threshold level, width and headroom with actual controller sweeps.
+   Do not fix this by tagging the shell as a way out or disabling collision.
+3. Prove all court approaches and the walk-in Helmsmith: no blocking shell or
+   duplicate vendor, catalog models/service retained, entry/exit from Lamp Lane,
+   and appropriate room/upper-house/parapet form. Preserve closed private
+   homes; public shop bays and passages must genuinely be open.
+4. Complete the P3 diagnostic: every scheduled part and join, noon/dusk
+   market/South Street/arcade/Lamp Lane views, isolated join close-ups,
+   package-area P0 findings against a matching pre-build baseline, and each
+   required parkour route with the real hero and Xiao Hou Zi. Coverage counts
+   alone do not validate forms or traversability.
+5. Resolve the current pending-pack unload failure shared by this combined
+   submission before calling either package complete. The final P4 probe has
+   zero active packs but 34 then 36 tracked requests after both unload waits.
+   Diagnose and drain the actual requests safely; do not raise timeouts or
+   hide the failure. Recheck two cycles and actor/vendor uniqueness.
+6. Record comparable rendered before/after samples for P3's own area.
+   City-wide performance targets and optimization remain deferred; loading
+   correctness, unsafe support loss and new blocking geometry remain blockers.
+
+**Next build order:** finish P3 properly first (P4's pencil infill shares its
+tile-house grammar), then finish P4 from its first-review section. Keep
+separate commits/diagnostics and do not redesign the locked layout.
+Write `docs/diagnostics/<date>-moy-P3-fixes.md`; stop if a shared blocker
+prevents useful P4 progress, otherwise continue to P4 sequentially.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

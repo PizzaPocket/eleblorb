@@ -282,6 +282,59 @@ Write `docs/diagnostics/<date>-moy-P4.md` with:
 - the screenshots;
 - every place the data and this brief disagreed.
 
+## First build review — 2026-10-19: fix
+
+Reviewed `fdbc8f8`, `../diagnostics/2026-10-19-moy-P4.md`, its raw audit,
+rendered before/after summaries, and Old High Street/court noon screenshots.
+**Result: fix, not L2.** The report accurately describes a partial proxy pass.
+Keep the 99-owner integration; complete the existing brief rather than
+accepting approximations or writing a smaller replacement specification.
+
+1. **Finish the scheduled house forms.** Implement all 51 part templates and
+   10 joins, including distinct stone/earth bases, battered superellipse lifts
+   and horns, cornices, patterned friezes, surface-fitted openings and qamariya,
+   kishks/brackets, service pieces, roof kiosk/wind mouth/cap and manzars.
+   The screenshots show plain continuous masses and facade strips, not the
+   authored kit. Use actual SuperEgg/profile/cut-and-cap construction; do not
+   copy the browser model's pointed sampling artifacts. Complete P3's shared
+   tile grammar before the ten pencil infills.
+2. **Restore circulation first.** A single `_polygon_building` blocker currently
+   spans court passages. Punch the real passage and collision, fit lamps,
+   and retain solid private flats elsewhere. Build the specified yards,
+   gateways, pockets, planting and the complete well/lid/trough/ghaf composition.
+   A painted facade panel is not a passage or shop opening.
+3. **Make the roof network usable.** Complete perimeter parapets/merlons with
+   actual openings at roof-link ends. Cut both ends of each of the 15 ramps
+   to the adjoining roof/landing planes and add side protection where
+   specified. Prove continuous top surfaces and both directions of traversal;
+   a collider on an inclined box is insufficient.
+4. **Resolve geometry failures with a matched baseline.** The supplied area
+   audit has 96 trap and 108 reach findings, with 14,769 trapped walk cells.
+   Identify P4-owned failures by check/location/owner, compare the same area,
+   start, grid and settings before/after, fix new blocking failures and
+   separately list inherited surrounding-city debt. Do not pass the package
+   from the generic runtime validator's 99-owner/15-ramp counts.
+5. **Fix the unload correctness blocker with P3.** The final after probe's
+   two cycles are unsettled: 34 then 36 requests remain despite zero active
+   packs and pending exits. Trace path/status/lifetime, release safely, and
+   prove settled cycles and actor uniqueness. This is correctness work;
+   do not turn it into the deferred city-wide P2 optimization loop.
+6. **Supply the missing movement and join evidence.** Run the five required
+   hero/Xiao routes, with actual movement, supports and anchors. Include
+   the door/opening pair, frieze miter, cap ridge, seated merlon and punched
+   window/glass/ring close-ups. The current `oldhigh` noon shot is dominated by
+   a nearby wall; reposition only the camera to show the intended street
+   route, then record its pose. Keep the other useful district images.
+7. **Report the final state honestly.** Re-bake, check freshness/coverage and
+   plan/runtime checks, repeat the area P0 fixtures and before/after rendered
+   samples. Keep performance numbers as observations while districts are
+   replaced. No printed letters or numerals on architecture/signs; picture
+   marks are allowed. List every part/join and any remaining failures.
+   Write `docs/diagnostics/<date>-moy-P4-fixes.md` and stop for review.
+
+**Handoff:** P3 first, then P4, using the existing binding schedules. Neither
+package is accepted as a finished district by this review.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
