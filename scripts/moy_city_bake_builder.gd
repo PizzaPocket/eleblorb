@@ -1223,7 +1223,7 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 						var tread := MeshInstance3D.new(); tread.name = "HelixMovingTread_%02d" % tread_index; tread.mesh = tread_mesh; tread.material_override = tread_material
 						var fraction := float(tread_index) / float(tread_count)
 						if not is_up: fraction = 1.0 - fraction
-						tread.set_meta("helix_fraction", fraction); tread.set_meta("helix_radius",2.7); tread.set_meta("helix_offset_y",0.05)
+						tread.set_meta("helix_fraction", fraction); tread.set_meta("helix_radius",2.7); tread.set_meta("helix_offset_y",0.05); tread.set_meta("underside_visual_only",true)
 						var tread_angle := lerpf(a0,a1,fraction); var tread_y := lerpf(y0,y1,fraction)
 						tread.position = Vector3(cos(tread_angle)*2.7,tread_y+0.05,sin(tread_angle)*2.7); tread.rotation.y = -tread_angle-PI*0.5; body.add_child(tread)
 					for rail_radius in [1.48,3.92]:
@@ -1585,7 +1585,7 @@ static func _add_escalator_belt_visuals(body: StaticBody3D, length: float, width
 	for i in tread_count:
 		var tread := MeshInstance3D.new(); tread.name = "Moving_Tread_%02d" % i
 		tread.mesh = tread_mesh; tread.material_override = tread_material
-		tread.set_meta("belt_distance", perimeter * float(i) / float(tread_count))
+		tread.set_meta("belt_distance", perimeter * float(i) / float(tread_count)); tread.set_meta("underside_visual_only",true)
 		body.add_child(tread)
 
 

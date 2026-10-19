@@ -42,9 +42,12 @@ var _broken_reach_links: Array[Dictionary] = []
 var _sample_stats := {"grid_step_m": WALK_GRID_STEP, "columns": 0, "walk_cells": 0}
 var _mesh_buckets:Dictionary = {}
 var _mesh_bounds:Dictionary = {}
+var _mesh_face_cache:Dictionary = {}
+var _body_collision_shapes:Dictionary = {}
 var _suite_started_usec:int = 0
 
 func _ready() -> void:
+	if bool(get_meta("library_mode", false)): return
 	call_deferred("_run")
 
 func _run() -> void:
@@ -639,40 +642,78 @@ func _check_headroom()->void:
 
 func _check_underside(meshes:Array[MeshInstance3D], shapes:Array[CollisionShape3D])->void:
 	_build_mesh_buckets(meshes)
+	_mesh_face_cache.clear()
 	var body_cells:Dictionary = {}
 	for cell in _walk_cells:
 		var body_path:String = cell.body_path
-		if not body_cells.has(body_path): body_cells[body_path] = {"body": cell.body, "cells": []}
+		if not body_cells.has(body_path): body_cells[body_path] = {"body": cell.body, "cells": [], "shapes": [], "missing_visual": []}
 		body_cells[body_path].cells.append(cell)
-	var issues:Dictionary = {}
-	var checked_meshes:Dictionary = {}
+	var static_bodies:Dictionary = {}
+	for shape in shapes:
+		var owner := _collision_owner_for_node(shape)
+		var body_path := str(owner.get_path()) if owner != null else ""
+		if owner == null: continue
+		static_bodies[owner.get_instance_id()] = owner
+		if body_cells.has(body_path): body_cells[body_path].shapes.append(shape)
+	var mesh_results:Dictionary = {}
+	var body_ray_excludes:Dictionary = {}
 	for body_path in body_cells:
 		var entry:Dictionary = body_cells[body_path]
 		if not _is_walk_deck(entry.body): continue
 		for cell in entry.cells:
 			var candidates := _meshes_at_walk_cell(meshes, cell)
+			var has_matching_visual := false
 			for mesh in candidates:
+				if _collision_owner_for_node(mesh) != entry.body: continue
+				if _is_underside_visual_only(mesh): continue
+				var sample_xz := Vector2(float(cell.x),float(cell.z))
+				var visual_top:float = _surface_y_at(mesh,sample_xz)
+				if is_nan(visual_top) or absf(visual_top-float(cell.y)) > 0.08: continue
+				has_matching_visual = true
 				var mesh_id := mesh.get_instance_id()
-				if checked_meshes.has(mesh_id): continue
-				checked_meshes[mesh_id] = true
-				var bounds := _node_world_aabb(mesh)
-				var sample := Vector3(float(cell.x), bounds.position.y, float(cell.z))
-				var has_visible_face := _has_visible_underside(mesh, sample)
-				var ray_from:Vector3 = cell.position - Vector3.UP
+				var sample:Vector3 = cell.position
+				var thickness:float = _underside_thickness(mesh, sample_xz, visual_top, entry.shapes)
+				var has_visible_face := _has_visible_underside(mesh, Vector3(sample.x,visual_top,sample.z), thickness)
+				# Start from the physics sample, not the visual surface: the two
+				# may differ by the allowed 8 cm and a start inside a box is missed.
+				var ray_from:Vector3 = cell.position - Vector3.UP * thickness
 				var ray_to:Vector3 = cell.position + Vector3.UP * 0.05
 				var query := PhysicsRayQueryParameters3D.create(ray_from, ray_to, _static_mask)
+				query.hit_back_faces = true
+				if not body_ray_excludes.has(body_path):
+					var excludes:Array[RID] = _dynamic_excludes.duplicate()
+					for other_body in static_bodies.values():
+						if other_body != entry.body: excludes.append((other_body as CollisionObject3D).get_rid())
+					body_ray_excludes[body_path] = excludes
+				query.exclude = body_ray_excludes[body_path]
 				var hit := get_viewport().world_3d.direct_space_state.intersect_ray(query)
 				var collider_present:bool = not hit.is_empty() and hit.get("collider") == entry.body
-				if has_visible_face and collider_present: continue
-				var key := str(mesh.get_path())
-				if not issues.has(key): issues[key] = {"mesh": mesh, "position": sample, "visible": has_visible_face, "collider": collider_present, "cells": []}
-				issues[key].cells.append(cell)
-	for key in issues:
-		var issue:Dictionary = issues[key]
+				if not mesh_results.has(mesh_id):
+					mesh_results[mesh_id] = {"mesh": mesh, "position": sample, "visible": true, "collider": true, "cell_count": 0, "bad_position": sample, "has_bad_position": false, "missing_face": false, "missing_collider": false}
+				var result:Dictionary = mesh_results[mesh_id]
+				result.cell_count += 1
+				if not has_visible_face:
+					result.visible = false
+					result.missing_face = true
+				if not collider_present:
+					result.collider = false
+					result.missing_collider = true
+				if (not has_visible_face or not collider_present) and not result.has_bad_position:
+					result.bad_position = sample
+					result.has_bad_position = true
+			if not has_matching_visual: entry.missing_visual.append(cell)
+	for mesh_id in mesh_results:
+		var issue:Dictionary = mesh_results[mesh_id]
+		if issue.visible and issue.collider: continue
 		var reasons:Array[String] = []
-		if not issue.visible: reasons.append("no underside-facing face or two-sided material")
-		if not issue.collider: reasons.append("upward ray did not hit this deck's collider")
-		_record("underside", issue.mesh, issue.position, "; ".join(reasons), true)
+		if not issue.visible: reasons.append("no underside-facing face at one or more of %d sampled cells" % int(issue.cell_count))
+		if not issue.collider: reasons.append("upward ray did not hit this deck's collider at one or more of %d sampled cells" % int(issue.cell_count))
+		_record("underside", issue.mesh, issue.bad_position, "; ".join(reasons), true)
+	for body_path in body_cells:
+		var entry:Dictionary = body_cells[body_path]
+		if not _is_walk_deck(entry.body) or entry.missing_visual.is_empty(): continue
+		var missing:Array = entry.missing_visual
+		_record("underside", entry.body, missing[0].position, "walkable deck collider has no visual within 0.08 m at %d sampled cells" % missing.size(), true, null, "deck_visual_missing")
 	_check_inward_winding(meshes)
 
 func _is_walk_deck(body:Node)->bool:
@@ -702,24 +743,151 @@ func _meshes_at_walk_cell(meshes:Array[MeshInstance3D], cell:Dictionary)->Array[
 		var bounds:AABB = _mesh_bounds[mesh.get_instance_id()]
 		if float(cell.x) < bounds.position.x - 0.01 or float(cell.x) > bounds.end.x + 0.01: continue
 		if float(cell.z) < bounds.position.z - 0.01 or float(cell.z) > bounds.end.z + 0.01: continue
-		if absf(bounds.end.y - float(cell.y)) > 0.3: continue
+		if float(cell.y) < bounds.position.y - 0.08 or float(cell.y) > bounds.end.y + 0.08: continue
 		if bounds.size.x < 0.25 or bounds.size.z < 0.25: continue
 		candidates.append(mesh)
 	return candidates
 
-func _has_visible_underside(mesh:MeshInstance3D, sample:Vector3)->bool:
+func _collision_owner_for_node(node:Node)->CollisionObject3D:
+	var ancestor:Node = node.get_parent()
+	while ancestor != null:
+		if ancestor is CollisionObject3D: return ancestor as CollisionObject3D
+		ancestor = ancestor.get_parent()
+	return null
+
+func _is_underside_visual_only(mesh:MeshInstance3D)->bool:
+	# belt_distance and helix_fraction are authored only on the moving stair
+	# treads. Recognize them in the current bake while the explicit tag is added
+	# by the builder for subsequent bakes.
+	return bool(mesh.get_meta("underside_visual_only",false)) or mesh.has_meta("belt_distance") or mesh.has_meta("helix_fraction")
+
+func _underside_thickness(mesh:MeshInstance3D, point:Vector2, top_y:float, body_shapes:Array)->float:
+	# Select the box whose top face supports this sample. This avoids borrowing
+	# the height of a rail or another box elsewhere on the same body.
+	var best_thickness := INF
+	var best_top_error := INF
+	for node in body_shapes:
+		if not node is CollisionShape3D: continue
+		var box := node as CollisionShape3D
+		if not box.shape is BoxShape3D: continue
+		var box_shape := box.shape as BoxShape3D
+		var local_point:Vector3 = box.global_transform.affine_inverse() * Vector3(point.x,top_y,point.y)
+		var half := box_shape.size * 0.5
+		if absf(local_point.x) > half.x + 0.12 or absf(local_point.z) > half.z + 0.12: continue
+		var top_error := absf(local_point.y-half.y)
+		if top_error > 0.12 or top_error >= best_top_error: continue
+		var y_axis := box.global_transform.basis.y
+		var vertical_projection := absf(y_axis.normalized().y)
+		var thickness := box_shape.size.y * y_axis.length() / maxf(vertical_projection,0.1) + 0.03
+		best_top_error = top_error
+		best_thickness = maxf(0.05,thickness)
+	if not is_inf(best_thickness): return best_thickness
+	# Curved concave decks use a conservative cap around their actual visual.
+	var bounds := _node_world_aabb(mesh)
+	return minf(maxf(bounds.size.y, 0.15), 0.75)
+
+func _has_visible_underside(mesh:MeshInstance3D, sample:Vector3, max_drop:float=0.75)->bool:
+	if mesh.mesh == null: return false
 	if _mesh_is_two_sided(mesh): return true
-	if mesh.mesh == null or mesh.mesh.get_surface_count() == 0: return false
-	var faces := mesh.mesh.get_faces()
+	var faces := _mesh_triangles(mesh)
 	for i in range(0, faces.size(), 3):
 		var a:Vector3 = mesh.global_transform * faces[i]
 		var b:Vector3 = mesh.global_transform * faces[i + 1]
 		var c:Vector3 = mesh.global_transform * faces[i + 2]
 		var normal := (c - a).cross(b - a).normalized()
 		if normal.y > -0.5: continue
-		if absf((a.y + b.y + c.y) / 3.0 - sample.y) > 0.15: continue
-		if _point_in_triangle_xz(Vector2(sample.x, sample.z), Vector2(a.x,a.z), Vector2(b.x,b.z), Vector2(c.x,c.z)): return true
+		# On a slope the bottom face is displaced sideways from the top point.
+		# Compare in 3D within the deck's physical thickness instead of asking
+		# for a face directly beneath the same XZ coordinate.
+		var distance := _point_triangle_distance_3d(sample,a,b,c)
+		if distance <= max_drop * absf(normal.y) + 0.02: return true
 	return false
+
+func _point_triangle_distance_3d(point:Vector3,a:Vector3,b:Vector3,c:Vector3)->float:
+	return point.distance_to(_closest_point_on_triangle_3d(point,a,b,c))
+
+func _closest_point_on_triangle_3d(point:Vector3,a:Vector3,b:Vector3,c:Vector3)->Vector3:
+	var ab:=b-a; var ac:=c-a; var normal:=ab.cross(ac).normalized()
+	if normal.length_squared() < 0.5:
+		var nearest_degenerate:=a
+		for candidate in [b,c]:
+			if point.distance_squared_to(candidate) < point.distance_squared_to(nearest_degenerate): nearest_degenerate=candidate
+		return nearest_degenerate
+	var projected:=point-normal*normal.dot(point-a)
+	var v0:=ab; var v1:=ac; var v2:=projected-a
+	var d00:=v0.dot(v0); var d01:=v0.dot(v1); var d11:=v1.dot(v1); var d20:=v2.dot(v0); var d21:=v2.dot(v1)
+	var denominator:=d00*d11-d01*d01
+	if absf(denominator) > 0.000001:
+		var v:float=(d11*d20-d01*d21)/denominator
+		var w:float=(d00*d21-d01*d20)/denominator
+		if v >= -0.001 and w >= -0.001 and v+w <= 1.001: return projected
+	var nearest:=_closest_point_on_segment_3d(point,a,b)
+	var candidate:=_closest_point_on_segment_3d(point,b,c)
+	if point.distance_squared_to(candidate) < point.distance_squared_to(nearest): nearest=candidate
+	candidate=_closest_point_on_segment_3d(point,c,a)
+	if point.distance_squared_to(candidate) < point.distance_squared_to(nearest): nearest=candidate
+	return nearest
+
+func _closest_point_on_segment_3d(point:Vector3,a:Vector3,b:Vector3)->Vector3:
+	var segment:=b-a; var t:=clampf((point-a).dot(segment)/maxf(segment.length_squared(),0.000001),0.0,1.0)
+	return a+segment*t
+
+func _underside_y_at(mesh:MeshInstance3D, point:Vector2, top_y:float, max_drop:float)->float:
+	if mesh.mesh == null: return NAN
+	if _mesh_is_two_sided(mesh): return top_y - minf(max_drop,0.05)
+	var sample:=Vector3(point.x,top_y,point.y)
+	var best_distance:=INF
+	var best_y:=NAN
+	var faces := _mesh_triangles(mesh)
+	for i in range(0,faces.size(),3):
+		var a:Vector3 = mesh.global_transform * faces[i]
+		var b:Vector3 = mesh.global_transform * faces[i+1]
+		var c:Vector3 = mesh.global_transform * faces[i+2]
+		var normal:Vector3=(c-a).cross(b-a).normalized()
+		if normal.y > -0.5: continue
+		var nearest:=_closest_point_on_triangle_3d(sample,a,b,c)
+		var distance:=sample.distance_to(nearest)
+		if distance > max_drop*absf(normal.y)+0.02 or distance >= best_distance: continue
+		best_distance=distance; best_y=nearest.y
+	return best_y
+
+func _surface_y_at(mesh:MeshInstance3D, point:Vector2)->float:
+	if mesh.mesh == null: return NAN
+	var best := NAN
+	var faces := _mesh_triangles(mesh)
+	for i in range(0,faces.size(),3):
+		var a:Vector3 = mesh.global_transform * faces[i]
+		var b:Vector3 = mesh.global_transform * faces[i+1]
+		var c:Vector3 = mesh.global_transform * faces[i+2]
+		if (c-a).cross(b-a).normalized().y < 0.5: continue
+		var y := _triangle_height_xz(point,a,b,c)
+		if not is_nan(y) and (is_nan(best) or y > best): best = y
+	return best
+
+func _down_face_height_at(point:Vector2,a:Vector3,b:Vector3,c:Vector3,top_y:float,max_drop:float)->float:
+	var normal := (c-a).cross(b-a).normalized()
+	if normal.y > -0.5: return NAN
+	var y := _triangle_height_xz(point,a,b,c)
+	if is_nan(y) or y >= top_y-0.005 or top_y-y > max_drop: return NAN
+	return y
+
+func _mesh_triangles(mesh:MeshInstance3D)->PackedVector3Array:
+	var mesh_id := mesh.get_instance_id()
+	if _mesh_face_cache.has(mesh_id): return _mesh_face_cache[mesh_id]
+	var source:Mesh = mesh.mesh
+	if source == null or not is_instance_valid(source): return PackedVector3Array()
+	var faces := source.get_faces()
+	_mesh_face_cache[mesh_id] = faces
+	return faces
+
+func _triangle_height_xz(point:Vector2, a:Vector3, b:Vector3, c:Vector3)->float:
+	var p0 := Vector2(a.x,a.z); var p1 := Vector2(b.x,b.z); var p2 := Vector2(c.x,c.z)
+	if not _point_in_triangle_xz(point,p0,p1,p2): return NAN
+	var denominator := (p1-p0).cross(p2-p0)
+	if absf(denominator) < 0.000001: return NAN
+	var u := (point-p0).cross(p2-p0) / denominator
+	var v := (p1-p0).cross(point-p0) / denominator
+	return a.y + u * (b.y-a.y) + v * (c.y-a.y)
 
 func _mesh_is_two_sided(mesh:MeshInstance3D)->bool:
 	var materials:Array[Material] = []
@@ -745,7 +913,7 @@ func _point_in_triangle_xz(p:Vector2, a:Vector2, b:Vector2, c:Vector2)->bool:
 func _check_inward_winding(meshes:Array[MeshInstance3D])->void:
 	for mesh in meshes:
 		if not _body_has_meta(mesh,&"closed_shell") or mesh.mesh == null or mesh.mesh.get_surface_count() == 0: continue
-		var faces := mesh.mesh.get_faces()
+		var faces := _mesh_triangles(mesh)
 		if faces.size() < 36: continue
 		var bounds := _node_world_aabb(mesh)
 		var center := bounds.get_center()
@@ -871,7 +1039,7 @@ func _run_fixture_suite()->void:
 		["reach",Vector4(27,-3,35,3),Vector3(28,0.2,0),"FixtureDisconnectedPlatform","disconnected from spawn","FixtureReachClean"],
 		["trap",Vector4(37,-3,45,3),Vector3(44,0.2,0),"FixtureOneWayPocket","cannot return to spawn","FixtureTrapClean"],
 		["headroom",Vector4(47,-3,53,3),Vector3(50,0.2,0),"FixtureHeadroomBeam","standing height","FixtureHeadroomClean"],
-		["underside",Vector4(57,-3,63,3),Vector3(60,0.2,0),"FixtureUndersideTopOnlyVisual","no underside-facing face","FixtureUndersideClean"],
+		["underside",Vector4(57,-3,126,3),Vector3(60,0.2,0),"FixtureUndersideTopOnlyVisual","no underside-facing face","FixtureUndersideClean"],
 		["solid",Vector4(67,-3,77,3),Vector3(70,0,0),"FixtureUncollidedSolid","no collider within 0.05 m","FixtureSolidClean"],
 		["guard",Vector4(77,-3,86,3),Vector3(80,2.2,0),"FixtureGuardPad","fully guarded and has no tagged way through","FixtureGuardClean"],
 	]
@@ -901,15 +1069,30 @@ func _run_fixture_suite()->void:
 			if String(test[5]) in path: clean_caught = true
 		var second_trap_caught := check != "trap"
 		var broken_link_caught := check != "reach"
+		var partial_underside_caught := check != "underside"
+		var partial_twin_clean := true
+		var stepped_underside_caught := check != "underside"
+		var stepped_twin_clean := true
 		if check == "reach":
 			for finding in _findings:
 				if finding.check_id == "reach" and "FixtureBrokenReachLinkEndpoint" in String(finding.node_path) and "no walk cell within 3 m" in String(finding.detail): broken_link_caught = true
 		if check == "trap":
 			for finding in _findings:
 				if finding.check_id == "trap" and "FixtureShellGap" in String(finding.node_path) and "inside an untagged shell" in String(finding.detail): second_trap_caught = true
-		if caught and second_trap_caught and broken_link_caught and not clean_caught: print("WORLD_CHECK_FIXTURE PASS ",check," fault=",test[3]," clean=",test[5])
+		if check == "underside":
+			for finding in _findings:
+				if finding.check_id != "underside": continue
+				var path := String(finding.node_path)
+				var detail := String(finding.detail)
+				if "FixtureUndersidePartialVisual" in path and "no underside-facing face" in detail: partial_underside_caught = true
+				if "FixtureUndersidePartialCleanTwin" in path: partial_twin_clean = false
+				if "FixtureSteppedFlightNoBottom" in path and "no underside-facing face" in detail: stepped_underside_caught = true
+				if "FixtureSteppedFlightCleanTwin" in path: stepped_twin_clean = false
+		var underside_fixtures_ok := partial_underside_caught and partial_twin_clean and stepped_underside_caught and stepped_twin_clean
+		if caught and second_trap_caught and broken_link_caught and not clean_caught and underside_fixtures_ok:
+			print("WORLD_CHECK_FIXTURE PASS ",check," fault=",test[3]," clean=",test[5]," partial_deck=",partial_underside_caught," partial_twin_clean=",partial_twin_clean," stepped_flight=",stepped_underside_caught," stepped_twin_clean=",stepped_twin_clean)
 		else:
-			print("WORLD_CHECK_FIXTURE FAIL ",check," expected_fault=",caught," clean_twin_clear=",not clean_caught)
+			print("WORLD_CHECK_FIXTURE FAIL ",check," expected_fault=",caught," clean_twin_clear=",not clean_caught," partial_deck=",partial_underside_caught," partial_twin_clean=",partial_twin_clean," stepped_flight=",stepped_underside_caught," stepped_twin_clean=",stepped_twin_clean)
 			for finding in _findings:
 				if finding.check_id == check: print("  finding ",finding.node_path," :: ",finding.detail)
 			failed.append(check)
@@ -982,10 +1165,47 @@ func _fixture_headroom(root:Node3D)->void:
 
 func _fixture_underside(root:Node3D)->void:
 	var body := _fixture_box(root,"FixtureUndersideDeck",Vector3(2,0.1,2),Vector3(60,1.05,0),false); body.set_meta("walk_deck",true)
-	var arrays:Array = []; arrays.resize(Mesh.ARRAY_MAX); arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3(-1,0,-1),Vector3(-1,0,1),Vector3(1,0,-1)]); arrays[Mesh.ARRAY_INDEX] = PackedInt32Array([0,2,1])
-	var top_only := ArrayMesh.new(); top_only.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+	var top_only := _fixture_top_only_mesh(2.0,2.0)
 	var visual := MeshInstance3D.new(); visual.name="FixtureUndersideTopOnlyVisual"; visual.mesh = top_only; visual.position.y = 0.05; body.add_child(visual)
 	var clean := _fixture_box(root,"FixtureUndersideCleanBoxedDeck",Vector3(1.5,0.1,1.5),Vector3(62,1.05,0),true); clean.set_meta("walk_deck",true)
+	var partial := _fixture_box(root,"FixtureUndersidePartialDeck",Vector3(2,0.1,2),Vector3(64,1.05,0),false); partial.set_meta("walk_deck",true)
+	var partial_visual := MeshInstance3D.new(); partial_visual.name="FixtureUndersidePartialVisual"; partial_visual.mesh=_fixture_partial_bottom_mesh(); partial.add_child(partial_visual)
+	var partial_clean := _fixture_box(root,"FixtureUndersidePartialCleanTwin",Vector3(2,0.1,2),Vector3(66.5,1.05,0),true); partial_clean.set_meta("walk_deck",true)
+	var stepped := _fixture_stepped_flight(root,"FixtureSteppedFlightNoBottom",120.0,false)
+	var stepped_clean := _fixture_stepped_flight(root,"FixtureSteppedFlightCleanTwin",124.0,true)
+	stepped.set_meta("flight",true); stepped_clean.set_meta("flight",true)
+	# A tagged moving detail is ignored while the supporting flight remains checked.
+	var decorative_tread := MeshInstance3D.new(); decorative_tread.name="FixtureTaggedMovingTread"; decorative_tread.mesh=BoxMesh.new(); decorative_tread.set_meta("underside_visual_only",true); decorative_tread.position=Vector3(0,0.08,0); stepped.add_child(decorative_tread)
+
+func _fixture_top_only_mesh(width:float,depth:float)->ArrayMesh:
+	var x:=width*0.5; var z:=depth*0.5
+	var arrays:Array=[]; arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX]=PackedVector3Array([Vector3(-x,0,-z),Vector3(-x,0,z),Vector3(x,0,-z),Vector3(x,0,z)])
+	arrays[Mesh.ARRAY_INDEX]=PackedInt32Array([0,2,1,1,2,3])
+	var mesh:=ArrayMesh.new(); mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays); return mesh
+
+func _fixture_partial_bottom_mesh()->ArrayMesh:
+	var vertices := PackedVector3Array([
+		Vector3(-1,0.05,-1),Vector3(-1,0.05,1),Vector3(1,0.05,-1),Vector3(1,0.05,1),
+		Vector3(-1,-0.05,-1),Vector3(-1,-0.05,1),Vector3(0,-0.05,-1),Vector3(0,-0.05,1)])
+	var arrays:Array=[]; arrays.resize(Mesh.ARRAY_MAX); arrays[Mesh.ARRAY_VERTEX]=vertices
+	arrays[Mesh.ARRAY_INDEX]=PackedInt32Array([0,2,1,1,2,3,4,5,6,5,7,6])
+	var mesh:=ArrayMesh.new(); mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays); return mesh
+
+func _fixture_stepped_flight(parent:Node3D,label:String,x:float,complete_bottom:bool)->StaticBody3D:
+	var body:=StaticBody3D.new(); body.name=label; body.position.x=x; body.collision_layer=1; body.collision_mask=1; body.set_meta("walk_deck",true); parent.add_child(body)
+	for index in 2:
+		var size:=Vector3(1.0,0.1,1.4); var center:=Vector3(float(index)*0.5-0.25,0.1+float(index)*0.35,0)
+		var collision:=CollisionShape3D.new(); var box:=BoxShape3D.new(); box.size=size; collision.shape=box; collision.position=center; body.add_child(collision)
+		var visual:=MeshInstance3D.new(); visual.name="%s_Step_%d"%[label,index]
+		if complete_bottom:
+			var box_mesh:=BoxMesh.new(); box_mesh.size=size; visual.mesh=box_mesh
+		else:
+			var top:=ArrayMesh.new(); var step_arrays:Array=[]; step_arrays.resize(Mesh.ARRAY_MAX)
+			step_arrays[Mesh.ARRAY_VERTEX]=PackedVector3Array([Vector3(-0.5,0.05,-0.7),Vector3(-0.5,0.05,0.7),Vector3(0.5,0.05,-0.7),Vector3(0.5,0.05,0.7)])
+			step_arrays[Mesh.ARRAY_INDEX]=PackedInt32Array([0,2,1,1,2,3]); top.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,step_arrays); visual.mesh=top
+		visual.position=center; body.add_child(visual)
+	return body
 
 func _fixture_solid(root:Node3D)->void:
 	var mesh := MeshInstance3D.new(); mesh.name = "FixtureUncollidedSolid"; var box := BoxMesh.new(); box.size = Vector3(3,3,3); mesh.mesh = box; mesh.position = Vector3(70,1.5,0); root.add_child(mesh)

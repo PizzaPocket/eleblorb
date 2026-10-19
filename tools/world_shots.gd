@@ -6,7 +6,7 @@ const STANDARD_VIEWS := {
 	"street_civic_east": {"camera": Vector3(-360, -58.2, 10), "at": Vector3(-390, -55, 0)},
 	"street_crossing_north": {"camera": Vector3(-555, -58.2, -25), "at": Vector3(-555, -55, -5)},
 	"street_crossing_south": {"camera": Vector3(-555, -58.2, 25), "at": Vector3(-555, -55, 5)},
-	"under_high_line": {"camera": Vector3(-482, -58.5, -14), "at": Vector3(-487, -54.5, -14)},
+	"under_high_line": {"camera": Vector3(-472, -58.5, -28), "at": Vector3(-477, -54.5, -28)},
 	"under_civic_north_flight": {"camera": Vector3(-482, -58.5, -14), "at": Vector3(-487, -54.5, -14)},
 	"under_civic_south_flight": {"camera": Vector3(-482, -58.5, 14), "at": Vector3(-487, -54.5, 14)},
 }
@@ -17,7 +17,7 @@ func _ready() -> void:
 func _render_set() -> void:
 	var args := _parse_args(OS.get_cmdline_user_args())
 	var package := String(args.get("package", "P0"))
-	var date := String(args.get("date", "2026-10-18"))
+	var date := String(args.get("date", Time.get_date_string_from_system()))
 	var views := _package_views(package)
 	var root := (load("res://scenes/main.tscn") as PackedScene).instantiate() as Node3D
 	get_tree().root.add_child(root)
@@ -31,7 +31,9 @@ func _render_set() -> void:
 	var deadline := Time.get_ticks_msec() + 240000
 	while city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec() < deadline:
 		await get_tree().create_timer(0.25).timeout
-	_add_flight_views(views, city)
+	await get_tree().physics_frame
+	var reach_helper := _prepare_reach_helper(root, player)
+	_add_flight_views(views, city, reach_helper)
 	var camera := Camera3D.new()
 	camera.current = true
 	camera.fov = 52.0
@@ -51,6 +53,7 @@ func _render_set() -> void:
 			await RenderingServer.frame_post_draw
 			var image := get_viewport().get_texture().get_image()
 			var path := "%s/%s-%s.png" % [out_dir, view_name, lighting]
+			print("WORLD_SHOT_SIZE ",path," ",image.get_width(),"x",image.get_height())
 			var error := image.save_png(ProjectSettings.globalize_path(path))
 			if error != OK:
 				push_error("Could not save screenshot %s: %s" % [path, error])
@@ -64,7 +67,8 @@ func _package_views(package:String)->Dictionary:
 	var selected:Dictionary = STANDARD_VIEWS.duplicate(true)
 	for standard_id in ["overview"]:
 		if available.has(standard_id): selected[standard_id] = available[standard_id]
-	var brief_path := "res://docs/architecture/moy_pkg_%s.md" % package
+	var brief_package := "P0" if package == "P0.1" else package
+	var brief_path := "res://docs/architecture/moy_pkg_%s.md" % brief_package
 	if not FileAccess.file_exists(brief_path): return selected
 	var text := FileAccess.get_file_as_string(brief_path)
 	var heading := RegEx.new(); heading.compile("(?ms)^## \\d+\\. Viewpoints\\s*\\n(.*?)(?=^## |\\z)")
@@ -76,21 +80,121 @@ func _package_views(package:String)->Dictionary:
 		if available.has(id): selected[id] = available[id]
 	return selected
 
-func _add_flight_views(views:Dictionary, city:Node)->void:
+func _prepare_reach_helper(root:Node3D, player:Node3D)->Node:
+	var helper := (load("res://tools/world_checks.gd") as Script).new() as Node
+	helper.set_meta("library_mode",true)
+	root.add_child(helper)
+	helper.set("_world",root)
+	helper.set("_area",Vector4(-790.0,-210.0,-330.0,210.0))
+	helper.set("_player_start",player.global_position if player != null else Vector3(-540.0,-58.0,0.0))
+	if player != null:
+		var floor_angle:Variant = player.get("floor_max_angle")
+		if floor_angle != null: helper.set("_walkable_slope_dot",cos(float(floor_angle)))
+	var meshes:Array[MeshInstance3D] = []
+	var shapes:Array[CollisionShape3D] = []
+	helper.call("_collect",root,meshes,shapes)
+	var body_collision_shapes:Dictionary = {}
+	for shape in shapes:
+		var owner:CollisionObject3D = helper.call("_collision_owner_for_node",shape)
+		if owner == null: continue
+		var owner_id := owner.get_instance_id()
+		if not body_collision_shapes.has(owner_id): body_collision_shapes[owner_id] = []
+		body_collision_shapes[owner_id].append(shape)
+	helper.set("_body_collision_shapes",body_collision_shapes)
+	var bounds:Vector2 = helper.call("_scene_y_bounds",shapes)
+	var grid:Dictionary = helper.call("_build_walk_grid",0.5,bounds.x,bounds.y)
+	helper.set("_walk_grid",grid)
+	helper.set("_grid_step",0.5)
+	helper.call("_build_reach_graph",root)
+	return helper
+
+func _add_flight_views(views:Dictionary, city:Node, reach_helper:Node)->void:
 	var runs:Dictionary = {}
 	for node in _walk(city):
 		if not node is Node3D or not (node as Node3D).has_meta("flight"): continue
 		var run_id := String((node as Node3D).get_meta("walk_run_id", node.name))
 		var bounds := _world_bounds(node as Node3D)
-		if not runs.has(run_id): runs[run_id] = bounds
+		if not runs.has(run_id): runs[run_id] = {"bounds":bounds,"bodies":[]}
 		else:
-			var merged:AABB = runs[run_id]
-			runs[run_id] = merged.merge(bounds)
+			var current:AABB = runs[run_id].bounds
+			runs[run_id].bounds = current.merge(bounds)
+		runs[run_id].bodies.append(node as Node3D)
+	var reachable:Dictionary = reach_helper.get("_reachable")
+	var cells_by_run:Dictionary = {}
+	for cell in reach_helper.get("_walk_cells"):
+		var body:Node = cell.body
+		if not body.has_meta("flight"): continue
+		if not reachable.has(String(cell.id)): continue
+		var run_id := String(body.get_meta("walk_run_id",body.name))
+		if not runs.has(run_id): continue
+		if not cells_by_run.has(run_id): cells_by_run[run_id] = []
+		cells_by_run[run_id].append(cell)
 	for run_id in runs:
-		var bounds:AABB = runs[run_id]
-		var center := bounds.get_center()
+		var view := _find_under_flight_view(String(run_id),runs[run_id],cells_by_run.get(run_id,[]),reach_helper,reachable)
+		if view.has("skip_reason"):
+			print("WORLD_SHOT_SKIP run=",run_id," reason=",view.skip_reason," reached_top_cells=",cells_by_run.get(run_id,[]).size())
+			continue
 		var key := "under_flight_%s" % String(run_id).to_lower().replace(":","_").replace(" ","_")
-		views[key] = {"camera": Vector3(center.x,bounds.position.y-1.0,center.z), "at": Vector3(center.x,center.y+1.0,center.z)}
+		views[key] = view
+
+func _find_under_flight_view(run_id:String, run:Dictionary, top_cells:Array, helper:Node, reachable:Dictionary)->Dictionary:
+	if top_cells.is_empty(): return {"skip_reason":"no_reached_top_cell"}
+	var bodies:Array = run.bodies
+	var body_meshes:Dictionary = {}
+	for body in bodies:
+		var owned:Array[MeshInstance3D] = []
+		for node in _walk(body):
+			if node is MeshInstance3D and helper.call("_collision_owner_for_node",node) == body and not helper.call("_is_underside_visual_only",node): owned.append(node as MeshInstance3D)
+		body_meshes[body.get_instance_id()] = owned
+	var reached_buckets:Dictionary = helper.get("_reached_buckets")
+	var state := get_viewport().world_3d.direct_space_state
+	var static_mask:int = int(helper.get("_static_mask"))
+	var dynamic_excludes:Array = helper.get("_dynamic_excludes")
+	var best:Dictionary = {}
+	var best_score := INF
+	for top_cell in top_cells:
+		var body:Node3D = top_cell.body
+		var cell_meshes:Array = body_meshes.get(body.get_instance_id(),[])
+		if cell_meshes.is_empty(): continue
+		var top_point := Vector2(float(top_cell.x),float(top_cell.z))
+		var target_mesh:MeshInstance3D = null
+		var target_y := NAN
+		var underside_y := NAN
+		for mesh in cell_meshes:
+			var mesh_bounds:AABB = helper.call("_node_world_aabb",mesh)
+			if top_point.x < mesh_bounds.position.x-0.01 or top_point.x > mesh_bounds.end.x+0.01 or top_point.y < mesh_bounds.position.z-0.01 or top_point.y > mesh_bounds.end.z+0.01: continue
+			var surface_y:float = helper.call("_surface_y_at",mesh,top_point)
+			if is_nan(surface_y) or absf(surface_y-float(top_cell.y)) > 0.15: continue
+			var body_shapes:Array = helper.get("_body_collision_shapes").get(body.get_instance_id(),[])
+			var thickness:float = helper.call("_underside_thickness",mesh,top_point,surface_y,body_shapes)
+			var bottom_y:float = helper.call("_underside_y_at",mesh,top_point,surface_y,thickness)
+			if is_nan(bottom_y): continue
+			if is_nan(target_y) or surface_y > target_y:
+				target_mesh=mesh; target_y=surface_y; underside_y=bottom_y
+		if target_mesh == null: continue
+		var buckets := Vector2i(floori(float(top_cell.x)/16.0),floori(float(top_cell.z)/16.0))
+		for dx in range(-1,2):
+			for dz in range(-1,2):
+				for camera_cell in reached_buckets.get(buckets+Vector2i(dx,dz),[]):
+					var horizontal := Vector2(float(camera_cell.x)-top_point.x,float(camera_cell.z)-top_point.y).length()
+					if horizontal > 5.0 or float(camera_cell.y) >= underside_y-1.45: continue
+					var camera_position:Vector3 = camera_cell.position+Vector3.UP*1.2
+					var target := Vector3(top_point.x,underside_y-0.02,top_point.y)
+					if target.y <= camera_position.y+0.15: continue
+					var query := PhysicsRayQueryParameters3D.create(camera_position,target,static_mask)
+					query.exclude = dynamic_excludes.duplicate()
+					if camera_cell.body is CollisionObject3D: query.exclude.append((camera_cell.body as CollisionObject3D).get_rid())
+					var hit := state.intersect_ray(query)
+					if not hit.is_empty():
+						var hit_node:Node = hit.get("collider") as Node
+						if hit_node != body or Vector3(hit.position).distance_to(target) > 0.35: continue
+					var score := absf(horizontal-2.0)+absf((target-camera_position).length()-5.0)*0.02
+					if score < best_score:
+						best_score=score
+						best={"camera":camera_position,"at":target,"source_cell":camera_cell,"run":run_id,"mesh":target_mesh}
+						if best_score < 0.05: return best
+	if best.is_empty(): return {"skip_reason":"no_clear_ray_from_below"}
+	return best
 
 func _world_bounds(node:Node3D)->AABB:
 	var found := false
