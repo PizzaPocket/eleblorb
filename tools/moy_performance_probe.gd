@@ -10,7 +10,9 @@ const DEFAULT_RESOLUTION := Vector2i(1280, 720)
 const FRAME_WIDTH := 13
 const REQUIRED_CROSSROADS_SAMPLES := ["crossroads_spawn", "old_moy_street", "old_moy_rooftop",
 	"downtown_up", "estate_court", "crossing_east_gate", "east_gate_train_hall"]
-const ROUTE_SAMPLE_NAMES := REQUIRED_CROSSROADS_SAMPLES
+const P3_SAMPLE_NAMES := ["market", "southst", "arcade", "lamplane"]
+const P4_SAMPLE_NAMES := ["oldmoy", "wellquarter", "cinemasq", "oldhigh", "oldcourt", "oldroofs"]
+const ROUTE_SAMPLE_NAMES := REQUIRED_CROSSROADS_SAMPLES + P3_SAMPLE_NAMES + P4_SAMPLE_NAMES
 const DEFAULT_ROUTE := "crossroads_spawn,old_moy_street,old_moy_rooftop,downtown_up,estate_court,crossing_east_gate,east_gate_train_hall"
 const REQUIRED_CONTROLLED_ROUTE_PROOFS := ["moving_train_ride", "four_gate_entries", "vine_handover",
 	"occupied_support_thresholds", "xiao_hou_zi_entry", "alternate_body_entry", "hotel_annulus_hold",
@@ -376,7 +378,20 @@ func _run_crossroads(camera: Camera3D) -> void:
 		{"name":"downtown_up", "camera":Vector3(-462,5,-40), "look":Vector3(-462,-25,-20), "player":Vector2(-462,-20)},
 		{"name":"estate_court", "camera":Vector3(-535,-38,-125), "look":Vector3(-535,-48,-100), "player":Vector2(-535,-100)},
 		{"name":"crossing_east_gate", "camera":Vector3(-560,8,8), "look":Vector3(-560,13.2,0), "player":Vector2(-560,0)},
-		{"name":"east_gate_train_hall", "camera":Vector3(-351,-34,-20), "look":Vector3(-351,-45,0), "player":Vector2(-351,0)}]
+		{"name":"east_gate_train_hall", "camera":Vector3(-351,-34,-20), "look":Vector3(-351,-45,0), "player":Vector2(-351,0)},
+		# P3's performance views are the Moy atlas places translated into world
+		# coordinates. The same P2 sampler/settings run these before and after.
+		{"name":"market", "camera":Vector3(-550,50,290), "look":Vector3(-670,-45,130), "player":Vector2(-650,130)},
+		{"name":"southst", "camera":Vector3(-558.5,-58.2,132), "look":Vector3(-563,-51,205), "player":Vector2(-560,140)},
+		{"name":"arcade", "camera":Vector3(-690,-58.2,128), "look":Vector3(-690,-53,205), "player":Vector2(-690,130)},
+		{"name":"lamplane", "camera":Vector3(-630,-58.2,172), "look":Vector3(-530,-56,172), "player":Vector2(-600,172)}]
+	views.append_array([
+		{"name":"oldmoy", "camera":Vector3(-580,35,120), "look":Vector3(-705,-50,-20), "player":Vector2(-718,25)},
+		{"name":"wellquarter", "camera":Vector3(-652,60,-160), "look":Vector3(-710,-55,-30), "player":Vector2(-730,-60)},
+		{"name":"cinemasq", "camera":Vector3(-714,-56.8,7), "look":Vector3(-725,-57,23), "player":Vector2(-720,8)},
+		{"name":"oldhigh", "camera":Vector3(-724,-46,2), "look":Vector3(-709,-48,-50), "player":Vector2(-720,-20)},
+		{"name":"oldcourt", "camera":Vector3(-664,-58,-64), "look":Vector3(-694,-58,-31), "player":Vector2(-685,-35)},
+		{"name":"oldroofs", "camera":Vector3(-670,-74,-70), "look":Vector3(-705,-98,-40), "player":Vector2(-690,-60)}])
 	var requested: Array = String(_config.route).split(",", true)
 	for view in views:
 		if String(view.name) not in requested: continue

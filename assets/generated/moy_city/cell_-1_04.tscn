@@ -17,19 +17,19 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_bd6c3"]
 size = Vector3(18, 0.15, 12)
 
-[node name="MoyCell_-1_04" type="Node3D" unique_id=95258861]
+[node name="MoyCell_-1_04" type="Node3D" unique_id=1314322611]
 
-[node name="Building_41_Recycling_works" type="StaticBody3D" parent="." unique_id=1120425394]
+[node name="Building_41_Recycling_works" type="StaticBody3D" parent="." unique_id=1248541936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -807, -58, 22)
 
-[node name="@CollisionShape3D@2621" type="CollisionShape3D" parent="Building_41_Recycling_works" unique_id=102346474]
+[node name="@CollisionShape3D@19697" type="CollisionShape3D" parent="Building_41_Recycling_works" unique_id=68182596]
 shape = SubResource("BoxShape3D_c87h1")
 
-[node name="@MeshInstance3D@2622" type="MeshInstance3D" parent="Building_41_Recycling_works" unique_id=135538390]
+[node name="@MeshInstance3D@19698" type="MeshInstance3D" parent="Building_41_Recycling_works" unique_id=483696780]
 material_override = SubResource("StandardMaterial3D_frjyl")
 mesh = SubResource("BoxMesh_kbi7n")
 
-[node name="@MeshInstance3D@2623" type="MeshInstance3D" parent="Building_41_Recycling_works" unique_id=855942059]
+[node name="@MeshInstance3D@19699" type="MeshInstance3D" parent="Building_41_Recycling_works" unique_id=1536170180]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.925, 0)
 material_override = SubResource("StandardMaterial3D_syl67")
 mesh = SubResource("BoxMesh_bd6c3")

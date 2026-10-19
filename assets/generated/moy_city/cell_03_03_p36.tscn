@@ -268,33 +268,33 @@ size = Vector3(0.04, 40, 2.5)
 [sub_resource type="BoxMesh" id="BoxMesh_pxnqn"]
 size = Vector3(0.04, 40, 2.5)
 
-[node name="MoyCell_03_03_Part_36" type="Node3D" unique_id=957571719]
+[node name="MoyCell_03_03_Part_36" type="Node3D" unique_id=1833786086]
 
-[node name="CrossingTower_02_Part_03" type="Node3D" parent="." unique_id=930340819]
+[node name="CrossingTower_02_Part_03" type="Node3D" parent="." unique_id=100235062]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -60, 13)
 
-[node name="CrossingTowerLiftCalls" type="Node3D" parent="CrossingTower_02_Part_03" unique_id=1770323962]
+[node name="CrossingTowerLiftCalls" type="Node3D" parent="CrossingTower_02_Part_03" unique_id=323459354]
 
-[node name="CrossingTowerLift_Call_park_ground" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=1669787155]
+[node name="CrossingTowerLift_Call_park_ground" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=1885882117]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8563457, 0, -6.8563457)
 metadata/reach_target = true
 metadata/reach_link_id = "CrossingTowerLift"
 
-[node name="@MeshInstance3D@5537" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground" unique_id=1252343990]
+[node name="@MeshInstance3D@22719" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground" unique_id=1562169209]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_olqoo")
 mesh = SubResource("ArrayMesh_qnvg7")
 surface_material_override/0 = SubResource("StandardMaterial3D_qsdyu")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@5538" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground" unique_id=1401272254]
+[node name="@MeshInstance3D@22720" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground" unique_id=1903942190]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_nlyam")
 mesh = SubResource("ArrayMesh_65byu")
 surface_material_override/0 = SubResource("StandardMaterial3D_7yvmt")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@5540" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground" unique_id=1825144491]
+[node name="@Area3D@22722" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground" unique_id=2012087890]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -303,29 +303,29 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@5539" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground/@Area3D@5540" unique_id=153979810]
+[node name="@CollisionShape3D@22721" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_park_ground/@Area3D@22722" unique_id=1719488771]
 shape = SubResource("SphereShape3D_md1tr")
 
-[node name="CrossingTowerLift_Call_deck_concourse" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=2035198577]
+[node name="CrossingTowerLift_Call_deck_concourse" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=1278138659]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8563457, 6.5, -6.8563457)
 metadata/reach_target = true
 metadata/reach_link_id = "CrossingTowerLift"
 
-[node name="@MeshInstance3D@5541" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse" unique_id=1605512047]
+[node name="@MeshInstance3D@22723" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse" unique_id=1709577325]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_kmc4g")
 mesh = SubResource("ArrayMesh_ps0bq")
 surface_material_override/0 = SubResource("StandardMaterial3D_hoink")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@5542" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse" unique_id=91690474]
+[node name="@MeshInstance3D@22724" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse" unique_id=1347009147]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_7mses")
 mesh = SubResource("ArrayMesh_sq6j0")
 surface_material_override/0 = SubResource("StandardMaterial3D_pxqwt")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@5544" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse" unique_id=1837483149]
+[node name="@Area3D@22726" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse" unique_id=1691522892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -334,29 +334,29 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@5543" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse/@Area3D@5544" unique_id=354247495]
+[node name="@CollisionShape3D@22725" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_deck_concourse/@Area3D@22726" unique_id=281389886]
 shape = SubResource("SphereShape3D_tksew")
 
-[node name="CrossingTowerLift_Call_city_hall_level" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=867831936]
+[node name="CrossingTowerLift_Call_city_hall_level" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=1523401691]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8563457, 14.2, -6.8563457)
 metadata/reach_target = true
 metadata/reach_link_id = "CrossingTowerLift"
 
-[node name="@MeshInstance3D@5545" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level" unique_id=845387090]
+[node name="@MeshInstance3D@22727" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level" unique_id=533949989]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_yfmou")
 mesh = SubResource("ArrayMesh_2aiea")
 surface_material_override/0 = SubResource("StandardMaterial3D_cwlmv")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@5546" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level" unique_id=755036108]
+[node name="@MeshInstance3D@22728" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level" unique_id=1648985074]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_0yv8v")
 mesh = SubResource("ArrayMesh_lga2o")
 surface_material_override/0 = SubResource("StandardMaterial3D_v0wcg")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@5548" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level" unique_id=1344517565]
+[node name="@Area3D@22730" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level" unique_id=379568094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -365,29 +365,29 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@5547" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level/@Area3D@5548" unique_id=17493403]
+[node name="@CollisionShape3D@22729" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_city_hall_level/@Area3D@22730" unique_id=1696989886]
 shape = SubResource("SphereShape3D_k7mln")
 
-[node name="CrossingTowerLift_Call_meridian_platform" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=794989776]
+[node name="CrossingTowerLift_Call_meridian_platform" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=1524749609]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8563457, 37, -6.8563457)
 metadata/reach_target = true
 metadata/reach_link_id = "CrossingTowerLift"
 
-[node name="@MeshInstance3D@5549" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform" unique_id=915768354]
+[node name="@MeshInstance3D@22731" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform" unique_id=928359482]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_kevyc")
 mesh = SubResource("ArrayMesh_cw2jx")
 surface_material_override/0 = SubResource("StandardMaterial3D_rs5sa")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@5550" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform" unique_id=979704964]
+[node name="@MeshInstance3D@22732" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform" unique_id=1781892360]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_ttohr")
 mesh = SubResource("ArrayMesh_kj3ys")
 surface_material_override/0 = SubResource("StandardMaterial3D_fcbey")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@5552" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform" unique_id=796043998]
+[node name="@Area3D@22734" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform" unique_id=1514695662]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -396,29 +396,29 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@5551" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform/@Area3D@5552" unique_id=1637389925]
+[node name="@CollisionShape3D@22733" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_meridian_platform/@Area3D@22734" unique_id=1471243650]
 shape = SubResource("SphereShape3D_macy0")
 
-[node name="CrossingTowerLift_Call_clock_room" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=1370200074]
+[node name="CrossingTowerLift_Call_clock_room" type="Node3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls" unique_id=2117505614]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.8563457, 41.6, -6.8563457)
 metadata/reach_target = true
 metadata/reach_link_id = "CrossingTowerLift"
 
-[node name="@MeshInstance3D@5553" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room" unique_id=1083315875]
+[node name="@MeshInstance3D@22735" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room" unique_id=409469117]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_nqibb")
 mesh = SubResource("ArrayMesh_3hqi1")
 surface_material_override/0 = SubResource("StandardMaterial3D_67smr")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@5554" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room" unique_id=442063545]
+[node name="@MeshInstance3D@22736" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room" unique_id=1277908070]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_5xkpk")
 mesh = SubResource("ArrayMesh_be5lf")
 surface_material_override/0 = SubResource("StandardMaterial3D_c8rcp")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@5556" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room" unique_id=1313326822]
+[node name="@Area3D@22738" type="Area3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room" unique_id=941045453]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -427,65 +427,65 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@5555" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room/@Area3D@5556" unique_id=177538280]
+[node name="@CollisionShape3D@22737" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingTowerLiftCalls/CrossingTowerLift_Call_clock_room/@Area3D@22738" unique_id=1215978909]
 shape = SubResource("SphereShape3D_34x4w")
 
-[node name="CrossingLiftGuide" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=1574690071]
+[node name="CrossingLiftGuide" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=564741155]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5299997, 20.2, -6.5299997)
 
-[node name="@CollisionShape3D@5557" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingLiftGuide" unique_id=921421588]
+[node name="@CollisionShape3D@22739" type="CollisionShape3D" parent="CrossingTower_02_Part_03/CrossingLiftGuide" unique_id=1374365661]
 shape = SubResource("BoxShape3D_buej3")
 
-[node name="@MeshInstance3D@5558" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingLiftGuide" unique_id=1721731504]
+[node name="@MeshInstance3D@22740" type="MeshInstance3D" parent="CrossingTower_02_Part_03/CrossingLiftGuide" unique_id=1740233932]
 material_override = SubResource("StandardMaterial3D_u3gre")
 mesh = SubResource("BoxMesh_75ufx")
 
-[node name="@StaticBody3D@5561" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=1944708095]
+[node name="@StaticBody3D@22743" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=423513536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5299997, 20.2, -3.93)
 
-[node name="@CollisionShape3D@5559" type="CollisionShape3D" parent="CrossingTower_02_Part_03/@StaticBody3D@5561" unique_id=697309856]
+[node name="@CollisionShape3D@22741" type="CollisionShape3D" parent="CrossingTower_02_Part_03/@StaticBody3D@22743" unique_id=1487290516]
 shape = SubResource("BoxShape3D_8sk2l")
 
-[node name="@MeshInstance3D@5560" type="MeshInstance3D" parent="CrossingTower_02_Part_03/@StaticBody3D@5561" unique_id=398445870]
+[node name="@MeshInstance3D@22742" type="MeshInstance3D" parent="CrossingTower_02_Part_03/@StaticBody3D@22743" unique_id=284376516]
 material_override = SubResource("StandardMaterial3D_yghl5")
 mesh = SubResource("BoxMesh_pmjgx")
 
-[node name="@StaticBody3D@5564" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=1456049404]
+[node name="@StaticBody3D@22746" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=1777202989]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.93, 20.2, -6.5299997)
 
-[node name="@CollisionShape3D@5562" type="CollisionShape3D" parent="CrossingTower_02_Part_03/@StaticBody3D@5564" unique_id=350121546]
+[node name="@CollisionShape3D@22744" type="CollisionShape3D" parent="CrossingTower_02_Part_03/@StaticBody3D@22746" unique_id=820102922]
 shape = SubResource("BoxShape3D_vittg")
 
-[node name="@MeshInstance3D@5563" type="MeshInstance3D" parent="CrossingTower_02_Part_03/@StaticBody3D@5564" unique_id=682667403]
+[node name="@MeshInstance3D@22745" type="MeshInstance3D" parent="CrossingTower_02_Part_03/@StaticBody3D@22746" unique_id=1375860973]
 material_override = SubResource("StandardMaterial3D_mpw4w")
 mesh = SubResource("BoxMesh_tjw18")
 
-[node name="@StaticBody3D@5567" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=1828870768]
+[node name="@StaticBody3D@22749" type="StaticBody3D" parent="CrossingTower_02_Part_03" unique_id=1799990380]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.93, 20.2, -3.93)
 
-[node name="@CollisionShape3D@5565" type="CollisionShape3D" parent="CrossingTower_02_Part_03/@StaticBody3D@5567" unique_id=518960095]
+[node name="@CollisionShape3D@22747" type="CollisionShape3D" parent="CrossingTower_02_Part_03/@StaticBody3D@22749" unique_id=393862587]
 shape = SubResource("BoxShape3D_pgu4w")
 
-[node name="@MeshInstance3D@5566" type="MeshInstance3D" parent="CrossingTower_02_Part_03/@StaticBody3D@5567" unique_id=222440392]
+[node name="@MeshInstance3D@22748" type="MeshInstance3D" parent="CrossingTower_02_Part_03/@StaticBody3D@22749" unique_id=430599750]
 material_override = SubResource("StandardMaterial3D_23r82")
 mesh = SubResource("BoxMesh_nyrg6")
 
-[node name="CrossingLiftGlass" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=1576652262]
+[node name="CrossingLiftGlass" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=183451036]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.23, 20.2, -6.5299997)
 material_override = SubResource("StandardMaterial3D_hswxy")
 mesh = SubResource("BoxMesh_s6xpl")
 
-[node name="@MeshInstance3D@5568" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=1640563370]
+[node name="@MeshInstance3D@22750" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=1614086140]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.23, 20.2, -3.93)
 material_override = SubResource("StandardMaterial3D_hswxy")
 mesh = SubResource("BoxMesh_ddxgc")
 
-[node name="@MeshInstance3D@5569" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=1669648213]
+[node name="@MeshInstance3D@22751" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=539907113]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5299997, 20.2, -5.23)
 material_override = SubResource("StandardMaterial3D_hswxy")
 mesh = SubResource("BoxMesh_2un7c")
 
-[node name="@MeshInstance3D@5570" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=1933592077]
+[node name="@MeshInstance3D@22752" type="MeshInstance3D" parent="CrossingTower_02_Part_03" unique_id=1061471447]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.93, 20.2, -5.23)
 material_override = SubResource("StandardMaterial3D_hswxy")
 mesh = SubResource("BoxMesh_pxnqn")

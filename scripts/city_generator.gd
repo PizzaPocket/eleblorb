@@ -507,15 +507,17 @@ func _add_moy_actors() -> void:
 func _add_moy_helmsmith() -> void:
 	var packed := load(NPC_SCENE) as PackedScene
 	if packed == null: return
-	# Preserve the existing vendor, with its original authored SuperEgg shop
-	# frontage, on tested open Civic Plaza ground.
-	var shop := StaticBody3D.new(); shop.name="MoyHelmsmithShop"; shop.position=Vector3(-470,_ground(Vector2(-470,-18)),-18); add_child(shop)
-	_build_helmsmith_storefront(shop,{"width":2,"depth":2,"light_seed":0})
+	# Building 38 on Lamp Lane keeps the original walk-in room, display and
+	# catalogue models; only its location and the proprietor's line change.
+	var shop := StaticBody3D.new(); shop.name="MoyHelmsmithShop"; shop.position=Vector3(-595,_ground(Vector2(-595,180)),180); add_child(shop)
+	_build_helmsmith_storefront(shop,{"width":2,"depth":2,"width_m":10.0,"depth_m":12.0,"light_seed":0})
+	var entrance_target := Node3D.new(); entrance_target.name = "Helmsmith_Lamp_Lane_Entrance"
+	entrance_target.position = Vector3(0, 0.1, -6.25); entrance_target.set_meta("reach_target", true); shop.add_child(entrance_target)
 	var vendor=packed.instantiate(); vendor.set_terrain_reference(terrain); vendor.stationary=true; vendor.is_vendor=true
 	vendor.display_name="Helmsmith"; vendor.shop_category="city"
-	var vendor_lines: Array[String]=["A good helm does not ask who is inside it. This one will fit a blorb just fine.","A core takes one head-shape at a time. Choose a sealed diver's hood or a knight's steel."]
+	var vendor_lines: Array[String]=["A good helm does not ask who is inside it. This one will fit a blorb just fine.","The old bronze one came in with sand still in its hinges."]
 	vendor.vendor_lines=vendor_lines; vendor.skin_color=Color(0.38,0.24,0.16); vendor.shirt_color=Color(0.23,0.25,0.29); vendor.pants_color=Color(0.12,0.14,0.17); vendor.hair_color=Color(0.12,0.1,0.08); vendor.hair_style=FigureHair.STYLE_FLAT_TOP
-	vendor.position=Vector3(0,0,1.8); vendor.facing_degrees=180.0; vendor.add_to_group("city_npcs"); shop.add_child(vendor)
+	vendor.position=Vector3(0,0,5.2); vendor.facing_degrees=180.0; vendor.add_to_group("city_npcs"); shop.add_child(vendor)
 	_moy_shop_added = true
 	_moy_activation_frame_pending = true
 
@@ -858,8 +860,8 @@ func _build_helmsmith_storefront(tower: StaticBody3D, spec: Dictionary) -> void:
 	var shop := Node3D.new()
 	shop.name = "HelmsmithStorefront"
 	tower.add_child(shop)
-	var width := float(int(spec["width"])) * TownProps.CELL_SIZE
-	var depth := float(int(spec["depth"])) * TownProps.CELL_SIZE
+	var width := float(spec.get("width_m", float(int(spec["width"])) * TownProps.CELL_SIZE))
+	var depth := float(spec.get("depth_m", float(int(spec["depth"])) * TownProps.CELL_SIZE))
 	var half_width := width * 0.5
 	var half_depth := depth * 0.5
 	var teal := Color(0.08, 0.46, 0.52)

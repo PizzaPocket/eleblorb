@@ -28,7 +28,7 @@ func _render_set() -> void:
 	var date := String(args.get("date", Time.get_date_string_from_system()))
 	var views := _package_views(package)
 	var root := (load("res://scenes/main.tscn") as PackedScene).instantiate() as Node3D
-	if package == "P2":
+	if package in ["P2", "P3", "P4"]:
 		var city_before_ready := root.get_node_or_null("WesternCity")
 		if city_before_ready != null:
 			city_before_ready.set_meta("moy_force_all_packs", true)
@@ -45,14 +45,14 @@ func _render_set() -> void:
 	while city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec() < deadline:
 		await get_tree().create_timer(0.25).timeout
 	await get_tree().physics_frame
-	if package != "P2":
+	if package not in ["P2", "P3", "P4"]:
 		var reach_helper := _prepare_reach_helper(root, player)
 		_add_flight_views(views, city, reach_helper)
 	var camera := Camera3D.new()
 	camera.current = true
 	camera.fov = 70.0 if package == "P2" else 52.0
 	camera.near = 0.05
-	camera.far = 1800.0 if package == "P2" else camera.far
+	camera.far = 1800.0 if package in ["P2", "P3"] else camera.far
 	root.add_child(camera)
 	get_viewport().size = Vector2i(1280, 720)
 	var out_dir := "res://docs/diagnostics/images/%s-%s" % [date, package]
@@ -97,8 +97,8 @@ func _render_set() -> void:
 func _package_views(package:String)->Dictionary:
 	if package == "P2": return P2_BENCHMARK_VIEWS.duplicate(true)
 	var available := _read_places()
-	var selected:Dictionary = STANDARD_VIEWS.duplicate(true)
-	for standard_id in ["overview"]:
+	var selected:Dictionary = {} if package in ["P3", "P4"] else STANDARD_VIEWS.duplicate(true)
+	for standard_id in ([] if package in ["P3", "P4"] else ["overview"]):
 		if available.has(standard_id): selected[standard_id] = available[standard_id]
 	var brief_package := "P0" if package == "P0.1" else package
 	var brief_path := "res://docs/architecture/moy_pkg_%s.md" % brief_package

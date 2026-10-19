@@ -40,11 +40,23 @@ func _ready() -> void:
 	for building in PLAN.BUILDINGS:
 		# Hotel and playground are composites, not generic numbered bodies.
 		if building.rect == null or int(building.n) in [1, 11]: continue
+		# P3 replaces these two generic landmark masses with its authored market
+		# terrace and live walk-in shop; validate their package-specific owners.
+		if int(building.n) == 34:
+			if not city.find_child("Market_Flats_Terrace_34", true, false) is StaticBody3D:
+				_fail("P3 market flats terrace collision body missing")
+			continue
+		if int(building.n) == 38:
+			if not city.find_child("MoyHelmsmithShop", true, false) is StaticBody3D:
+				_fail("P3 Helmsmith walk-in shop collision body missing")
+			continue
 		var label := "Building_%02d_%s" % [int(building.n), String(building.name).replace(" ", "_")]
 		if not building_bodies.has(label): _fail("numbered building collision body missing: %s" % label)
 	if old_house_count < 60: _fail("old house bodies missing: %d" % old_house_count)
 	if lot_count < 133: _fail("lot bodies missing: %d" % lot_count)
 	_test_pass3_counts(city)
+	_test_market_kit_geometry(city)
+	_test_p4_kit_geometry(city)
 	_test_escalator_geometry(city)
 	_test_pass4_geometry(city)
 	_test_recorded_positions(city)
@@ -461,6 +473,58 @@ func _test_pass3_counts(city: Node) -> void:
 	print("MOY_REMOVED_GEOMETRY tunnels=0 gate_flyovers=0 wind_trees=0")
 
 
+func _test_market_kit_geometry(city: Node) -> void:
+	var market_houses := 0
+	var houses_with_collision := 0
+	var stack: Array[Node] = [city]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		if node is StaticBody3D and String(node.name).begins_with("MarketHouse_"):
+			market_houses += 1
+			if not node.find_children("*", "CollisionShape3D", true, false).is_empty():
+				houses_with_collision += 1
+		for child in node.get_children(): stack.append(child)
+	if market_houses != 80: _fail("P3 market house bodies expected 80, found %d" % market_houses)
+	if houses_with_collision != market_houses: _fail("P3 market house collision missing on %d/%d bodies" % [market_houses - houses_with_collision, market_houses])
+	var arcade := city.find_child("Market_Arcade_Street_Roof", true, false) as StaticBody3D
+	if arcade == null or not CollisionPolicy.validate_body(arcade): _fail("P3 Arcade roof visual/collision policy mismatch")
+	var helmsmith := city.find_child("MoyHelmsmithShop", true, false) as StaticBody3D
+	if helmsmith != null and helmsmith.find_children("*", "CollisionShape3D", true, false).is_empty():
+		_fail("P3 Helmsmith shop has no collision geometry")
+	print("MOY_P3_KIT market_houses=", market_houses, " collision_bodies=", houses_with_collision,
+		" arcade_policy=", "PASS" if arcade != null and CollisionPolicy.validate_body(arcade) else "FAIL",
+		" helmsmith_loaded=", helmsmith != null)
+
+
+func _test_p4_kit_geometry(city: Node) -> void:
+	var houses := 0
+	var towers := 0
+	var collidable := 0
+	var ramps := 0
+	var courts := 0
+	var pockets := 0
+	var stack: Array[Node] = [city]
+	while not stack.is_empty():
+		var node: Node = stack.pop_back()
+		if node is StaticBody3D and bool(node.get_meta("moy_p4_house", false)):
+			houses += 1
+			if not node.find_children("*", "CollisionShape3D", true, false).is_empty(): collidable += 1
+			if bool(node.get_meta("moy_p4_tower_house", false)): towers += 1
+		if node is StaticBody3D and String(node.name).begins_with("OldMoyRoofRamp_"): ramps += 1
+		if node is StaticBody3D and String(node.name).begins_with("OldMoyCourt_"): courts += 1
+		if node is StaticBody3D and String(node.name).begins_with("OldMoyPocket_"): pockets += 1
+		for child in node.get_children(): stack.append(child)
+	if houses != 99: _fail("P4 scheduled house owners expected 99, found %d" % houses)
+	if collidable != houses: _fail("P4 tower-house collision missing on %d/%d owners" % [houses - collidable, houses])
+	if towers != 89: _fail("P4 tower-house owners expected 89, found %d" % towers)
+	if ramps != 15: _fail("P4 roof ramps expected 15, found %d" % ramps)
+	if courts != 8: _fail("P4 courtyard floors expected 8, found %d" % courts)
+	if pockets != 27: _fail("P4 open pocket floors expected 27, found %d" % pockets)
+	print("MOY_P4_KIT scheduled_house_owners=", houses, " tower_house_owners=", towers, " collision_bodies=", collidable,
+		" roof_links=", ramps, " courts=", courts, " open_pockets=", pockets,
+		" first_well=", city.find_child("CinemaSquareFirstWell", true, false) != null)
+
+
 func _sum_prefix(counts: Dictionary, prefix: String) -> int:
 	var total:=0
 	for key in counts:
@@ -865,7 +929,7 @@ func _test_train_clearance(train: Node3D) -> void:
 				var collider: Object=hit.get("collider")
 				if collider==null: continue
 				var name:=String(collider.get("name"))
-				if name.begins_with("Building_") or name.begins_with("OldHouse_") or name.begins_with("Lot_") or name.begins_with("WestGate") or name.begins_with("MeridianArch") or name.begins_with("SpineGate") or name.begins_with("NorthSouthGate") or name.begins_with("WallLine_Station_"):
+				if name.begins_with("Building_") or name.begins_with("OldHouse_") or name.begins_with("Lot_") or name.begins_with("MarketHouse_") or name.begins_with("Market_Arcade") or name.begins_with("WestGate") or name.begins_with("MeridianArch") or name.begins_with("SpineGate") or name.begins_with("NorthSouthGate") or name.begins_with("WallLine_Station_"):
 					_fail("scheduled train clearance intersects %s on %s at %s"%[name,train.get("service_name"),pose.origin])
 					return
 			sample_count+=1
@@ -875,7 +939,7 @@ func _test_train_clearance(train: Node3D) -> void:
 func _count_coverage(node: Node, found: Dictionary) -> void:
 	var label := String(node.name)
 	if label.begins_with("OldHouse_"): old_house_count += 1
-	if label.begins_with("Lot_"): lot_count += 1
+	if label.begins_with("Lot_") or label.begins_with("MarketHouse_"): lot_count += 1
 	if node is StaticBody3D:
 		if label.begins_with("Building_") and label not in ["Building_1_GrandHotel"]:
 			var rid := (node as StaticBody3D).get_rid()

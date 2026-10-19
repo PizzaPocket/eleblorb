@@ -39,18 +39,50 @@ static func build_packs() -> Dictionary:
 	for i in PLAN.LOTS.size():
 		var lot: Array = PLAN.LOTS[i]
 		var r: Rect2 = lot[0]
+		var kit: Dictionary = PLAN.LOT_KITS[i] if i < PLAN.LOT_KITS.size() and PLAN.LOT_KITS[i] is Dictionary else {}
+		if String(kit.get("kit", "")) in ["tong_lau", "lockup", "infill"]:
+			var market_body := _market_house(i, r, kit)
+			if String(kit.get("kit", "")) == "infill":
+				market_body.name = "Lot_%03d" % i
+				market_body.set_meta("moy_p4_house", true)
+			_add(packs, _cell(r.get_center()), market_body)
+			continue
+		if String(kit.get("kit", "")) == "tower": continue # Authored below by the P4 tower-house kit.
 		var h := float(lot[1]) * float(PLAN.STOREY[lot[2]])
 		var color := _lot_color(i, String(lot[2]))
 		var body := _box_body("Lot_%03d" % i, Vector3(r.size.x, h, r.size.y), Vector3(r.get_center().x, DATUM + h * 0.5, r.get_center().y), color)
 		_add_roof(body, r.size, h, color.lightened(0.15))
 		_add(packs, _cell(r.get_center()), body)
+	_add_market_streets(packs)
 	for i in PLAN.OLD_HOUSES.size():
 		var house: Dictionary = PLAN.OLD_HOUSES[i]
-		var h := float(house.storeys) * 3.25
-		var body := _polygon_building("OldHouse_%02d" % i, house.corners, h, _old_house_color(i))
+		var body := _old_moy_house("OldHouse_%02d" % i, house.corners, house.storeys, house.kit, int(house.get("front_edge", -1)), i)
 		_add(packs, _cell(_polygon_center(house.corners)), body)
+	for i in PLAN.LOTS.size():
+		var lot: Array = PLAN.LOTS[i]
+		var kit: Dictionary = PLAN.LOT_KITS[i] if i < PLAN.LOT_KITS.size() and PLAN.LOT_KITS[i] is Dictionary else {}
+		if String(kit.get("kit", "")) == "tower":
+			var rect: Rect2 = lot[0]
+			var corners := [[rect.position.x, rect.position.y], [rect.end.x, rect.position.y], [rect.end.x, rect.end.y], [rect.position.x, rect.end.y]]
+			var body := _old_moy_house("Lot_%03d" % i, corners, int(kit.get("storeys", lot[1])), kit, _front_edge_for_rect(String(kit.get("front", "s"))), 60 + i)
+			_add(packs, _cell(rect.get_center()), body)
+	_add_old_moy_shared_spaces(packs)
 	for b in PLAN.BUILDINGS:
-		if b.rect == null or int(b.n) == 11:
+		if b.rect == null or int(b.n) in [11, 38]:
+			continue
+		if int(b.n) == 34:
+			var flat_kit: Dictionary = PLAN.BUILDING_KITS.get(34, {}).duplicate(true)
+			var flats := _market_house(34, b.rect, flat_kit)
+			flats.name = "Market_Flats_Terrace_34"
+			_add(packs, _cell(b.rect.get_center()), flats)
+			continue
+		var tower_kit: Dictionary = PLAN.BUILDING_KITS.get(int(b.n), {})
+		if not tower_kit.is_empty() and String(tower_kit.get("kit", "")) == "tower":
+			var r: Rect2 = b.rect
+			var corners := [[r.position.x, r.position.y], [r.end.x, r.position.y], [r.end.x, r.end.y], [r.position.x, r.end.y]]
+			var tower_label := "Building_%02d_%s" % [int(b.n), String(b.name).replace(" ", "_")]
+			var tower := _old_moy_house(tower_label, corners, int(tower_kit.get("storeys", 6)), tower_kit, _front_edge_for_rect(String(tower_kit.get("front", "s"))), 90 + int(b.n))
+			_add(packs, _cell(r.get_center()), tower)
 			continue
 		if int(b.n) == 13:
 			var block := _block_tower_exterior()
@@ -201,6 +233,248 @@ static func _block_tower_exterior() -> StaticBody3D:
 		var balcony := _box_body("BLOCK_Approach_Balcony_%02d" % level, Vector3(2.0, 0.28, 3.4), Vector3(nx0 - 0.85, y, nz), Color("#353944"))
 		root.add_child(balcony)
 	return root
+
+
+## P3 street kit. The plan owns each footprint, orientation and variant; these
+## reusable builders only turn those records into shared, baked geometry.
+static func _market_house(index: int, rect: Rect2, kit: Dictionary) -> StaticBody3D:
+	var root := StaticBody3D.new()
+	root.name = "MarketHouse_%03d" % index
+	root.set_meta("market_lot", index)
+	root.position = Vector3(rect.get_center().x, DATUM, rect.get_center().y)
+	var front := String(kit.get("front", "s"))
+	var along_x := front in ["n", "s"]
+	var width := rect.size.x if along_x else rect.size.y
+	var depth := rect.size.y if along_x else rect.size.x
+	var storeys := int(kit.get("storeys", 2))
+	var lockup := String(kit.get("kit", "")) == "lockup"
+	var cfg: Dictionary = PLAN.MARKET_HOUSE
+	var height := float(storeys) * float(cfg.storey)
+	var palette := [Color("#438d83"), Color("#b9955c"), Color("#b66e62"), Color("#7898ad"), Color("#d2c4a7")]
+	var colour: Color = palette[int(kit.get("colour", 0)) % palette.size()]
+	# The continuous shell is the blocking house volume. The door leaf remains
+	# closed at the plan's threshold; the facade layers use the same palette.
+	var passage_lot := index == 34 or index == 71
+	if passage_lot:
+		root.set_meta("ways_out", true)
+		var opening := float(cfg.passage.w)
+		var side_span := maxf(0.0, width - opening) * 0.5
+		if along_x:
+			for side in [-1.0, 1.0]:
+				_add_building_box_part(root, Vector3(side_span, float(cfg.storey), rect.size.y), Vector3(side * (opening * 0.5 + side_span * 0.5), float(cfg.storey) * 0.5, 0), colour)
+			_add_building_box_part(root, Vector3(opening, float(cfg.storey) - float(cfg.passage.h), rect.size.y), Vector3(0, (float(cfg.storey) + float(cfg.passage.h)) * 0.5, 0), colour)
+		else:
+			for side in [-1.0, 1.0]:
+				_add_building_box_part(root, Vector3(rect.size.x, float(cfg.storey), side_span), Vector3(0, float(cfg.storey) * 0.5, side * (opening * 0.5 + side_span * 0.5)), colour)
+			_add_building_box_part(root, Vector3(rect.size.x, float(cfg.storey) - float(cfg.passage.h), opening), Vector3(0, (float(cfg.storey) + float(cfg.passage.h)) * 0.5, 0), colour)
+		_add_building_box_part(root, Vector3(rect.size.x, height - float(cfg.storey), rect.size.y), Vector3(0, height * 0.5 + float(cfg.storey) * 0.5, 0), colour)
+	else:
+		_add_building_box_part(root, Vector3(rect.size.x, height, rect.size.y), Vector3(0, height * 0.5, 0), colour)
+	_add_building_box_part(root, Vector3(rect.size.x + 0.12, 0.6, rect.size.y + 0.12), Vector3(0, 0.3, 0), Color("#77766f"))
+	var outward := Vector3(0, 0, 1) if front == "s" else (Vector3(0, 0, -1) if front == "n" else (Vector3(1, 0, 0) if front == "e" else Vector3(-1, 0, 0)))
+	var tangent := Vector3.RIGHT if along_x else Vector3.FORWARD
+	var facade_depth := depth * 0.5 + 0.045
+	var ground_y := 0.0
+	if lockup:
+		_add_building_box_part(root, _market_face_size(width * 0.98, 2.8, 0.07, along_x), outward * facade_depth + Vector3.UP * 1.4, Color("#555a5d"))
+		for slat_y in range(12):
+			var y := 0.2 + float(slat_y) * 0.22
+			_add_market_visual_box(root, _market_face_size(width * 0.96, 0.035, 0.035, along_x), outward * (facade_depth + 0.05) + Vector3.UP * y, Color("#85898a"))
+		_add_building_box_part(root, _market_face_size(width * 0.28, 0.8, 0.06, along_x), outward * facade_depth + Vector3.UP * 3.25, Color("#29343a"))
+		_add_market_visual_box(root, _market_face_size(width * 0.31, 0.06, 0.05, along_x), outward * (facade_depth + 0.05) + Vector3.UP * 3.25, Color("#d2c4a7"))
+	else:
+		var floor_count := storeys
+		for floor_i in range(1, floor_count):
+			var y := float(floor_i) * float(cfg.storey)
+			var is_veranda := bool(kit.get("veranda", false)) and String(kit.get("gen", "")) == "boom"
+			var tile := String(kit.get("gen", "")) == "tile"
+			var projection := float(cfg.boom.veranda.out) if is_veranda else (float(cfg.tile.balcony.d) if tile else float(cfg.boom.balcony.d))
+			var first_tile_floor := tile and floor_i == 1
+			if first_tile_floor:
+				projection = float(cfg.tile.canopy.d)
+				_add_building_box_part(root, _market_face_size(width * 0.96, float(cfg.tile.canopy.t), projection, along_x), outward * (depth * 0.5 + projection * 0.5) + Vector3.UP * float(cfg.tile.canopy.y), Color("#b9ad98"))
+			elif floor_i >= (int(cfg.tile.balcony.first) if tile else 1):
+				_add_building_box_part(root, _market_face_size(width * 0.91, 0.18, projection, along_x), outward * (depth * 0.5 + projection * 0.5) + Vector3.UP * (y + 0.08), Color("#b9ad98"))
+			if is_veranda:
+				for side in [-1.0, 1.0]:
+					_add_building_box_part(root, _market_face_size(0.5, float(cfg.storey), 0.5, along_x), tangent * side * width * 0.44 + outward * (depth * 0.5 + projection - 0.25) + Vector3.UP * (y + float(cfg.storey) * 0.5), colour.lightened(0.2))
+			if is_veranda:
+				var rail_y := y + float(cfg.boom.veranda.rail)
+				_add_building_box_part(root, _market_face_size(width * 0.84, 0.08, 0.08, along_x), outward * (depth * 0.5 + projection - 0.08) + Vector3.UP * rail_y, Color("#6f4f37"))
+				for baluster_index in range(1, 10):
+					var bx := -width * 0.4 + width * 0.8 * float(baluster_index) / 10.0
+					_add_building_box_part(root, _market_face_size(0.06, maxf(0.1, rail_y - y - 0.18), 0.06, along_x), tangent * bx + outward * (depth * 0.5 + projection - 0.08) + Vector3.UP * (y + (rail_y - y) * 0.5), Color("#76573f"))
+			elif floor_i >= (int(cfg.tile.balcony.first) if tile else 1):
+				var rail_y := y + float(cfg.tile.balcony.rail if tile else cfg.boom.balcony.rail)
+				_add_building_box_part(root, _market_face_size(width * 0.86, 0.06, 0.06, along_x), outward * (depth * 0.5 + projection - 0.04) + Vector3.UP * rail_y, Color("#39464b"))
+				for rail_index in range(1, 7):
+					var bx := -width * 0.4 + width * 0.8 * float(rail_index) / 7.0
+					_add_building_box_part(root, _market_face_size(0.04, maxf(0.1, rail_y - y - 0.18), 0.04, along_x), tangent * bx + outward * (depth * 0.5 + projection - 0.04) + Vector3.UP * (y + (rail_y - y) * 0.5), Color("#39464b"))
+			var window_y := y + (float(cfg.tile.window.sill) + float(cfg.tile.window.h) * 0.5 if tile else 1.32)
+			var window_w := float(cfg.tile.window.w) if tile else float(cfg.boom.window.w)
+			var window_h := float(cfg.tile.window.h) if tile else float(cfg.boom.window.h)
+			_add_building_box_part(root, _market_face_size(window_w, window_h, 0.08, along_x), outward * facade_depth + Vector3.UP * window_y, Color("#31434a"))
+			var window_trim := Color("#ddd1ba") if tile else Color("#e5d8bf")
+			var frame_front := outward * (facade_depth + 0.045)
+			for side in [-1.0, 1.0]:
+				_add_market_visual_box(root, _market_face_size(0.07, window_h + 0.12, 0.05, along_x), tangent * side * (window_w * 0.5 + 0.035) + frame_front + Vector3.UP * window_y, window_trim)
+			_add_market_visual_box(root, _market_face_size(window_w + 0.12, 0.07, 0.05, along_x), frame_front + Vector3.UP * (window_y - window_h * 0.5 - 0.035), window_trim)
+			_add_market_visual_box(root, _market_face_size(window_w + 0.12, 0.07, 0.05, along_x), frame_front + Vector3.UP * (window_y + window_h * 0.5 + 0.035), window_trim)
+			if not tile:
+				for side in [-1.0, 1.0]:
+					_add_building_box_part(root, _market_face_size(float(cfg.boom.shutter), 2.65, 0.05, along_x), tangent * side * (window_w * 0.5 + float(cfg.boom.shutter) * 0.5) + outward * (facade_depth + 0.03) + Vector3.UP * window_y, Color("#72583f"))
+		# Shopfront canopy, picture sign frames and a simple closed street door.
+		if String(kit.get("gen", "")) == "tile":
+			_add_building_box_part(root, _market_face_size(width * 0.94, 0.2, float(cfg.tile.canopy.d), along_x), outward * (depth * 0.5 + float(cfg.tile.canopy.d) * 0.5) + Vector3.UP * float(cfg.tile.canopy.y), Color("#b9ad98"))
+		else:
+			_add_building_box_part(root, _market_face_size(width * 0.7, 2.1, 0.08, along_x), outward * facade_depth + Vector3.UP * 1.4, Color("#343e40"))
+		var door_data: Variant = kit.get("door")
+		if door_data is Array and door_data.size() >= 2:
+			var door_pos := Vector2(float(door_data[0]), float(door_data[1])) - rect.get_center()
+			var local := Vector3(door_pos.x, 1.2, door_pos.y)
+			_add_building_box_part(root, _market_face_size(1.16, 2.35, 0.09, along_x), local + outward * (depth * 0.5 + 0.06), Color("#45372e"))
+			var door_face := local + outward * (depth * 0.5 + 0.12)
+			for side in [-1.0, 1.0]:
+				_add_market_visual_box(root, _market_face_size(0.12, 2.55, 0.06, along_x), door_face + tangent * side * 0.66 + Vector3.UP * 0.05, Color("#77756d"))
+			_add_market_visual_box(root, _market_face_size(1.42, 0.12, 0.06, along_x), door_face + Vector3.UP * 1.32, Color("#77756d"))
+			_add_market_visual_box(root, _market_face_size(1.2, 0.4, 0.05, along_x), door_face + Vector3.UP * 2.62, Color(0.67, 0.82, 0.84, 0.72))
+			_add_market_visual_box(root, _market_face_size(1.25, 0.04, 0.06, along_x), door_face + Vector3.UP * 2.43, Color("#77756d"))
+			var target := Node3D.new(); target.name = "MarketDoor_%03d" % index
+			target.position = Vector3(door_pos.x, 0.1, door_pos.y) + outward * (depth * 0.5 + 0.35)
+			target.set_meta("reach_target", true); root.add_child(target)
+			# A shallow, glazed picture window and trade shelves dress the
+			# shopfront on the span left beside the closed house door.
+			var door_tangent := door_pos.x if along_x else -door_pos.y
+			for shop_side in [-1.0, 1.0]:
+				var shop_start := -width * 0.5 if shop_side < 0.0 else door_tangent + 0.6
+				var shop_end := door_tangent - 0.6 if shop_side < 0.0 else width * 0.5
+				var shop_span := shop_end - shop_start
+				if shop_span <= 0.7: continue
+				var shop_center := (shop_start + shop_end) * 0.5
+				var glass_center := tangent * shop_center + outward * (depth * 0.5 + 0.1)
+				_add_market_visual_box(root, _market_face_size(shop_span, 1.9, 0.06, along_x), glass_center + Vector3.UP * 1.55, Color(0.24, 0.46, 0.49, 0.72))
+				_add_market_visual_box(root, _market_face_size(shop_span, 0.24, 0.14, along_x), glass_center + Vector3.UP * 0.37, Color("#467b77"))
+				var shelf_z := depth * 0.5 - minf(float(cfg.shop.depth), depth * 0.45)
+				_add_market_visual_box(root, _market_face_size(shop_span * 0.82, 0.08, 0.24, along_x), tangent * shop_center + Vector3(0, 1.1, 0) + outward * shelf_z, Color("#624a36"))
+				for goods_i in range(3):
+					var gx := shop_center - shop_span * 0.28 + float(goods_i) * shop_span * 0.28
+					_add_market_egg(root, _market_face_size(0.16, 0.2, 0.14, along_x), tangent * gx + outward * shelf_z + Vector3.UP * 1.34, [Color("#d5a055"), Color("#bf6459"), Color("#729a87")][goods_i])
+		for sign_i in int(kit.get("signs", 0)):
+			var sign_y := float(cfg.sign.y) + float(sign_i) * (float(cfg.sign.h) + float(cfg.sign.gap))
+			var sign_center := outward * (depth * 0.5 + 0.12) + Vector3.UP * sign_y
+			_add_building_box_part(root, _market_face_size(0.9, 0.7, 0.12, along_x), sign_center, Color("#d29b55"))
+			_add_market_egg(root, _market_face_size(0.32, 0.25, 0.035, along_x), sign_center + outward * 0.08, [Color("#c95c54"), Color("#478c86"), Color("#d7c166")][sign_i % 3])
+		if bool(kit.get("blade", false)):
+			_add_building_box_part(root, Vector3(0.06, 0.06, float(cfg.sign.out)), outward * (depth * 0.5 + float(cfg.sign.out) * 0.5) + Vector3.UP * (float(cfg.sign.y) + 0.8), Color("#596970"))
+			_add_building_box_part(root, _market_face_size(0.12, 1.1, 0.6, along_x), outward * (depth * 0.5 + float(cfg.sign.out)) + Vector3.UP * (float(cfg.sign.y) + 0.25), Color("#d29b55"))
+	# Flat roof and parapet cap, with the plan-selected roof cue.
+	_add_building_box_part(root, Vector3(rect.size.x + 0.15, 0.2, rect.size.y + 0.15), Vector3(0, height + 0.1, 0), Color("#8c8272"))
+	_add_building_box_part(root, Vector3(rect.size.x, 1.0, 0.2), Vector3(0, height + 0.55, -rect.size.y * 0.5 + 0.1), colour.darkened(0.1))
+	var roof_kind := String(kit.get("roof", "tanks"))
+	if roof_kind == "tanks":
+		for tank_x in [-width * 0.24, width * 0.24]:
+			_add_building_box_part(root, Vector3(1.0, 2.1, 1.0), Vector3(tank_x, height + 1.25, 0), Color("#59676a"))
+	elif roof_kind == "garden":
+		_add_building_box_part(root, Vector3(width * 0.5, 0.5, depth * 0.42), Vector3(0, height + 0.35, 0), Color("#76644e"))
+		for plant_x in [-width * 0.18, 0.0, width * 0.18]:
+			_add_building_box_part(root, Vector3(0.45, 1.1, 0.45), Vector3(plant_x, height + 1.15, 0), Color("#658161"))
+	elif roof_kind == "laundry":
+		for side in [-1.0, 1.0]:
+			_add_building_box_part(root, Vector3(0.06, 2.2, 0.06), Vector3(side * width * 0.26, height + 1.2, 0), Color("#66594c"))
+		_add_building_box_part(root, Vector3(width * 0.52, 0.035, 0.035), Vector3(0, height + 2.1, 0), Color("#66594c"))
+	StaticMerge.merge(root)
+	return root
+
+
+static func _market_face_size(span: float, vertical: float, depth: float, along_x: bool) -> Vector3:
+	return Vector3(span, vertical, depth) if along_x else Vector3(depth, vertical, span)
+
+
+static func _add_market_visual_box(root: Node3D, size: Vector3, center: Vector3, color: Color) -> MeshInstance3D:
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	var visual := MeshInstance3D.new()
+	visual.mesh = mesh
+	visual.position = center
+	visual.material_override = _material(color)
+	CollisionPolicy.mark_decorative(visual)
+	root.add_child(visual)
+	return visual
+
+
+static func _add_market_egg(root: Node3D, half: Vector3, center: Vector3, color: Color) -> MeshInstance3D:
+	var visual := SuperEgg.build_part(half, color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	visual.position = center
+	CollisionPolicy.mark_decorative(visual)
+	root.add_child(visual)
+	return visual
+
+
+static func _add_market_streets(packs: Dictionary) -> void:
+	var cfg: Dictionary = PLAN.MARKET_HOUSE
+	var arcade: Dictionary = PLAN.ARCADE_ROOF
+	var roof := StaticBody3D.new(); roof.name = "Market_Arcade_Street_Roof"
+	var x_mid := (float(arcade.x[0]) + float(arcade.x[1])) * 0.5
+	var span_x := float(arcade.x[1]) - float(arcade.x[0])
+	var z0 := float(arcade.z[0]); var z1 := float(arcade.z[1]); var roof_h := float(arcade.h)
+	for z in arcade.arches:
+		# These are still straight cross-ribs (the scheduled arched profile is a
+		# known visual departure), but each has an explicit parkour collider.
+		_add_market_roof_box(roof, Vector3(span_x, 0.3, 0.3), Vector3(x_mid, DATUM + roof_h, float(z)), Color("#596970"), CollisionPolicy.PARKOUR)
+		for edge_x in [float(arcade.x[0]) + 0.15, float(arcade.x[1]) - 0.15]:
+			_add_market_roof_box(roof, Vector3(0.3, roof_h, 0.25), Vector3(edge_x, DATUM + roof_h * 0.5, float(z)), Color("#596970"), CollisionPolicy.SOLID)
+	# The translucent infill is a solid roof surface. Its box collider follows
+	# the rendered panel's footprint so loading cannot expose a visual/collision
+	# mismatch along the street.
+	_add_market_roof_box(roof, Vector3(span_x, 0.06, z1 - z0), Vector3(x_mid, DATUM + roof_h + 0.2, (z0 + z1) * 0.5), Color(0.54, 0.72, 0.73, 0.58), CollisionPolicy.SOLID)
+	StaticMerge.merge(roof)
+	_add(packs, _cell(Vector2(x_mid, (z0 + z1) * 0.5)), roof)
+	var lane: Dictionary = PLAN.LAMP_LANE
+	for i in lane.lanterns.size():
+		var x := float(lane.lanterns[i]); var body := Node3D.new(); body.name = "LampLane_Lantern_%02d" % i
+		body.position = Vector3(x, DATUM + float(lane.lantern_y), (float(lane.z[0]) + float(lane.z[1])) * 0.5)
+		var lantern_mesh := BoxMesh.new(); lantern_mesh.size = Vector3(0.3, 0.4, 0.3)
+		var lantern := MeshInstance3D.new(); lantern.mesh = lantern_mesh
+		var glow := _material(Color("#ffcb71")); glow.emission_enabled = true; glow.emission = Color("#ff9d40"); glow.emission_energy_multiplier = 1.1
+		lantern.material_override = glow; body.add_child(lantern)
+		_add(packs, _cell(Vector2(x, float(lane.z[0]) + 2.0)), body)
+		if i < lane.lanterns.size() - 1 and float(lane.lanterns[i + 1]) - x <= float(cfg.lamp.lantern_every) * 1.5:
+			var next_x := float(lane.lanterns[i + 1]); var string := Node3D.new(); string.name = "LampLane_String_%02d" % i
+			string.position = Vector3((x + next_x) * 0.5, DATUM + float(lane.lantern_y) + 0.1, (float(lane.z[0]) + float(lane.z[1])) * 0.5)
+			var cord_mesh := BoxMesh.new(); cord_mesh.size = Vector3(next_x - x, 0.025, 0.025)
+			var cord := MeshInstance3D.new(); cord.mesh = cord_mesh; cord.material_override = _material(Color("#403a34")); string.add_child(cord)
+			_add(packs, _cell(Vector2((x + next_x) * 0.5, float(lane.z[0]) + 2.0)), string)
+	for i in lane.stalls.size():
+		var stall: Dictionary = lane.stalls[i]; var c: Array = stall.c
+		var body := _box_body("LampLane_Stall_%02d" % i, Vector3(2.4, 0.9, 1.0), Vector3(float(c[0]), DATUM + 0.45, float(c[1])), Color("#8b684d"))
+		_add_building_box_part(body, Vector3(2.6, 0.08, 1.4), Vector3(0, 1.8, 0), Color("#b57550"))
+		_add(packs, _cell(Vector2(float(c[0]), float(c[1]))), body)
+	for way in PLAN.COURT_WAYS:
+		if int(way.court) != 3 and int(way.court) != 5: continue
+		var points: Array = way.pts; var floor := _poly_floor("Market_Court_%02d_Floor" % int(way.court), points, DATUM + 0.02, Color("#a99272"))
+		_add(packs, _cell(Vector2(float(points[0][0]), float(points[0][1]))), floor)
+		if way.has("passage"):
+			var p: Dictionary = way.passage; var a: Array = p.court_end; var center := Vector2(float(a[0]), float(a[1]))
+			var lamp := _round_column("Market_Court_Passage_Lamp_%02d" % int(way.court), 0.15, 0.4, Vector3(center.x, DATUM + float(p.h) - 0.2, center.y), Color("#ffd292"))
+			_add(packs, _cell(center), lamp)
+
+
+static func _add_market_roof_box(root: StaticBody3D, size: Vector3, center: Vector3, color: Color, policy: StringName) -> void:
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	var visual := MeshInstance3D.new()
+	visual.mesh = mesh
+	visual.position = center
+	visual.material_override = _material(color)
+	visual.set_meta(CollisionPolicy.POLICY_META, policy)
+	root.add_child(visual)
+	var shape := BoxShape3D.new()
+	shape.size = size
+	var collision := CollisionShape3D.new()
+	collision.shape = shape
+	collision.position = center
+	collision.set_meta(CollisionPolicy.POLICY_META, policy)
+	root.add_child(collision)
 
 
 static func _block_panel(a: Vector3, b: Vector3, width: float, color: Color) -> StaticBody3D:
@@ -960,6 +1234,132 @@ static func _lot_color(index: int, kind: String) -> Color:
 
 static func _old_house_color(index: int) -> Color:
 	return [Color("#d5c09d"), Color("#c8a685"), Color("#d1b2a3"), Color("#b2c4b8"), Color("#c0c6cf")][index % 5]
+
+
+## P4: replace each old-town mass with its plan-selected tower-house form.
+## The footprint remains one blocking shell so the old routes cannot leak
+## through the dense blocks while the facade kit is dressed in shared materials.
+static func _old_moy_house(label: String, points: Array, storeys: int, kit: Dictionary, front_edge: int, palette_index: int) -> StaticBody3D:
+	var height := float(storeys) * float(PLAN.TOWER_HOUSE.storey)
+	var root := _polygon_building(label, points, height, _old_house_color(palette_index))
+	root.set_meta("moy_p4_house", true)
+	root.set_meta("moy_p4_tower_house", String(kit.get("kit", "tower")) == "tower")
+	root.set_meta("moy_p4_kit", String(kit.get("kit", "tower")))
+	if points.size() < 3:
+		return root
+	if String(kit.get("kit", "tower")) == "infill":
+		var edge := int(kit.get("front_edge", front_edge))
+		if edge < 0 or edge >= points.size(): edge = 0
+		var ia := Vector2(points[edge][0], points[edge][1]); var ib := Vector2(points[(edge + 1) % points.size()][0], points[(edge + 1) % points.size()][1])
+		var it := (ib - ia).normalized(); var io := Vector2(it.y, -it.x); var ic := (ia + ib) * 0.5
+		var iw := ia.distance_to(ib); var tile_colors := [Color("#71949a"), Color("#b17e68"), Color("#c8ad78"), Color("#73907e")]
+		for row in range(mini(8, storeys)):
+			for col in range(maxi(1, int(iw / 1.2))):
+				var along := (float(col) + 0.5) / float(maxi(1, int(iw / 1.2))) * iw - iw * 0.5
+				var fc := ic + it * along + io * 0.06
+				_add_old_face_box(root, Vector3(0.26, 0.24, 0.045), Vector3(fc.x, DATUM + 0.55 + float(row) * 1.0, fc.y), io, tile_colors[(row + col) % tile_colors.size()])
+		_add_building_box_part(root, Vector3(0.9, height * 0.82, 0.16), Vector3(0, height * 0.55, 0), Color("#96b9c1"))
+		return root
+	if String(kit.get("kit", "tower")) != "tower": return root
+	var base_kind := String(kit.get("base_kind", "stone"))
+	var base_storeys := int(kit.get("base", 1))
+	var base_height := minf(height - 3.0, float(PLAN.TOWER_HOUSE.plinth) + float(base_storeys) * (0.7 if base_kind == "stone" else 0.65))
+	var a := Vector2(points[0][0], points[0][1]); var b := Vector2(points[1][0], points[1][1])
+	if front_edge >= 0 and front_edge < points.size():
+		a = Vector2(points[front_edge][0], points[front_edge][1]); b = Vector2(points[(front_edge + 1) % points.size()][0], points[(front_edge + 1) % points.size()][1])
+	var tangent := (b - a).normalized(); var outward := Vector2(tangent.y, -tangent.x)
+	var span := a.distance_to(b); var face_center := (a + b) * 0.5
+	var wall_depth := 0.08
+	# Material bands are separate scheduled courses and remain decorative here;
+	# the continuous shell is the conservative player/party blocker.
+	_add_old_face_box(root, Vector3(span * 0.94, base_height, wall_depth), Vector3(face_center.x, DATUM + base_height * 0.5, face_center.y), outward, Color("#625d54"))
+	# The ground-floor leaf and its gypsum reveal are visible even though the
+	# continuous shell remains the closed-door blocker in this exterior-only pass.
+	var door_tint: Color = [Color("#416b79"), Color("#5d8060"), Color("#a87942")][palette_index % 3]
+	var door_at := face_center + outward * 0.09
+	_add_old_face_box(root, Vector3(1.17, 2.38, 0.045), Vector3(door_at.x, DATUM + 1.19, door_at.y), outward, door_tint)
+	for dx in [-0.64, 0.64]:
+		var jamb: Vector2 = door_at + tangent * dx
+		_add_old_face_box(root, Vector3(0.12, 2.55, 0.08), Vector3(jamb.x, DATUM + 1.28, jamb.y), outward, Color("#eee7d8"))
+	_add_old_face_box(root, Vector3(1.4, 0.12, 0.08), Vector3(door_at.x, DATUM + 2.52, door_at.y), outward, Color("#eee7d8"))
+	_add_old_face_box(root, Vector3(0.32, 0.32, 0.035), Vector3(door_at.x, DATUM + 2.83, door_at.y), outward, Color("#c59b55"))
+	var courses := int(floor((height - base_height) / float(PLAN.TOWER_HOUSE.storey)))
+	for floor_i in range(maxi(1, courses)):
+		var y0 := base_height + float(floor_i) * float(PLAN.TOWER_HOUSE.storey)
+		var y := y0 + float(PLAN.TOWER_HOUSE.storey) * 0.55
+		var window_count := maxi(1, int(floor(span / 2.4)))
+		for wi in range(window_count):
+			var xoff := (float(wi) + 0.5) / float(window_count) * span - span * 0.5
+			var c := face_center + tangent * xoff + outward * 0.06
+			_add_old_face_box(root, Vector3(0.7, 1.25, 0.06), Vector3(c.x, DATUM + y, c.y), outward, Color("#34434a"))
+			_add_old_face_box(root, Vector3(0.78, 0.08, 0.1), Vector3(c.x, DATUM + y - 0.68, c.y), outward, Color("#eee7d8"))
+		# White frieze and pale string course at each brick-floor datum.
+		_add_old_face_box(root, Vector3(span * 0.96, 0.16, 0.10), Vector3(face_center.x, DATUM + y0 + float(PLAN.TOWER_HOUSE.storey), face_center.y), outward, Color("#eee7d8"))
+	# A flat roof terrace, crenellated parapet, west-facing wind catcher and the
+	# optional rooftop room follow kit flags. These are solid/landing shapes.
+	_add_old_face_box(root, Vector3(span * 0.96, 0.16, 0.16), Vector3(face_center.x, DATUM + height + 0.08, face_center.y), outward, Color("#e4dac8"))
+	_add_old_face_box(root, Vector3(span * 0.96, 0.65, 0.18), Vector3(face_center.x, DATUM + height + 0.48, face_center.y), outward, Color("#985e4c"))
+	var merlon_count := maxi(2, int(span / 1.8))
+	for mi in range(merlon_count):
+		var mx := (float(mi) + 0.5) / float(merlon_count) * span - span * 0.5
+		var mc := face_center + tangent * mx
+		_add_building_box_part(root, Vector3(minf(0.6, span / float(merlon_count) * 0.7), 0.5, 0.24), Vector3(mc.x - root.position.x, height + 1.05, mc.y - root.position.z), Color("#985e4c"))
+	_add_building_box_part(root, Vector3(1.6, 4.5, 1.2), Vector3(0, height + 2.5, -0.5), Color("#eee7d8"))
+	if bool(kit.get("manzar", false)):
+		_add_building_box_part(root, Vector3(4.0, 2.2, 4.5), Vector3(0, height + 1.1, 0), Color("#eee7d8"))
+	StaticMerge.merge(root)
+	return root
+
+
+static func _front_edge_for_rect(front: String) -> int:
+	# Corners are ordered SW, SE, NE, NW. Return the edge that faces the selected road.
+	return 0 if front == "s" else (2 if front == "n" else (1 if front == "e" else 3))
+
+
+static func _add_old_face_box(root: StaticBody3D, size: Vector3, center: Vector3, outward: Vector2, color: Color) -> void:
+	var mesh := BoxMesh.new(); mesh.size = size
+	var visual := MeshInstance3D.new(); visual.mesh = mesh; visual.position = center - root.position
+	visual.rotation.y = -atan2(outward.y, outward.x) + PI * 0.5
+	visual.material_override = _material(color); CollisionPolicy.mark_decorative(visual); root.add_child(visual)
+
+
+static func _add_old_moy_shared_spaces(packs: Dictionary) -> void:
+	for i in PLAN.OLD_TOWN.courts.size():
+		var court: Dictionary = PLAN.OLD_TOWN.courts[i]
+		var pts: Array = court.get("pts", [])
+		if pts.size() < 3: continue
+		var center := _polygon_center(pts)
+		_add(packs, _cell(center), _poly_floor("OldMoyCourt_%02d" % i, pts, DATUM + 0.04, Color("#b9a586")))
+		var bench := _box_body("OldMoyCourtBench_%02d" % i, Vector3(1.6, 0.5, 0.45), Vector3(center.x, DATUM + 0.28, center.y), Color("#765b42"))
+		_add(packs, _cell(center), bench)
+	for i in PLAN.OLD_TOWN.pockets.size():
+		var pocket: Dictionary = PLAN.OLD_TOWN.pockets[i]
+		var pts: Array = pocket.get("pts", [])
+		if pts.size() < 3 or String(pocket.get("kind", "")) == "paving": continue
+		var center := _polygon_center(pts)
+		_add(packs, _cell(center), _poly_floor("OldMoyPocket_%02d" % i, pts, DATUM + 0.05, Color("#b9a586")))
+		if String(pocket.get("kind", "")) in ["pocket", "yard"]:
+			var bench := _box_body("OldMoyPocketBench_%02d" % i, Vector3(1.2, 0.45, 0.4), Vector3(center.x, DATUM + 0.25, center.y), Color("#765b42"))
+			_add(packs, _cell(center), bench)
+	for i in PLAN.OLD_TOWN.roof_links.size():
+		var link: Dictionary = PLAN.OLD_TOWN.roof_links[i]
+		var foot: Array = link.foot; var head: Array = link.head
+		var start := Vector3(foot[0], DATUM + float(link.y[0]), foot[1])
+		var finish := Vector3(head[0], DATUM + float(link.y[1]), head[1])
+		var delta := finish - start
+		var ramp := _box_body("OldMoyRoofRamp_%02d" % i, Vector3(float(link.w), 0.14, delta.length()), (start + finish) * 0.5, Color("#79563b"))
+		ramp.rotation.y = atan2(delta.x, delta.z)
+		ramp.rotation.x = -atan2(delta.y, Vector2(delta.x, delta.z).length())
+		for child in ramp.get_children(): child.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+		_add(packs, _cell(Vector2((foot[0] + head[0]) * 0.5, (foot[1] + head[1]) * 0.5)), ramp)
+	var first_square: Dictionary = PLAN.OLD_TOWN.squares[0]
+	var well: Dictionary = first_square.get("first_well", {})
+	if not well.is_empty():
+		var head: Dictionary = well.get("head", {})
+		var c: Array = head.get("c", [0.0, 0.0]); var center := Vector2(c[0], c[1])
+		var well_body := _round_column("CinemaSquareFirstWell", float(head.get("r", 1.1)), float(head.get("h", 0.8)), Vector3(center.x, DATUM + float(head.get("h", 0.8)) * 0.5, center.y), Color("#77736b"))
+		for child in well_body.get_children(): child.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+		_add(packs, _cell(center), well_body)
 
 
 static func _polygon_center(points: Array) -> Vector2:

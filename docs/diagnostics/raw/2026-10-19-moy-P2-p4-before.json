@@ -1,0 +1,531 @@
+{
+	"activation": [
+		{
+			"active_packs": 62,
+			"frame": 103,
+			"frame_ms": 52.242,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 168
+		},
+		{
+			"active_packs": 171,
+			"frame": 381,
+			"frame_ms": 102.339151515152,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 382,
+			"frame_ms": 57.534,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 384,
+			"frame_ms": 54.7313333333319,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 385,
+			"frame_ms": 51.3683333333333,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 386,
+			"frame_ms": 60.5670000000014,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 387,
+			"frame_ms": 54.6329999999986,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 388,
+			"frame_ms": 54.7619047619048,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 389,
+			"frame_ms": 50.6970952380952,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 390,
+			"frame_ms": 56.5746666666681,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 391,
+			"frame_ms": 50.5913333333319,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		},
+		{
+			"active_packs": 171,
+			"frame": 392,
+			"frame_ms": 54.5454545454545,
+			"phase": "approach",
+			"position": [
+				-600.0,
+				-59.5,
+				0.0
+			],
+			"requested_packs": 59
+		}
+	],
+	"config": {
+		"actual_resolution": [
+			1280,
+			720
+		],
+		"actual_viewport_resolution": [
+			1280,
+			720
+		],
+		"backend_is_rendered": true,
+		"command_line": [
+			"tools/moy_performance_probe.tscn",
+			"--run-id=p4-before",
+			"--route=crossroads_spawn,old_moy_street,old_moy_rooftop",
+			"--duration=30",
+			"--warmup=5"
+		],
+		"commit": "2df87a78d8384ad47e3c1f7602558f9d5a81eded",
+		"cpu": "Apple M5",
+		"cpu_cores": 10,
+		"duration": 30.0,
+		"fov": 70.0,
+		"fps_cap": 0,
+		"game_time_hours": 12.0,
+		"godot_version": {
+			"build": "official",
+			"hash": "a13da4feb8d8aefc283c3763d33a2f170a18d541",
+			"hex": 263937,
+			"major": 4,
+			"minor": 7,
+			"patch": 1,
+			"status": "stable",
+			"string": "4.7.1-stable (official)",
+			"timestamp": 0
+		},
+		"memory_info": {
+			"available": 11780833280,
+			"free": 11780833280,
+			"physical": 25769803776,
+			"stack": 8372224
+		},
+		"mode": "crossroads",
+		"os": "macOS",
+		"os_version": "26.5.1",
+		"renderer": "forward_plus",
+		"renderer_adapter": "Apple M5 (Apple9)",
+		"resolution": [
+			1280,
+			720
+		],
+		"resolution_requested": [
+			1280,
+			720
+		],
+		"resolution_valid": true,
+		"route": "crossroads_spawn,old_moy_street,old_moy_rooftop",
+		"route_proof_file": "",
+		"run_id": "p4-before",
+		"sample_seconds": 30.0,
+		"seed": 20261019,
+		"source_hashes": {
+			"res://assets/generated/moy_city/cell_05_04_p01.tscn": "38e67284f7f395e5cbb009b24a8ca2ac1eb969892e500c4bc72b8b34bed5e102",
+			"res://assets/generated/moy_city/manifest.json": "186960d58adc29f57d4e163188bbee3f2ba7dad20caad7416a7ce91fb01cdceb",
+			"res://scripts/city_generator.gd": "89aff5d3a4eb73321cdfa6ae34739cd234c729e89eb595babf46956226616868",
+			"res://scripts/city_plan.gd": "5827408ce4458d270a0e9e5c54a73987a164893409efa0b7322e29f29b67f9c9",
+			"res://scripts/moy_city_bake_builder.gd": "02d9b89d5489c09fd3d51e9e7b2f839142e6b405f898d432541f56e0a40f5ac8",
+			"res://scripts/moy_ride_train.gd": "3864246f739955feaeb59e7dc85435e67f510dd96df7fa612fb9996ad9ae0cb3",
+			"res://tools/moy_performance_probe.gd": "a6d459585298d709a0dc2fc55cd6aa8ff3a0efbf274e20680f227cc00f4dfe95"
+		},
+		"startup_to_control_ready_ms": 28788.294,
+		"vsync": 0,
+		"vsync_mode": 0,
+		"vsync_supported": false,
+		"warmup": 5.0,
+		"warmup_seconds": 5.0
+	},
+	"errors": [],
+	"frame_data_format": "one JSON object per raw frame interval; see each sample.frame_data_path",
+	"samples": [
+		{
+			"active_packs": 0,
+			"camera": [
+				0.0,
+				4.0,
+				12.0
+			],
+			"camera_far": 1800.0,
+			"draws_distribution": {
+				"count": 1725,
+				"max": 813.0,
+				"min": 809.0,
+				"p50": 811.0,
+				"p95": 813.0,
+				"p99": 813.0
+			},
+			"draws_peak": 813.0,
+			"duration_s": 30.0,
+			"fov": 70.0,
+			"frame_data_path": "res://docs/diagnostics/raw/2026-10-19-moy-P2-p4-before.crossroads_spawn.frames.jsonl",
+			"frames": 1725,
+			"frames_over_100ms": 0,
+			"frames_over_50ms": 0,
+			"name": "crossroads_spawn",
+			"nodes_distribution": {
+				"count": 1725,
+				"max": 18664.0,
+				"min": 18664.0,
+				"p50": 18664.0,
+				"p95": 18664.0,
+				"p99": 18664.0
+			},
+			"over_100ms": [],
+			"over_50ms": [],
+			"p50_ms": 16.851,
+			"p95_ms": 20.647,
+			"p99_ms": 27.803,
+			"phase": "Moy asleep; Crossroads control baseline",
+			"physics_objects_distribution": {
+				"count": 1725,
+				"max": 2.0,
+				"min": 1.0,
+				"p50": 2.0,
+				"p95": 2.0,
+				"p99": 2.0
+			},
+			"probe_frame_buffer_bytes": 179400,
+			"raw_frame_buffer_payload_bytes_peak": 179400,
+			"requested_packs": 7,
+			"retained_resources": 7,
+			"static_memory_observer_accounting": {
+				"adjustment_applied": false,
+				"other_probe_storage": "activation/release telemetry and inventories are retained; observer allocations are not subtracted",
+				"packed_array_capacity_bytes": null,
+				"packed_frame_payload_bytes_exact": 179400,
+				"retained_telemetry_records": {
+					"activation_frames": 0,
+					"activation_stages": 0,
+					"release_stages": 0
+				}
+			},
+			"static_mib_distribution_observed": {
+				"count": 1725,
+				"max": 411.664987564087,
+				"min": 411.345323562622,
+				"p50": 411.545381546021,
+				"p95": 411.66477394104,
+				"p99": 411.664880752563
+			},
+			"target": [
+				0.0,
+				2.0,
+				0.0
+			],
+			"triangles_distribution": {
+				"count": 1725,
+				"max": 901077.0,
+				"min": 897909.0,
+				"p50": 899269.0,
+				"p95": 901077.0,
+				"p99": 901077.0
+			},
+			"triangles_peak": 901077.0,
+			"video_mib_distribution": {
+				"count": 1725,
+				"max": 1040.5625,
+				"min": 1040.4375,
+				"p50": 1040.4375,
+				"p95": 1040.5625,
+				"p99": 1040.5625
+			},
+			"worst_ms": 29.868
+		},
+		{
+			"active_packs": 155,
+			"camera": [
+				-704.0,
+				-54.0,
+				-24.0
+			],
+			"camera_far": 1800.0,
+			"draws_distribution": {
+				"count": 1263,
+				"max": 2805.0,
+				"min": 2765.0,
+				"p50": 2782.0,
+				"p95": 2798.0,
+				"p99": 2804.0
+			},
+			"draws_peak": 2805.0,
+			"duration_s": 30.0,
+			"fov": 70.0,
+			"frame_data_path": "res://docs/diagnostics/raw/2026-10-19-moy-P2-p4-before.old_moy_street.frames.jsonl",
+			"frames": 1263,
+			"frames_over_100ms": 0,
+			"frames_over_50ms": 0,
+			"name": "old_moy_street",
+			"nodes_distribution": {
+				"count": 1263,
+				"max": 38546.0,
+				"min": 38546.0,
+				"p50": 38546.0,
+				"p95": 38546.0,
+				"p99": 38546.0
+			},
+			"over_100ms": [],
+			"over_50ms": [],
+			"p50_ms": 23.142,
+			"p95_ms": 30.664,
+			"p99_ms": 35.21,
+			"phase": "stationary view after approach",
+			"physics_objects_distribution": {
+				"count": 1263,
+				"max": 13.0,
+				"min": 12.0,
+				"p50": 13.0,
+				"p95": 13.0,
+				"p99": 13.0
+			},
+			"probe_frame_buffer_bytes": 131352,
+			"raw_frame_buffer_payload_bytes_peak": 131352,
+			"requested_packs": 73,
+			"retained_resources": 73,
+			"static_memory_observer_accounting": {
+				"adjustment_applied": false,
+				"other_probe_storage": "activation/release telemetry and inventories are retained; observer allocations are not subtracted",
+				"packed_array_capacity_bytes": null,
+				"packed_frame_payload_bytes_exact": 131352,
+				"retained_telemetry_records": {
+					"activation_frames": 186,
+					"activation_stages": 174,
+					"release_stages": 19
+				}
+			},
+			"static_mib_distribution_observed": {
+				"count": 1263,
+				"max": 621.536381721497,
+				"min": 621.361241340637,
+				"p50": 621.486916542053,
+				"p95": 621.536061286926,
+				"p99": 621.536274909973
+			},
+			"target": [
+				-700.0,
+				-58.0,
+				0.0
+			],
+			"triangles_distribution": {
+				"count": 1263,
+				"max": 5243190.0,
+				"min": 5223930.0,
+				"p50": 5225046.0,
+				"p95": 5242998.0,
+				"p99": 5243178.0
+			},
+			"triangles_peak": 5243190.0,
+			"video_mib_distribution": {
+				"count": 1263,
+				"max": 1144.84375,
+				"min": 1144.84375,
+				"p50": 1144.84375,
+				"p95": 1144.84375,
+				"p99": 1144.84375
+			},
+			"worst_ms": 45.47
+		},
+		{
+			"active_packs": 155,
+			"camera": [
+				-704.0,
+				-29.0,
+				-24.0
+			],
+			"camera_far": 1800.0,
+			"draws_distribution": {
+				"count": 1213,
+				"max": 2737.0,
+				"min": 2690.0,
+				"p50": 2711.0,
+				"p95": 2737.0,
+				"p99": 2737.0
+			},
+			"draws_peak": 2737.0,
+			"duration_s": 30.0,
+			"fov": 70.0,
+			"frame_data_path": "res://docs/diagnostics/raw/2026-10-19-moy-P2-p4-before.old_moy_rooftop.frames.jsonl",
+			"frames": 1213,
+			"frames_over_100ms": 0,
+			"frames_over_50ms": 1,
+			"name": "old_moy_rooftop",
+			"nodes_distribution": {
+				"count": 1213,
+				"max": 38546.0,
+				"min": 38546.0,
+				"p50": 38546.0,
+				"p95": 38546.0,
+				"p99": 38546.0
+			},
+			"over_100ms": [],
+			"over_50ms": [
+				{
+					"active_packs": 155,
+					"elapsed_ms": 6107.011,
+					"frame_index": 248,
+					"frame_ms": 67.917,
+					"phase": "stationary view after approach",
+					"position": [
+						-704.0,
+						-59.5,
+						0.0
+					],
+					"requested_packs": 73
+				}
+			],
+			"p50_ms": 23.866,
+			"p95_ms": 32.365,
+			"p99_ms": 39.083,
+			"phase": "stationary view after approach",
+			"physics_objects_distribution": {
+				"count": 1213,
+				"max": 13.0,
+				"min": 12.0,
+				"p50": 13.0,
+				"p95": 13.0,
+				"p99": 13.0
+			},
+			"probe_frame_buffer_bytes": 126152,
+			"raw_frame_buffer_payload_bytes_peak": 126152,
+			"requested_packs": 73,
+			"retained_resources": 73,
+			"static_memory_observer_accounting": {
+				"adjustment_applied": false,
+				"other_probe_storage": "activation/release telemetry and inventories are retained; observer allocations are not subtracted",
+				"packed_array_capacity_bytes": null,
+				"packed_frame_payload_bytes_exact": 126152,
+				"retained_telemetry_records": {
+					"activation_frames": 186,
+					"activation_stages": 174,
+					"release_stages": 19
+				}
+			},
+			"static_mib_distribution_observed": {
+				"count": 1213,
+				"max": 621.673607826233,
+				"min": 621.529980659485,
+				"p50": 621.594807624817,
+				"p95": 621.673607826233,
+				"p99": 621.673607826233
+			},
+			"target": [
+				-700.0,
+				-42.0,
+				0.0
+			],
+			"triangles_distribution": {
+				"count": 1213,
+				"max": 5456194.0,
+				"min": 5417598.0,
+				"p50": 5434310.0,
+				"p95": 5456194.0,
+				"p99": 5456194.0
+			},
+			"triangles_peak": 5456194.0,
+			"video_mib_distribution": {
+				"count": 1213,
+				"max": 1144.96875,
+				"min": 1144.84375,
+				"p50": 1144.84375,
+				"p95": 1144.96875,
+				"p99": 1144.96875
+			},
+			"worst_ms": 67.917
+		}
+	],
+	"schema": 2,
+	"transitions": [
+		{
+			"active_packs": 171,
+			"elapsed_ms": 10429.677,
+			"frames": 393,
+			"phase": "approach",
+			"requested_packs": 59
+		}
+	]
+}

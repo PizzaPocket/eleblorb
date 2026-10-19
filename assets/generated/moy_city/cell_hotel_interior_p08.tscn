@@ -143,28 +143,28 @@ roughness = 0.2
 [sub_resource type="BoxMesh" id="BoxMesh_3ttqs"]
 size = Vector3(10, 2.4, 0.14)
 
-[node name="HotelPublicInteriorPack_Part_08" type="Node3D" unique_id=1414090652]
+[node name="HotelPublicInteriorPack_Part_08" type="Node3D" unique_id=1312177680]
 
-[node name="HotelCapsuleLift_3_Call_mezzanine" type="Node3D" parent="." unique_id=754340846]
+[node name="HotelCapsuleLift_3_Call_mezzanine" type="Node3D" parent="." unique_id=646265168]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.46518, 6.5, -5.5348196)
 metadata/reach_target = true
 metadata/reach_link_id = "HotelCapsuleLift_3"
 
-[node name="@MeshInstance3D@2181" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_mezzanine" unique_id=1870434989]
+[node name="@MeshInstance3D@18463" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_mezzanine" unique_id=1209861421]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_eeu7o")
 mesh = SubResource("ArrayMesh_fpk7p")
 surface_material_override/0 = SubResource("StandardMaterial3D_2hfwf")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@2182" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_mezzanine" unique_id=1814427694]
+[node name="@MeshInstance3D@18464" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_mezzanine" unique_id=1294513764]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_ea2ef")
 mesh = SubResource("ArrayMesh_dog2r")
 surface_material_override/0 = SubResource("StandardMaterial3D_75yif")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@2184" type="Area3D" parent="HotelCapsuleLift_3_Call_mezzanine" unique_id=545885506]
+[node name="@Area3D@18466" type="Area3D" parent="HotelCapsuleLift_3_Call_mezzanine" unique_id=481630124]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -173,29 +173,29 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@2183" type="CollisionShape3D" parent="HotelCapsuleLift_3_Call_mezzanine/@Area3D@2184" unique_id=2058660208]
+[node name="@CollisionShape3D@18465" type="CollisionShape3D" parent="HotelCapsuleLift_3_Call_mezzanine/@Area3D@18466" unique_id=455064434]
 shape = SubResource("SphereShape3D_pknoo")
 
-[node name="HotelCapsuleLift_3_Call_level_27_—_party_suite" type="Node3D" parent="." unique_id=923193988]
+[node name="HotelCapsuleLift_3_Call_level_27_—_party_suite" type="Node3D" parent="." unique_id=183035238]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.46518, 89.5, -5.5348196)
 metadata/reach_target = true
 metadata/reach_link_id = "HotelCapsuleLift_3"
 
-[node name="@MeshInstance3D@2185" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite" unique_id=1309427463]
+[node name="@MeshInstance3D@18467" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite" unique_id=1613831899]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_y1yrg")
 mesh = SubResource("ArrayMesh_p3fyq")
 surface_material_override/0 = SubResource("StandardMaterial3D_obchl")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@2186" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite" unique_id=372840753]
+[node name="@MeshInstance3D@18468" type="MeshInstance3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite" unique_id=858814350]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_ter2x")
 mesh = SubResource("ArrayMesh_dp481")
 surface_material_override/0 = SubResource("StandardMaterial3D_rx8gs")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@2188" type="Area3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite" unique_id=2113413876]
+[node name="@Area3D@18470" type="Area3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite" unique_id=1227987279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -204,55 +204,55 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@2187" type="CollisionShape3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite/@Area3D@2188" unique_id=15623192]
+[node name="@CollisionShape3D@18469" type="CollisionShape3D" parent="HotelCapsuleLift_3_Call_level_27_—_party_suite/@Area3D@18470" unique_id=2122736659]
 shape = SubResource("SphereShape3D_ygxbv")
 
-[node name="HotelLevel27RingCorridor" type="StaticBody3D" parent="." unique_id=481578021]
+[node name="HotelLevel27RingCorridor" type="StaticBody3D" parent="." unique_id=1869954836]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 89.35, -16)
 
-[node name="@MeshInstance3D@2189" type="MeshInstance3D" parent="HotelLevel27RingCorridor" unique_id=2142369412]
+[node name="@MeshInstance3D@18471" type="MeshInstance3D" parent="HotelLevel27RingCorridor" unique_id=1315335280]
 material_override = SubResource("StandardMaterial3D_qta5y")
 mesh = SubResource("ArrayMesh_0iwux")
 
-[node name="@CollisionShape3D@2190" type="CollisionShape3D" parent="HotelLevel27RingCorridor" unique_id=647369027]
+[node name="@CollisionShape3D@18472" type="CollisionShape3D" parent="HotelLevel27RingCorridor" unique_id=212508797]
 shape = SubResource("ConcavePolygonShape3D_vwvr2")
 
-[node name="HotelLevel27PartySuite" type="StaticBody3D" parent="." unique_id=1235328173]
+[node name="HotelLevel27PartySuite" type="StaticBody3D" parent="." unique_id=530088680]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 89.35, 21)
 
-[node name="@CollisionShape3D@2191" type="CollisionShape3D" parent="HotelLevel27PartySuite" unique_id=1780265809]
+[node name="@CollisionShape3D@18473" type="CollisionShape3D" parent="HotelLevel27PartySuite" unique_id=1280958229]
 shape = SubResource("BoxShape3D_33erp")
 
-[node name="@MeshInstance3D@2192" type="MeshInstance3D" parent="HotelLevel27PartySuite" unique_id=314102432]
+[node name="@MeshInstance3D@18474" type="MeshInstance3D" parent="HotelLevel27PartySuite" unique_id=315794206]
 material_override = SubResource("StandardMaterial3D_olp2e")
 mesh = SubResource("BoxMesh_licw5")
 
-[node name="HotelPartySuiteWall" type="StaticBody3D" parent="." unique_id=573528568]
+[node name="HotelPartySuiteWall" type="StaticBody3D" parent="." unique_id=748631317]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 91, 21)
 
-[node name="@CollisionShape3D@2193" type="CollisionShape3D" parent="HotelPartySuiteWall" unique_id=833494950]
+[node name="@CollisionShape3D@18475" type="CollisionShape3D" parent="HotelPartySuiteWall" unique_id=335190654]
 shape = SubResource("BoxShape3D_ru73r")
 
-[node name="@MeshInstance3D@2194" type="MeshInstance3D" parent="HotelPartySuiteWall" unique_id=1870956526]
+[node name="@MeshInstance3D@18476" type="MeshInstance3D" parent="HotelPartySuiteWall" unique_id=811545168]
 material_override = SubResource("StandardMaterial3D_bpxm2")
 mesh = SubResource("BoxMesh_xust0")
 
-[node name="@StaticBody3D@2197" type="StaticBody3D" parent="." unique_id=79050889]
+[node name="@StaticBody3D@18479" type="StaticBody3D" parent="." unique_id=1327911709]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 91, 21)
 
-[node name="@CollisionShape3D@2195" type="CollisionShape3D" parent="@StaticBody3D@2197" unique_id=935224981]
+[node name="@CollisionShape3D@18477" type="CollisionShape3D" parent="@StaticBody3D@18479" unique_id=2082293489]
 shape = SubResource("BoxShape3D_wny0b")
 
-[node name="@MeshInstance3D@2196" type="MeshInstance3D" parent="@StaticBody3D@2197" unique_id=129437475]
+[node name="@MeshInstance3D@18478" type="MeshInstance3D" parent="@StaticBody3D@18479" unique_id=479981907]
 material_override = SubResource("StandardMaterial3D_bavau")
 mesh = SubResource("BoxMesh_b317o")
 
-[node name="HotelPartySuiteParkWindow" type="StaticBody3D" parent="." unique_id=656376040]
+[node name="HotelPartySuiteParkWindow" type="StaticBody3D" parent="." unique_id=1530784342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 91, 26)
 
-[node name="@CollisionShape3D@2198" type="CollisionShape3D" parent="HotelPartySuiteParkWindow" unique_id=409234471]
+[node name="@CollisionShape3D@18480" type="CollisionShape3D" parent="HotelPartySuiteParkWindow" unique_id=1442603507]
 shape = SubResource("BoxShape3D_32ni3")
 
-[node name="@MeshInstance3D@2199" type="MeshInstance3D" parent="HotelPartySuiteParkWindow" unique_id=1494987914]
+[node name="@MeshInstance3D@18481" type="MeshInstance3D" parent="HotelPartySuiteParkWindow" unique_id=1112271133]
 material_override = SubResource("StandardMaterial3D_rdb5a")
 mesh = SubResource("BoxMesh_3ttqs")

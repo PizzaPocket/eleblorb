@@ -385,9 +385,9 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_xj8n6"]
 size = Vector3(0.08, 2, 0.08)
 
-[node name="MoyCell_04_03_Part_03" type="Node3D" unique_id=1880024381]
+[node name="MoyCell_04_03_Part_03" type="Node3D" unique_id=1832127356]
 
-[node name="DeckEscalator_Civic Plaza south_Up" type="StaticBody3D" parent="." unique_id=53776845]
+[node name="DeckEscalator_Civic Plaza south_Up" type="StaticBody3D" parent="." unique_id=1984857013]
 transform = Transform3D(-0.86682314, 0.49861565, 0, 0.49861562, 0.8668232, 0, 0, 0, -1, -483.35, -56.75, 14.598)
 script = ExtResource("1_0uj8f")
 travel_direction = Vector3(-0.86682314, 0.49861562, 0)
@@ -399,348 +399,348 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:DeckEscalator_Civic Plaza south"
 
-[node name="@CollisionShape3D@4374" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=652005088]
+[node name="@CollisionShape3D@21556" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1372599574]
 shape = SubResource("BoxShape3D_wrijc")
 
-[node name="@MeshInstance3D@4375" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=696224103]
+[node name="@MeshInstance3D@21557" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=411006537]
 material_override = SubResource("StandardMaterial3D_5o2qo")
 mesh = SubResource("BoxMesh_grj1q")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1569781114]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=840672970]
 material_override = SubResource("StandardMaterial3D_7y5d2")
 mesh = SubResource("ArrayMesh_3aiy8")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1884113956]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=919345552]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 0.0
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1734394882]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1760781497]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 0.6880862098080207
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=656964438]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2139598102]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 1.3761724196160414
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2109074946]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2010051335]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 2.0642586294240624
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=774831000]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=950696332]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 2.752344839232083
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1184749240]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1531773893]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 3.4404310490401038
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1299486315]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=564761349]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 4.128517258848125
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=141690964]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1394216679]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 4.816603468656145
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=344917463]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=328282090]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 5.504689678464166
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=705475550]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=16318628]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 6.192775888272187
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=783707175]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=662072390]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 6.8808620980802075
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=102024821]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1918449556]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 7.568948307888228
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1135973089]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1241398289]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 8.25703451769625
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1856887583]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1902882033]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 8.94512072750427
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1661380272]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2006106755]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 9.63320693731229
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=979013125]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=566296247]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 10.321293147120311
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=889976624]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=377259016]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 11.009379356928331
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1359608120]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1201104189]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 11.697465566736351
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1503162244]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1278537574]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 12.385551776544373
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=596796259]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2023824150]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 13.073637986352393
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1029651456]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1803664252]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 13.761724196160415
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1185368842]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2070549614]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 14.449810405968435
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=937459905]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1183472431]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 15.137896615776455
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=93504816]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1810859314]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 15.825982825584477
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=833989021]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2083656496]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 16.5140690353925
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1929538607]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1210109854]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 17.20215524520052
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1459889802]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2140064517]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 17.89024145500854
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1982132723]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1811146372]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 18.57832766481656
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2068669442]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=44352162]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 19.26641387462458
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=941705598]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1264930089]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 19.954500084432603
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1843049481]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=633142783]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 20.642586294240623
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1127358501]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=493389280]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 21.330672504048643
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=570750734]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1029231154]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 22.018758713856663
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1619695260]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1127827424]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 22.706844923664683
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1868203918]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=782623254]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 23.394931133472703
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=23873696]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=291321799]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 24.083017343280726
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=54298114]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=129941194]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 24.771103553088746
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=749884549]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=370265232]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 25.45918976289677
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1283136864]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=364001256]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 26.147275972704787
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=856765857]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=500077658]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 26.835362182512807
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=15135643]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1695786691]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 27.52344839232083
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1847014513]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1135602121]
 material_override = SubResource("StandardMaterial3D_3mdxm")
 mesh = SubResource("BoxMesh_a0065")
 metadata/belt_distance = 28.211534602128854
 metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@4376" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=713072086]
+[node name="@CollisionShape3D@21558" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=701385821]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
 shape = SubResource("BoxShape3D_kff5v")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=199416779]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1850077476]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_i4or2")
 mesh = SubResource("BoxMesh_farob")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=530545608]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1245695081]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2590234, 1.4, -0.543)
 material_override = SubResource("StandardMaterial3D_uxfqh")
 mesh = SubResource("BoxMesh_ehogv")
 metadata/handrail_distance = 3.2590234
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2065318495]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1546947648]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2590234, 1.4, -0.543)
 material_override = SubResource("StandardMaterial3D_uxfqh")
 mesh = SubResource("BoxMesh_3vw6g")
 metadata/handrail_distance = 9.77707028388977
 
-[node name="@CollisionShape3D@4378" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=483524945]
+[node name="@CollisionShape3D@21560" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2017229558]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, -0.543)
 shape = SubResource("BoxShape3D_1n6c1")
 
-[node name="@MeshInstance3D@4379" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1196602361]
+[node name="@MeshInstance3D@21561" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=647299385]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_opaom")
 mesh = SubResource("BoxMesh_urggg")
 
-[node name="@CollisionShape3D@4380" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=260560468]
+[node name="@CollisionShape3D@21562" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=269366974]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, -0.543)
 shape = SubResource("BoxShape3D_6xt2p")
 
-[node name="@MeshInstance3D@4381" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=728915622]
+[node name="@MeshInstance3D@21563" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=440802200]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_8bjkl")
 mesh = SubResource("BoxMesh_s2llj")
 
-[node name="@CollisionShape3D@4382" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=235960461]
+[node name="@CollisionShape3D@21564" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=552962977]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
 shape = SubResource("BoxShape3D_xvwoa")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=403919062]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1663753141]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_i4or2")
 mesh = SubResource("BoxMesh_avoho")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=103196956]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=567750358]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2590234, 1.4, 0.543)
 material_override = SubResource("StandardMaterial3D_5onsh")
 mesh = SubResource("BoxMesh_d6ycl")
 metadata/handrail_distance = 3.2590234
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1356991762]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1087493397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2590234, 1.4, 0.543)
 material_override = SubResource("StandardMaterial3D_5onsh")
 mesh = SubResource("BoxMesh_0buiw")
 metadata/handrail_distance = 9.77707028388977
 
-[node name="@CollisionShape3D@4384" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1880063247]
+[node name="@CollisionShape3D@21566" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=709242504]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, 0.543)
 shape = SubResource("BoxShape3D_f43jq")
 
-[node name="@MeshInstance3D@4385" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=2139726497]
+[node name="@MeshInstance3D@21567" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1067275756]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_38idn")
 mesh = SubResource("BoxMesh_0n7pt")
 
-[node name="@CollisionShape3D@4386" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=1417281035]
+[node name="@CollisionShape3D@21568" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=971370584]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, 0.543)
 shape = SubResource("BoxShape3D_xi30f")
 
-[node name="@MeshInstance3D@4387" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=419740650]
+[node name="@MeshInstance3D@21569" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Up" unique_id=662284880]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_0rfv1")
 mesh = SubResource("BoxMesh_ww2o5")
 
-[node name="DeckEscalator_Civic Plaza south_Down" type="StaticBody3D" parent="." unique_id=2008307063]
+[node name="DeckEscalator_Civic Plaza south_Down" type="StaticBody3D" parent="." unique_id=420398401]
 transform = Transform3D(0.86682314, 0.49861565, 0, -0.49861562, 0.8668232, 0, 0, 0, 1, -483.35, -56.75, 13.402)
 script = ExtResource("1_0uj8f")
 travel_direction = Vector3(0.86682314, -0.49861562, 0)
@@ -752,493 +752,493 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:DeckEscalator_Civic Plaza south"
 
-[node name="@CollisionShape3D@4388" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=591664814]
+[node name="@CollisionShape3D@21570" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1190715179]
 shape = SubResource("BoxShape3D_4aql5")
 
-[node name="@MeshInstance3D@4389" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1481299992]
+[node name="@MeshInstance3D@21571" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=886335014]
 material_override = SubResource("StandardMaterial3D_nagoi")
 mesh = SubResource("BoxMesh_d2vuf")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=449643988]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1097238100]
 material_override = SubResource("StandardMaterial3D_um5pu")
 mesh = SubResource("ArrayMesh_g85sv")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=156380563]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=936983293]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 0.0
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=366618762]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2138996337]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 0.6880862098080207
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=755804081]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=937139751]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 1.3761724196160414
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1757289269]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=123246258]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 2.0642586294240624
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1116243850]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1361422548]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 2.752344839232083
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1975449458]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1496328576]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 3.4404310490401038
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=687504906]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1154473031]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 4.128517258848125
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1245943474]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=196498926]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 4.816603468656145
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1693542375]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1227426699]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 5.504689678464166
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1118109988]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=27675682]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 6.192775888272187
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1865311613]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2005403842]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 6.8808620980802075
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=896227072]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1366410259]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 7.568948307888228
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=254545388]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1995387551]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 8.25703451769625
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=757391767]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=614751846]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 8.94512072750427
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=462499734]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1995460855]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 9.63320693731229
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=804620379]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=70006662]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 10.321293147120311
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=588766453]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2043937522]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 11.009379356928331
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1844655122]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1776942212]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 11.697465566736351
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=948521426]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=200703378]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 12.385551776544373
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1173219314]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2022387530]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 13.073637986352393
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=769168076]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1712621205]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 13.761724196160415
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1258861799]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=33808844]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 14.449810405968435
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2076605449]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1161856110]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 15.137896615776455
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=964105249]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1538054006]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 15.825982825584477
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1800486465]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=20215595]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 16.5140690353925
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1319428259]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=878080999]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 17.20215524520052
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1695311433]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2127814331]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 17.89024145500854
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1533158554]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=407352868]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 18.57832766481656
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1636959743]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1142768258]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 19.26641387462458
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=399405256]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1189754941]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 19.954500084432603
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=753594730]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=561520716]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 20.642586294240623
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=531697479]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1727769944]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 21.330672504048643
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=79679095]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1481870030]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 22.018758713856663
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=156321033]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=564423615]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 22.706844923664683
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=15148476]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1196193198]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 23.394931133472703
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2079718703]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1573353539]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 24.083017343280726
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=470884241]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=504964857]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 24.771103553088746
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1046662895]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=559631763]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 25.45918976289677
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1709713100]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1233061458]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 26.147275972704787
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=354543819]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=99782667]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 26.835362182512807
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=2008824743]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=215852507]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 27.52344839232083
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1250950669]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1810013391]
 material_override = SubResource("StandardMaterial3D_nnc7x")
 mesh = SubResource("BoxMesh_2ngg3")
 metadata/belt_distance = 28.211534602128854
 metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@4390" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1146204851]
+[node name="@CollisionShape3D@21572" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1070166270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
 shape = SubResource("BoxShape3D_onc4q")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1953773615]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=934052181]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_rgbi6")
 mesh = SubResource("BoxMesh_utn6n")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1145779272]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1579266472]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2590234, 1.4, -0.543)
 material_override = SubResource("StandardMaterial3D_jwgsa")
 mesh = SubResource("BoxMesh_8ujgc")
 metadata/handrail_distance = 3.2590234
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1128514359]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=74009730]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2590234, 1.4, -0.543)
 material_override = SubResource("StandardMaterial3D_jwgsa")
 mesh = SubResource("BoxMesh_koh0g")
 metadata/handrail_distance = 9.77707028388977
 
-[node name="@CollisionShape3D@4392" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1973313511]
+[node name="@CollisionShape3D@21574" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=799779308]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, -0.543)
 shape = SubResource("BoxShape3D_2vp6q")
 
-[node name="@MeshInstance3D@4393" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=939699542]
+[node name="@MeshInstance3D@21575" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1666523018]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_ujpd7")
 mesh = SubResource("BoxMesh_vy6n0")
 
-[node name="@CollisionShape3D@4394" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1269570999]
+[node name="@CollisionShape3D@21576" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=288600525]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, -0.543)
 shape = SubResource("BoxShape3D_bsckr")
 
-[node name="@MeshInstance3D@4395" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=671147711]
+[node name="@MeshInstance3D@21577" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=619100344]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_008w4")
 mesh = SubResource("BoxMesh_ma411")
 
-[node name="@CollisionShape3D@4396" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1450481862]
+[node name="@CollisionShape3D@21578" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1285868737]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
 shape = SubResource("BoxShape3D_5rpum")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1005511269]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=901401406]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_rgbi6")
 mesh = SubResource("BoxMesh_03oad")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=541675377]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=666965874]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2590234, 1.4, 0.543)
 material_override = SubResource("StandardMaterial3D_cod4c")
 mesh = SubResource("BoxMesh_xn3ui")
 metadata/handrail_distance = 3.2590234
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=504838844]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1735119196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2590234, 1.4, 0.543)
 material_override = SubResource("StandardMaterial3D_cod4c")
 mesh = SubResource("BoxMesh_b4gn8")
 metadata/handrail_distance = 9.77707028388977
 
-[node name="@CollisionShape3D@4398" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1664941293]
+[node name="@CollisionShape3D@21580" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1349577221]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, 0.543)
 shape = SubResource("BoxShape3D_x1rkh")
 
-[node name="@MeshInstance3D@4399" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=942860873]
+[node name="@MeshInstance3D@21581" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1986088570]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_0py01")
 mesh = SubResource("BoxMesh_y2f8g")
 
-[node name="@CollisionShape3D@4400" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1041925982]
+[node name="@CollisionShape3D@21582" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=143471421]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, 0.543)
 shape = SubResource("BoxShape3D_hqlq2")
 
-[node name="@MeshInstance3D@4401" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=1306821985]
+[node name="@MeshInstance3D@21583" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Down" unique_id=600557330]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_2hfw4")
 mesh = SubResource("BoxMesh_7bobw")
 
-[node name="DeckEscalator_Civic Plaza south_Landing_1" type="StaticBody3D" parent="." unique_id=776906213]
+[node name="DeckEscalator_Civic Plaza south_Landing_1" type="StaticBody3D" parent="." unique_id=249206411]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489, -53.65, 14)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:DeckEscalator_Civic Plaza south"
 metadata/reach_link_id = "Escalator:DeckEscalator_Civic Plaza south"
 metadata/reach_target = true
 
-[node name="@CollisionShape3D@4404" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Landing_1" unique_id=1352402368]
+[node name="@CollisionShape3D@21586" type="CollisionShape3D" parent="DeckEscalator_Civic Plaza south_Landing_1" unique_id=1269910566]
 shape = SubResource("BoxShape3D_i6rk8")
 
-[node name="@MeshInstance3D@4405" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Landing_1" unique_id=595684181]
+[node name="@MeshInstance3D@21587" type="MeshInstance3D" parent="DeckEscalator_Civic Plaza south_Landing_1" unique_id=1025368048]
 material_override = SubResource("StandardMaterial3D_kbjls")
 mesh = SubResource("BoxMesh_sbcru")
 
-[node name="CrossingTower_00_RingLink" type="StaticBody3D" parent="." unique_id=1224258515]
+[node name="CrossingTower_00_RingLink" type="StaticBody3D" parent="." unique_id=138803485]
 transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, -542.7167, -53.65, -17.283379)
 
-[node name="@CollisionShape3D@4877" type="CollisionShape3D" parent="CrossingTower_00_RingLink" unique_id=105286212]
+[node name="@CollisionShape3D@22059" type="CollisionShape3D" parent="CrossingTower_00_RingLink" unique_id=1012442568]
 shape = SubResource("BoxShape3D_gkebx")
 
-[node name="@MeshInstance3D@4878" type="MeshInstance3D" parent="CrossingTower_00_RingLink" unique_id=1234136327]
+[node name="@MeshInstance3D@22060" type="MeshInstance3D" parent="CrossingTower_00_RingLink" unique_id=1291341862]
 material_override = SubResource("StandardMaterial3D_w3flf")
 mesh = SubResource("BoxMesh_q6yml")
 
-[node name="CrossingRainReeds_-539_94_-11_57" type="Node3D" parent="." unique_id=1091581661]
+[node name="CrossingRainReeds_-539_94_-11_57" type="Node3D" parent="." unique_id=1327079639]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -539.94, -60, -11.57)
 
-[node name="@MeshInstance3D@5931" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_-11_57" unique_id=1330731046]
+[node name="@MeshInstance3D@23113" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_-11_57" unique_id=1301174487]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_tcxre")
 mesh = SubResource("BoxMesh_egn7s")
 
-[node name="@MeshInstance3D@5932" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_-11_57" unique_id=1508008248]
+[node name="@MeshInstance3D@23114" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_-11_57" unique_id=1634528191]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_2fqsg")
 mesh = SubResource("BoxMesh_bytqw")
 
-[node name="@MeshInstance3D@5933" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_-11_57" unique_id=206119416]
+[node name="@MeshInstance3D@23115" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_-11_57" unique_id=200369692]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_58tj3")
 mesh = SubResource("BoxMesh_3qvtt")
 
-[node name="CrossingRainReeds_-540_71_-8_23" type="Node3D" parent="." unique_id=672734065]
+[node name="CrossingRainReeds_-540_71_-8_23" type="Node3D" parent="." unique_id=1793347650]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -540.71, -60, -8.23)
 
-[node name="@MeshInstance3D@5934" type="MeshInstance3D" parent="CrossingRainReeds_-540_71_-8_23" unique_id=1266322970]
+[node name="@MeshInstance3D@23116" type="MeshInstance3D" parent="CrossingRainReeds_-540_71_-8_23" unique_id=705930468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_4ve4o")
 mesh = SubResource("BoxMesh_frngg")
 
-[node name="@MeshInstance3D@5935" type="MeshInstance3D" parent="CrossingRainReeds_-540_71_-8_23" unique_id=780042418]
+[node name="@MeshInstance3D@23117" type="MeshInstance3D" parent="CrossingRainReeds_-540_71_-8_23" unique_id=399749950]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_y4iol")
 mesh = SubResource("BoxMesh_qhq7m")
 
-[node name="@MeshInstance3D@5936" type="MeshInstance3D" parent="CrossingRainReeds_-540_71_-8_23" unique_id=548687326]
+[node name="@MeshInstance3D@23118" type="MeshInstance3D" parent="CrossingRainReeds_-540_71_-8_23" unique_id=108171195]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_8tbte")
 mesh = SubResource("BoxMesh_6yx27")
 
-[node name="CrossingRainReeds_-543_08_-5_35" type="Node3D" parent="." unique_id=459895105]
+[node name="CrossingRainReeds_-543_08_-5_35" type="Node3D" parent="." unique_id=689020382]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -543.08, -60, -5.35)
 
-[node name="@MeshInstance3D@5937" type="MeshInstance3D" parent="CrossingRainReeds_-543_08_-5_35" unique_id=188818671]
+[node name="@MeshInstance3D@23119" type="MeshInstance3D" parent="CrossingRainReeds_-543_08_-5_35" unique_id=1682129032]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_3lu58")
 mesh = SubResource("BoxMesh_ro2aa")
 
-[node name="@MeshInstance3D@5938" type="MeshInstance3D" parent="CrossingRainReeds_-543_08_-5_35" unique_id=1848137580]
+[node name="@MeshInstance3D@23120" type="MeshInstance3D" parent="CrossingRainReeds_-543_08_-5_35" unique_id=2124897233]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_af6lv")
 mesh = SubResource("BoxMesh_h2r3a")
 
-[node name="@MeshInstance3D@5939" type="MeshInstance3D" parent="CrossingRainReeds_-543_08_-5_35" unique_id=264115914]
+[node name="@MeshInstance3D@23121" type="MeshInstance3D" parent="CrossingRainReeds_-543_08_-5_35" unique_id=397347992]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_a2dl3")
 mesh = SubResource("BoxMesh_vxqsc")
 
-[node name="CrossingRainReeds_-543_46_-20_84" type="Node3D" parent="." unique_id=500342787]
+[node name="CrossingRainReeds_-543_46_-20_84" type="Node3D" parent="." unique_id=979662102]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -543.46, -60, -20.84)
 
-[node name="@MeshInstance3D@5952" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_-20_84" unique_id=1312924534]
+[node name="@MeshInstance3D@23134" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_-20_84" unique_id=1815851731]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_37hhu")
 mesh = SubResource("BoxMesh_npc76")
 
-[node name="@MeshInstance3D@5953" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_-20_84" unique_id=1356425803]
+[node name="@MeshInstance3D@23135" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_-20_84" unique_id=863698234]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_tfju5")
 mesh = SubResource("BoxMesh_gw7jm")
 
-[node name="@MeshInstance3D@5954" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_-20_84" unique_id=2042728890]
+[node name="@MeshInstance3D@23136" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_-20_84" unique_id=1489936570]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_rlbs6")
 mesh = SubResource("BoxMesh_ymi77")
 
-[node name="CrossingRainReeds_-539_34_-14_95" type="Node3D" parent="." unique_id=1174633381]
+[node name="CrossingRainReeds_-539_34_-14_95" type="Node3D" parent="." unique_id=2112605742]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -539.34, -60, -14.95)
 
-[node name="@MeshInstance3D@5955" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_-14_95" unique_id=794418503]
+[node name="@MeshInstance3D@23137" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_-14_95" unique_id=1243396454]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_m15yg")
 mesh = SubResource("BoxMesh_6sg30")
 
-[node name="@MeshInstance3D@5956" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_-14_95" unique_id=535285355]
+[node name="@MeshInstance3D@23138" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_-14_95" unique_id=844548108]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_6ieyk")
 mesh = SubResource("BoxMesh_1oncc")
 
-[node name="@MeshInstance3D@5957" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_-14_95" unique_id=1784322239]
+[node name="@MeshInstance3D@23139" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_-14_95" unique_id=1870466078]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_dro1o")
 mesh = SubResource("BoxMesh_owyrs")
 
-[node name="CrossingRainReeds_-539_94_14_43" type="Node3D" parent="." unique_id=1649571264]
+[node name="CrossingRainReeds_-539_94_14_43" type="Node3D" parent="." unique_id=1678586846]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -539.94, -60, 14.43)
 
-[node name="@MeshInstance3D@5997" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_14_43" unique_id=1320656733]
+[node name="@MeshInstance3D@23179" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_14_43" unique_id=1499235296]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_u5dt2")
 mesh = SubResource("BoxMesh_eb2ka")
 
-[node name="@MeshInstance3D@5998" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_14_43" unique_id=1433036955]
+[node name="@MeshInstance3D@23180" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_14_43" unique_id=746314576]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_1x8e4")
 mesh = SubResource("BoxMesh_0qgs7")
 
-[node name="@MeshInstance3D@5999" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_14_43" unique_id=1154685624]
+[node name="@MeshInstance3D@23181" type="MeshInstance3D" parent="CrossingRainReeds_-539_94_14_43" unique_id=1694300948]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_u8ytf")
 mesh = SubResource("BoxMesh_gsc30")
 
-[node name="CrossingRainReeds_-543_46_5_16" type="Node3D" parent="." unique_id=566559187]
+[node name="CrossingRainReeds_-543_46_5_16" type="Node3D" parent="." unique_id=89704231]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -543.46, -60, 5.16)
 
-[node name="@MeshInstance3D@6015" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_5_16" unique_id=566967260]
+[node name="@MeshInstance3D@23197" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_5_16" unique_id=1890145334]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_hdy5r")
 mesh = SubResource("BoxMesh_lt40p")
 
-[node name="@MeshInstance3D@6016" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_5_16" unique_id=917041176]
+[node name="@MeshInstance3D@23198" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_5_16" unique_id=2125393040]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_352jg")
 mesh = SubResource("BoxMesh_kxi6o")
 
-[node name="@MeshInstance3D@6017" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_5_16" unique_id=1235469482]
+[node name="@MeshInstance3D@23199" type="MeshInstance3D" parent="CrossingRainReeds_-543_46_5_16" unique_id=163825955]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_pg8ub")
 mesh = SubResource("BoxMesh_xj8n6")

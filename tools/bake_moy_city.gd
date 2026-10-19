@@ -48,7 +48,7 @@ func _ready() -> void:
 		push_error("Moy silhouette save failed: %s" % error_string(silhouette_err)); get_tree().quit(1); return
 	silhouette_root.free()
 	var hashes := {}
-	for source in ["res://scripts/city_plan.gd", "res://scripts/moy_city_bake_builder.gd", "res://scripts/moy_ride_train.gd", "res://scripts/moy_wind_turbine_rotor.gd", "res://scripts/moy_timekeeper.gd", "res://scripts/moy_hotel_lift.gd", "res://scripts/moy_hotel_revolving_door.gd", "res://scripts/moy_hotel_windrose.gd", "res://scripts/moy_lift_platform.gd", "res://scripts/moy_escalator.gd", "res://scripts/terrain_generator.gd", "res://scripts/village_works.gd", "res://scripts/collision_policy.gd", "res://tools/city_layout.py", "res://tools/bake_moy_city.gd"]:
+	for source in ["res://scripts/city_plan.gd", "res://scripts/moy_city_bake_builder.gd", "res://scripts/city_generator.gd", "res://scripts/moy_ride_train.gd", "res://scripts/moy_wind_turbine_rotor.gd", "res://scripts/moy_timekeeper.gd", "res://scripts/moy_hotel_lift.gd", "res://scripts/moy_hotel_revolving_door.gd", "res://scripts/moy_hotel_windrose.gd", "res://scripts/moy_lift_platform.gd", "res://scripts/moy_escalator.gd", "res://scripts/terrain_generator.gd", "res://scripts/village_works.gd", "res://scripts/collision_policy.gd", "res://tools/city_layout.py", "res://tools/bake_moy_city.gd"]:
 		hashes[source] = _sha256(ProjectSettings.globalize_path(source))
 	var spine: Dictionary={}
 	var meridian: Dictionary={}
