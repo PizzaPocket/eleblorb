@@ -46,3 +46,6 @@ separated above adjoining inhabited podiums.
 P6 revision-2 references: `references/moy_downtown_overview.png`,
 `references/moy_downtown_parts.png`, `references/moy_downtown_base.png`,
 `references/moy_downtown_passage.png` and `references/moy_downtown_street.png`.
+
+P6 medium-sized buildings use muted glass, metal and grey stone finishes;
+the three landmark palettes retain their accepted colours.

@@ -3901,7 +3901,10 @@ DOWNTOWN=dict(version=2,datum=-60.0,printed_marks=False,
     bay=3.6,recess=0.6,guard=1.2,path=2.0,door=(2.4,2.8),
     palette=dict(stone='#eee2c7',glass='#47767e',shadow='#354c55',
         terracotta='#c56849',jade='#278b81',coral='#ed8269',gold='#d8ac45',
-        cobalt='#426ca7',leaf='#748c52',ground='#c3b69b'),
+        cobalt='#426ca7',leaf='#748c52',ground='#c3b69b',
+        aluminium='#aeb7bd',champagne_metal='#b6b0a4',graphite='#626c73',
+        glass_smoke='#63717a',glass_bluegrey='#718591',glass_silver='#889397',
+        midrise_stone='#c1c2bd',midrise_shadow='#47525b'),
     wind=dict(top=262.0,crown=280.0,turn=90.0,radius=13.8,corner=0.2,
         storey=3.6,gaps=[72.0,144.0,216.0],gap_h=7.2,transfer=3.6,
         core=(4.0,6.0),column=1.2,deck=258.4,stops=[0.0,6.5,258.4],
@@ -3921,7 +3924,7 @@ for i,l in enumerate(lots):
     w_,d_=l[2]-l[0],l[3]-l[1]
     DK['owners'].append(dict(lot=i,rect=l[:4],storeys=l[4],height=l[4]*STOREY['midrise'],
         bays=[max(1,int(w_/DK['bay'])),max(1,int(d_/DK['bay']))],
-        variant=('pier','paired','recess')[i%3],accent=('jade','terracotta','cobalt')[i%3],
+        variant=('pier','paired','recess')[i%3],accent=('aluminium','champagne_metal','graphite')[i%3],
         passage=next((cw['passage'] for cw in COURT_WAYS if cw.get('passage',{}).get('lot')==i),None)))
 # User-authorized P6 site/massing change: LOTS remain stable source IDs for
 # cross-package references; sites replace their 23 independent tall owners.
@@ -3949,7 +3952,8 @@ for site_id,ids,shaft,height in _specs:
     DK['sites'].append(dict(id=site_id,sources=ids,podium=list(land.exterior.coords)[:-1],
         shaft=shaft,height=height,storeys=round(height/3.6),core=core,
         bays=[max(1,int(w_/DK['bay'])),max(1,int(d_/DK['bay']))],
-        variant=('pier','paired','recess')[ids[0]%3],accent=('jade','terracotta','cobalt')[ids[0]%3],
+        variant=('pier','paired','recess')[ids[0]%3],accent=('aluminium','champagne_metal','graphite')[ids[0]%3],
+        glass=('glass_smoke','glass_bluegrey','glass_silver')[ids[0]%3],
         passage=next((o['passage'] for o in DK['owners'] if o['lot'] in ids and o['passage']),None)))
 DK['source_role']='provenance only; replace old midrise geometry once per site, not once per source lot'
 for st in DK['sites']:

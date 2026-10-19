@@ -144,7 +144,11 @@ from the primary 1.4 m frame. Glazing up to 2.4 m high, width bay−0.65 m
 (minimum 0.5); one rounded cutter drives opening, glazing and trim.
 
 Three recorded families remain: single piers, paired piers and recessed bays.
-Pale ceramic, jade/terracotta/cobalt reveals; no printed characters. Roofs
+Muted grey stone, aluminium, champagne metal or graphite framing, with
+smoke, blue-grey or silver-grey glass, as recorded per site. No bright red,
+green or blue trim on the medium-sized buildings. Glass/metal dominate;
+variation is subtle and material-based. The three landmark palettes are
+unchanged. No printed characters. Roofs
 and terraces have 1.2 m guards and physical landing surfaces. Connect only
 existing Deck doors/routes. Do not invent lifts to every mid-rise roof.
 
@@ -358,3 +362,6 @@ and push; report any incomplete item explicitly.
   the misleading base model, including the south tower's former small posts.
   Current binding schedule: 47 part templates, 16 joins. All prior P6 build
   prompts must be read against revision 2, not the withdrawn first layout.
+
+- User palette revision: medium-sized buildings use conventional muted glass,
+  metal and stone finishes. Landmark colours remain unchanged.

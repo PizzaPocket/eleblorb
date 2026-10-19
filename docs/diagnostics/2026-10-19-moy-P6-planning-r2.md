@@ -63,3 +63,13 @@ routes, working lifts, matched P0 audits, performance and unload/re-entry
 proof. The old 23-tower build prompt is withdrawn. Pull revision 2 and build
 from the revised P6 brief. External artifact publication remains pending;
 this chat has no artifact-publishing tool.
+
+## Mid-rise material refinement
+
+User requested conventional skyscraper colours for the ten medium-sized
+buildings only: muted smoke/blue-grey/silver-grey glazing, aluminium,
+champagne metal or graphite frames, and neutral grey stone. Site material
+keys and model now use those finishes. Landmark palette entries and all
+wind/north/south parameters were compared with the previous commit and are
+unchanged, as are site geometry, parts/joins and geometric checks. Updated
+reference images replace the earlier bright-trim renders.

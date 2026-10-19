@@ -346,3 +346,12 @@ spans and 0.8 × 1.2 m girders beneath the podium slab. Enclosed storefront
 and service shells alternate with explicit public openings; a completely
 open base on thin perimeter posts is excluded. `DOWNTOWN` now binds 47 part
 templates and 16 joins. These are architectural game-design dimensions.
+
+### Downtown mid-rise material palette clarification
+
+User revision: the ten medium-sized buildings use conventional skyscraper
+materials: smoke/blue-grey/silver-grey glazing, aluminium/champagne metal/
+graphite frames, neutral grey stone at piers and podiums. Keep saturation
+low and vary finish subtly by site. This supersedes the earlier coloured
+jade/terracotta/cobalt accents for these ten buildings only. Windspire,
+capsule tower and dune tower retain their accepted landmark palettes.
