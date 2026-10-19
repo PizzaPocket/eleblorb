@@ -1,7 +1,7 @@
 # Package P2: bake, rendered performance and streaming
 
 2026-10-19. Build-session brief. Read `moy_build_roadmap.md` first.
-Status: **ready for build**. No performance acceptance is claimed by this brief.
+Status: **fix** (first review, section 10). Performance acceptance remains open.
 
 ## 1. Area, target and dependencies
 
@@ -199,3 +199,108 @@ No web export. Follow AGENTS.md for pushing; do not bypass hooks.
   artifact tooling; this cloud session has no artifact publication capability.
   The local atlas and brief are usable independently; no published URL claimed.
 
+## 10. First review — 2026-10-19: fix
+
+Reviewed build `7bcbb09`, diagnostic
+`../diagnostics/2026-10-19-moy-P2.md`, raw r2–r5 JSON/logs,
+the streaming/probe source diff, P0 reports, and overview/civic screenshots.
+**Result: fix.** Keep the instrumentation and raw evidence; do not mark P2 done.
+The diagnostic correctly admits the missing routes and missed budgets.
+
+Verified in review: r2/r3/r4 each contain seven 30-second samples and two cycles,
+with identical source hashes; their city-generator hash differs from final source.
+R5 matches the final recorded source hashes but has only one stationary sample.
+The P0 category counts equal the baseline; bake freshness passes (205 packs).
+This review does not independently reproduce the Apple M5 timings on Linux.
+
+### Fix in this order
+
+1. **Make evidence and acceptance explicit in the runner.**
+   `accepted_rendering_evidence=true` is only a backend/sample flag today;
+   r4 has four `travel_frame_over_100ms` errors but `failed=false`.
+   Preserve a separate rendering-validity result and add required-gate verdicts.
+   Exit nonzero for incomplete routes/cycles, required frame/stall misses and
+   readiness failures. A focused `--route` run must say partial, never full-suite
+   acceptance. Validate unknown/missing route names and expected sample counts.
+   The unload wait stops after 45 seconds but never fails if packs remain:
+   require actual settled unload completion and fail on timeout.
+   Add meaningful negative cases showing each failure path returns nonzero.
+
+2. **Fix benchmark overhead before trusting memory/stage attribution.**
+   `city_generator.gd` now appends activation, frame and release dictionaries
+   indefinitely in ordinary play, and recursively counts bodies in the timed
+   streaming path even without a benchmark. Make detailed telemetry opt-in,
+   bounded or drained; retain lightweight counters if needed.
+   The probe holds all raw frames and serializes accumulated data between
+   views, so later static-memory samples include growing benchmark storage.
+   Stream raw records to disk or quantify/exclude observer allocation from the
+   incremental-city memory verdict; compare equivalent settled states.
+   Separate request completion from activation eligibility: current
+   `request_to_ready_ms` is measured when an eligible pack is finally consumed
+   and can include activation-queue delay. `add_child` measures synchronous
+   tree insertion, not all deferred physics/GPU work. Name and correlate these
+   measurements accurately; do not present them as isolated deserialize,
+   registration or actual free-completion timings without proof.
+
+3. **Close the unload/lifetime regression.**
+   R5 has 0 active/requested/cached-manifest packs after unload, but node counts
+   increase 18,611 → 18,666 and reload counts 42,661 → 42,716.
+   Identify the +55 nodes by class/path/owner and include actor-group identities,
+   unique residents/vendor counts and pending/deferred work in equivalent states.
+   Do not assume the growth is duplicate actors until inspected.
+   Verify pending ResourceLoader jobs are consumed/released, rather than only
+   erasing `_moy_requested`; test leaving during requests and rapid re-entry.
+   In the 72–140 m hotel annulus, the same stream tick now requests hotel
+   paths and then erases their tracking state in the release branch. Keep
+   prefetched requests tracked until their intended release threshold, and
+   demonstrate no repeated request/reset loop while standing in that annulus.
+   Hotel request radius 140 m / activation 48 m gives 92 m lead; prove the
+   remaining 40 m beyond rope reach covers measured travel/load latency.
+   Keep occupancy/anchor/train supports until safe release, including when the
+   controlled body differs from `../Player`. Current city-wide eligibility
+   still uses that player's XZ distance to CITY_CENTER, so it does not itself
+   demonstrate the required tall-bounds/multiple-body streaming contract.
+
+4. **Optimize the measured bottlenecks, then remeasure.**
+   Estate p95 is 58.116 / 58.844 / 58.558 ms; around 7,500 draws and 13 million
+   primitives. Activation p95 is around 81–83 ms; synchronous activation stages
+   reach about 29 ms. Profile the heavy packs/materials/meshes and split or
+   simplify allowed local work without changing locked dimensions, collision
+   or coverage. Bound per-frame activation work and preserve spatial culling.
+   The Crossroads baseline itself peaks near 901k triangles: the diagnostic's
+   statement that Crossroads meets both complexity aims is incorrect.
+   Only the Crossing meets both in this dataset. Correct the summary and keep
+   Crossroads cost distinct from incremental Moy cost.
+   The recorded `crossing_east_gate` camera is at world x=-560 (the Crossing);
+   capture a separate actual East Gate train-hall view identified from plan data.
+
+5. **Implement the required real routes and repeatability proof.**
+   Add an actual moving-train ride through station, turn and vertical crossing;
+   controlled fast entry at all four gates; a cross-pack vine handover; occupied
+   roof/platform/train boundaries; Xiao Hou Zi and alternate-body entry.
+   Record support readiness and controller/anchor/train state, not teleports
+   or stationary camera labels. Run at least three warm traversals as well as
+   three fresh processes on final source, one Godot process per checkout.
+   R5 overlapped another validator, so use it only for its stated release-state
+   diagnosis, not final performance comparison. Repeat full and isolated QA
+   runtime checks; retain a reproducer/backtrace for any returning native crash.
+   Successful hardware runs establish non-reproduction of exit 134 there, not
+   its original cause; classify that limitation honestly.
+
+6. **Complete and correct the visual/check report.**
+   The 112 saved images are overview, civic/crossing streets, and underside/
+   escalator fixtures. They do not include the claimed dedicated Old Moy,
+   Downtown, Estate Court and train-hall benchmark shots. Add named noon/dusk
+   images at the actual benchmark cameras with matching run/source metadata.
+   Keep existing useful P0/P1 images. Re-run P0 fixtures (not documented in this
+   submission) and compare changed findings by location/path, preserving the
+   committed baseline and its existing debt. Re-run bake freshness and required
+   validators after final edits. Report command exits and every remaining miss.
+
+Deliver `docs/diagnostics/<date>-moy-P2-fixes.md` with each numbered item,
+final-source raw runs, gate table, node/actor lifetime evidence, route proofs,
+and correctly named screenshots. Do not loosen the original budgets or claim
+completion from a runner's rendering-evidence flag.
+
+**Handoff to Luna:** Build the P2 fixes in section 10 of
+`docs/architecture/moy_pkg_P2.md`, keeping the original acceptance contract.
