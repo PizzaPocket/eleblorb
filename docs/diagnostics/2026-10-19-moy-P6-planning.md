@@ -1,3 +1,6 @@
+> Historical revision-1 evidence. Superseded by `2026-10-19-moy-P6-planning-r2.md`;
+> do not use the 23-independent-tower schedule for a new build.
+
 # P6 planning verification — 2026-10-19
 
 **Ready brief and planning model; runtime P6 implementation has not started.**

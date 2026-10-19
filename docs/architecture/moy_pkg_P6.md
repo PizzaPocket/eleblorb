@@ -1,16 +1,16 @@
 # Package P6: Downtown's podiums and three tower exteriors
 
-2026-10-19. **Ready for implementation after earlier district fixes integrate.**
+2026-10-19. **Revision 2: ready; site/base checks passed; supersedes the original 23-tower handoff.**
 Read `moy_build_roadmap.md` first. This is a binding L2 brief, not another
 massing pass. The plan-data schedule and this brief supersede the scope draft.
 
-- **Area:** 23 generated mid-rise lots (110–132), Windspire 12, north tower
+- **Area:** 10 consolidated mid-rise sites replacing source lots 110–132, Windspire 12, north tower
   14 and south tower 15, with their recorded public ground and connections.
 - **Target:** L2: distinctive architecture, physical ledges and usable public
   routes. Simple planting/colour makes the design legible; final dressing is later.
 - **Depends on:** P0 checks and existing shared lifts/collision; integrate
   P3/P4 correctness fixes and P5 sequentially before touching shared builders.
-- **Binding data:** `CityPlan.DOWNTOWN` (42 part templates, 14 joins), plus
+- **Binding data:** `CityPlan.DOWNTOWN` (47 part templates, 16 joins), plus
   existing `LOTS`, `TOWER_SITE`, `COURT_WAYS`, `DECK`, heights and crowns.
 - **Model:** `docs/drawings/moy_downtown_3d.html`, overview, tower, street,
   garden and wind-gap views; separate podium/member section beside game hero.
@@ -50,67 +50,103 @@ BLOCK's neighbour is ordinary P6 mid-rise fabric, but its approach geometry
 serves P17. Preserve its footprint, height and six-metre separation. Do not
 change BLOCK's tower or silently block its court while building that neighbour.
 
-## 3. Exact owner coverage
+## 3. Authorized site revision and exact coverage
 
-All heights below are above ground datum world y = −60. Preserve all 23
-rectangles, storey counts and heights. Lot IDs are internal, never facade text.
-`DOWNTOWN.owners` stores each fitted bay count, variant, accent and passage.
+The user authorized merging sliver plots, separating tall shafts and replacing
+the all-open pillar bases. This is an intentional P6 plan change, not an
+implementation exception to the locked layout. Roads, landmark sites, court
+polygons, estate, hotel and P17 story/geometry remain unchanged.
 
-| Lot | Storeys | Roof, m | Facade family | Accent |
-|---|---:|---:|---|---|
-| 110 | 26 | 93.6 | recess | cobalt |
-| 111 | 22 | 79.2 | pier | jade |
-| 112 | 20 | 72.0 | paired | terracotta |
-| 113 | 26 | 93.6 | recess | cobalt |
-| 114 | 18 | 64.8 | pier | jade |
-| 115 | 26 | 93.6 | paired | terracotta |
-| 116 | 18 | 64.8 | recess | cobalt |
-| 117 | 26 | 93.6 | pier | jade |
-| 118 | 30 | 108.0 | paired | terracotta |
-| 119 | 34 | 122.4 | recess | cobalt |
-| 120 | 22 | 79.2 | pier | jade |
-| 121 | 20 | 72.0 | paired | terracotta |
-| 122 | 26 | 93.6 | recess | cobalt |
-| 123 | 18 | 64.8 | pier | jade |
-| 124 | 30 | 108.0 | paired | terracotta |
-| 125 | 24 | 86.4 | recess | cobalt |
-| 126 | 34 | 122.4 | pier | jade |
-| 127 | 26 | 93.6 | paired | terracotta |
-| 128 | 30 | 108.0 | recess | cobalt |
-| 129 | 24 | 86.4 | pier | jade |
-| 130 | 34 | 122.4 | paired | terracotta |
-| 131 | 22 | 79.2 | recess | cobalt |
-| 132 | 24 | 86.4 | pier | jade |
+`DOWNTOWN.sites` is now the building schedule. `DOWNTOWN.owners` and original
+`LOTS[110:133]` retain source/provenance and cross-package IDs only. They are
+not 23 buildings to implement. Replace those original proxies once each,
+then build the ten sites below. Never build both the old owners and new sites.
+Source lots have one and only one new site; their polygon union is its podium.
+Do not fill a bounding rectangle across a court or garden at an L-shaped site.
 
-Reconcile every old owner to exactly one replacement in the diagnostic. Do not
-leave the original proxy or its full-height collider beneath the new kit.
-Owner 119 contains court 8's 2.4 m-wide, 3.0 m-high passage, from world
-(−436,38) to (−436,58). Its walls, plinth, terrain exclusion and collision
-must all respect that same clear volume. Preserve the full court polygon.
+| Site | Source lots | Shaft world rect (x0,z0,x1,z1) | Roof above datum |
+|---|---|---|---:|
+| North garden | 110,114 | −480,−166,−466,−145 | 86.4 |
+| Capsule neighbours | 111,112,113 | −439,−119,−410,−105 | 93.6 |
+| Wind garden edge | 115,116 | −425,−95,−394,−83 | 93.6 |
+| East pavilion | 117,118 | −385.5,−55,−373.5,−41 | 57.6 |
+| BLOCK approach | 119,120 | −443,38,−413,58 | 122.4 |
+| Court east | 121,122,127 | −405,41,−376,55 | 86.4 |
+| Market west | 123,124 | −479,81,−441,95 | 108 |
+| Market east | 125,126 | −433,81,−394,95 | 108 |
+| South garden edge | 128,129,130 | −439,105,−410,119 | 108 |
+| South garden | 131,132 | −480,145,−466,166 | 86.4 |
 
-## 4. Shared podium and mid-rise kit
+Small strips are absorbed into podiums/low pavilions or terraces. None keeps
+an independent tall shaft. Shortest shaft dimension is at least 12 m.
+Shafts have at least 8 m between each other and the four landmark shafts,
+except the deliberately preserved six-metre P17 approach gap to BLOCK.
+These are game-design clearances, not a claim of regulatory compliance.
+Podiums may join at property boundaries; tall windowed facades do not touch.
+Existing public courts remain outside podium unions. Roof terraces use the
+space between podium edges and shafts, with proper guards and openings.
 
-- Structural storey rhythm 3.6 m; public podium top +6.5, slab 0.24,
-  underside +6.26. Ground colonnades are open, except declared sealed cores
-  and services. No full-footprint blocker below the podium.
-- Fit bay count `max(1,floor(face/3.6))`, width `face/count`, independently
-  on the two plan axes. Do not squeeze standard columns through narrow infill.
-- Continuous sealed upper volume ends 0.6 m behind each original face.
-  Piers and horizontal heads sit within that recess and original envelope.
-  Rounded 0.36 m piers, 0.24 m heads; glazing maximum 2.4 m high and bay
-  width minus 0.65 m (minimum 0.5 m). Derive visible apertures and glass from
-  the same cutter; the browser's sealed glazing surface is illustrative.
-- Three families: **pier**, single pale piers; **paired**, an extra slim
-  central mullion where bay exceeds 3 m; **recess**, deeper visual reveals
-  with pale framing and coloured horizontal shading. Use recorded accents.
-  Cornices and 1.2 m roof parapets make a deliberate top; no pasted crown.
-- Entrances: rounded head, square feet, 2.4 × 2.8 m clear, 2 m clear landings.
-  Use colour plus an unlettered pictorial inlay. No printed characters anywhere.
-- Roofs have collision and safe parapets. No new lift access to every roof:
-  roof traversal uses the game's shared climbing/swing systems. Do not add
-  inaccessible open rooms or unserved lift doors to imply private interiors.
-- Connect only existing `DECK` doors/through routes. P6 does not extend the
-  Deck to all downtown roofs or alter its supports, trains or street heights.
+Court 8's 2.4 × 3 m passage remains in source lot119, world (−436,38) to
+(−436,58). Cut that exact clear volume through podium walls and every
+collider, including base infill. Primary piers are explicitly placed outside
+it. `BLOCK_TOWER.inside.approach` retains its existing strip as the climb
+interface: wall x=−443, location z=55, roof +122.4. The enlarged P6 site
+absorbs lot120 to its east without moving that six-metre climb interface.
+
+## 4. Podiums, load paths and facade kit
+
+### 4.1 Structure is primary, not decorative
+
+Each mid-rise has a continuous core from embedded foundation to roof: 6 ×
+8 m, or 4 × 6 m at the 12 m-wide east pavilion shaft. Use the
+per-site `core` value. Major piers are 1.4 m square, aligned vertically through
+the shaft and podium into the foundations. `sites.grid` and `.piers` give
+actual positions; maximum primary spacing is 7.2 m. Do not replace these
+members with the 0.36 m facade piers or glass mullions.
+
+Podium roof top +6.5, slab 0.24, underside +6.26. Primary transfer girders
+are 0.8 m wide × 1.2 m deep, from +5.06 to +6.26, seated on the piers and
+joined into the core. Their individual supported spans must not exceed the
+checked grid spacing, even when the rendered beam is a continuous run.
+Keep support positions through upper floors; do not move them to rescue
+window patterns. Clip/cap shared bearing faces, and coordinate core openings
+with the structure. Terrace extensions need their own supported beams,
+secondary piers or cantilever detail; an unsupported slab over a garden is
+not a new foundation strategy.
+
+These dimensions establish an architectural load path for the game, not a
+real structural-engineering calculation. The model must visibly communicate
+core → floors/girders → aligned piers/walls → embedded base.
+
+### 4.2 Inhabited bases and selected public openings
+
+Podiums have substantial 0.4 m wall enclosures, recessed sealed storefronts
+and service cores, interrupted by selected entrances, lobbies and the court
+passage. They are not completely open floors ringed with small posts.
+Public entries are at least 2.4 × 2.8 m clear, with 2 m level landings.
+Court passage keeps its own 3 m clear head. P6 builds closed shop/service
+shells, not furnished or staffed interiors. Do not invent vendors or tenants.
+The core and primary frame support the building independently of storefronts.
+
+Foundation embeds at least 0.5 m below surveyed terrain. Source rectangles
+are land ownership/provenance; merged external walls follow the union outline
+and coordinate joints between adjoining podiums. A joined podium wall may be
+opaque/party wall; no sealed window faces another wall at zero clearance.
+
+### 4.3 Upper facades and roofs
+
+Use the 3.6 m storey rhythm and explicit new heights. The first upper
+interval runs from podium +6.5 to +10.8, then +14.4, +18.0 and so on
+to the recorded roof; do not finish with a 0.7 m miniature storey. Fit nominal 3.6 m bays
+to each **shaft** frontage. Sealed backing is 0.6 m behind its shaft outline;
+0.36 m facade piers and 0.24 m heads are secondary shading members, distinct
+from the primary 1.4 m frame. Glazing up to 2.4 m high, width bay−0.65 m
+(minimum 0.5); one rounded cutter drives opening, glazing and trim.
+
+Three recorded families remain: single piers, paired piers and recessed bays.
+Pale ceramic, jade/terracotta/cobalt reveals; no printed characters. Roofs
+and terraces have 1.2 m guards and physical landing surfaces. Connect only
+existing Deck doors/routes. Do not invent lifts to every mid-rise roof.
 
 ## 5. Windspire — building 12
 
@@ -191,8 +227,11 @@ shells and north/east planted strips retain their recorded site boundaries.
 ## 7. South tower — building 15
 
 Shaft rect (−477,110)–(−451,136), roof +150. Forty levels at 3.75 m.
-First balcony slab +7.5, underside +7.26; two-storey colonnade on 0.8 m
-posts. Inner sealed facade is a 20 m-wide superellipse of exponent 5.5,
+First balcony slab +7.5, underside +7.26; two-storey colonnade on 1.4 m
+aligned primary piers on the recorded 5.333 m grid. A continuous 6 × 8 m
+core runs from foundation to roof; 0.8 × 1.2 m girders sit beneath the first
+balcony slab, bottom +6.06/top +7.26. These replace the former four small
+corner posts. Retain the core and frame through the upper housing. Inner sealed facade is a 20 m-wide superellipse of exponent 5.5,
 not a square whose corners poke through the balconies.
 
 For level j, angle a, use radial half-span
@@ -215,17 +254,18 @@ Pergola top +3.6; posts seat under its lattice. No new private lift route.
 ## 8. Parts, joins and formation
 
 `DOWNTOWN.parts` and `.joins` are binding, not optional illustrations. The
-model displays all 42 part-template definitions and 14 join rules. The build
+model displays all 47 part-template definitions and 16 join rules. The build
 report accounts for each part with implemented owner(s), geometry/collision
 builder and screenshot, or a precise blocked reason. Account for each join
 with its shared planes and a close-up. No generic box proxy counts as a part.
 
-Symbolic half-sizes are evaluated per instance: W/D are its existing owner
-width/depth; run/segmentL/L are measured between join planes; clearH is the
+Symbolic half-sizes are evaluated per instance: W/D are the relevant shaft or merged podium width/depth; run/segmentL/L are measured between join planes; clearH is the
 owner's clear storey; bay is the fitted facade bay; windowW is bay−0.65 with
 0.5 minimum; profileW/D are that level's profile bounds; privateH/housingH
 are the recorded sealed vertical intervals; shaftW/rise are the assigned
-lift dimensions/served span; shared_radius/height come from NatureProps; roofTop is the assigned pavilion/pergola top.
+lift dimensions/served span; coreW/coreD are per-site core dimensions; height is the new shaft roof;
+southH is 150 m;
+span is between structural bearing planes; shared_radius/height come from NatureProps; roofTop is the assigned pavilion/pergola top.
 All are metres. Signs in formulas refer to world-local coordinates.
 
 Use production `SuperEgg.build_part`, `build_clipped_mesh` or
@@ -284,7 +324,7 @@ climbing ledge is different from an inescapable trap inside architectural seams.
   ownership/cancellation; no enlarged timeout to disguise failure.
 
 Write `docs/diagnostics/<date>-moy-P6.md`: exact owner reconciliation; all
-42 parts and 14 joins; geometry/winding/collision evidence; actual two-rig
+47 parts and 16 joins; geometry/winding/collision evidence; actual two-rig
 route results; before/after audits; performance and unload data; limitations.
 Separate implemented, verified, failed and unrun. Partial work stays partial.
 
@@ -297,20 +337,24 @@ day and dusk. Use a readable camera, never an occluding wall as route proof.
 
 ## 11. Planning evidence and handoff
 
-See `docs/diagnostics/2026-10-19-moy-P6-planning.md` for passed planning
+See `docs/diagnostics/2026-10-19-moy-P6-planning-r2.md` for passed planning
 checks, reference images and explicit runtime checks still owed by the build.
 
 Build prompt: Pull latest main. Read AGENTS.md, CLAUDE.md and the Moy
 roadmap. After earlier district fixes integrate, implement P6 from this brief
-and the Downtown model, accounting for all 42 parts and 14 joins. Preserve
-locked layout and other packages. Run the specified checks and write the
+and the Downtown model, accounting for all 47 parts and 16 joins. Preserve
+the authorized revision-2 layout and other packages. Run the specified checks and write the
 P6 implementation diagnostic with actual hero/Xiao route evidence. Commit
 and push; report any incomplete item explicitly.
 
 ## Decisions log
 
-- 2026-10-19: scope draft started at user's request; tower concepts retained.
-- 2026-10-19: user authorized completion. Bound 23 mid-rise owners and
-  42-part/14-join schedule; resolved public stops/levels, tower sections,
-  palette and existing court passage. Browser model is planning evidence;
-  runtime implementation belongs to Luna. Local publication remains pending.
+- Revision 1, 2026-10-19: retained 23 source plots as independent tall
+  buildings, with a 42-part/14-join schedule. Superseded after user review
+  of thin slivers, touching tall facades and the little-post base model.
+- Revision 2, user-authorized 2026-10-19: consolidate into ten sites;
+  minimum shaft width 12 m and mutual gap 8 m. Preserve the six-metre P17
+  interface. Continuous cores, 1.4 m aligned piers and deep girders replace
+  the misleading base model, including the south tower's former small posts.
+  Current binding schedule: 47 part templates, 16 joins. All prior P6 build
+  prompts must be read against revision 2, not the withdrawn first layout.

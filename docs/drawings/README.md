@@ -32,9 +32,17 @@ Every drawing is updated whenever the plan it shows changes, and republished to 
 
 ### Moy P6: Downtown
 
-`moy_downtown_3d.html` — 23 fitted mid-rise owners and the Windspire, north
+`moy_downtown_3d.html` — ten consolidated mid-rise sites replacing 23 source plots and the Windspire, north
 and south tower exteriors, drawn from `CityPlan.DOWNTOWN`. Includes tower,
 street, sky-garden, wind-gap and dusk views, a podium/member section beside
-the exported hero, and the binding 42-part/14-join schedule. Browser labels
+the exported hero, and the binding 47-part/16-join schedule. Browser labels
 are technical notation; no printed letters or numbers appear on architecture.
 Local page; external artifact publication pending. Brief: `../architecture/moy_pkg_P6.md`.
+
+P6 revision 2 replaces the thin-post section with a continuous-core/primary-
+pier section and adds a ground-level base view. Consolidated shafts are
+separated above adjoining inhabited podiums.
+
+P6 revision-2 references: `references/moy_downtown_overview.png`,
+`references/moy_downtown_parts.png`, `references/moy_downtown_base.png`,
+`references/moy_downtown_passage.png` and `references/moy_downtown_street.png`.

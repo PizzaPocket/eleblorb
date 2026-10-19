@@ -3896,7 +3896,7 @@ if EK['bridge']['floor'] != 26*EK['storey'] or EK['centre']['garden_floor'] != 2
 
 
 # ---- P6: Downtown. Geometry schedules only; no locked layout changes.
-DOWNTOWN=dict(version=1,datum=-60.0,printed_marks=False,
+DOWNTOWN=dict(version=2,datum=-60.0,printed_marks=False,
     towers=[12,14,15],storey=3.6,podium=6.5,slab=0.24,wall=0.24,
     bay=3.6,recess=0.6,guard=1.2,path=2.0,door=(2.4,2.8),
     palette=dict(stone='#eee2c7',glass='#47767e',shadow='#354c55',
@@ -3911,7 +3911,7 @@ DOWNTOWN=dict(version=1,datum=-60.0,printed_marks=False,
         side_mode='alternating_opposite_faces',capsule_w=6.4,capsule_d=[6.0,7.5,9.0],capsule_h=3.5,
         stops=[0.0,22*175.0/45],cabin=(2.0,2.4),shaft=(2.8,3.2)),
     south=dict(top=150.0,storeys=40,storey=3.75,colonnade=7.5,
-        inner=20.0,outer=26.0,balcony_min=1.5,ripple=1.4,
+        core=(6.0,8.0),column=1.4,grid=[-8,-8/3,8/3,8],inner=20.0,outer=26.0,balcony_min=1.5,ripple=1.4,
         terraces=[142.5,146.25,150.0],terrace_inner=[17.0,14.0],pergola_top=3.6),
     site=dict(post=0.24,canopy_top=3.6,bench=(2.2,0.48,0.6),planter=(2.0,0.6,1.2)))
 DK=DOWNTOWN
@@ -3923,6 +3923,49 @@ for i,l in enumerate(lots):
         bays=[max(1,int(w_/DK['bay'])),max(1,int(d_/DK['bay']))],
         variant=('pier','paired','recess')[i%3],accent=('jade','terracotta','cobalt')[i%3],
         passage=next((cw['passage'] for cw in COURT_WAYS if cw.get('passage',{}).get('lot')==i),None)))
+# User-authorized P6 site/massing change: LOTS remain stable source IDs for
+# cross-package references; sites replace their 23 independent tall owners.
+DK['structure']=dict(pier=1.4,core=(6.0,8.0),small_core=(4.0,6.0),
+    girder_depth=1.2,girder_width=0.8,wall=0.4,min_shaft=12.0,min_gap=8.0)
+DK['sites']=[]
+_specs=[
+ ('north_garden',[110,114],(-480,-166,-466,-145),86.4),
+ ('capsule_neighbours',[111,112,113],(-439,-119,-410,-105),93.6),
+ ('wind_garden_edge',[115,116],(-425,-95,-394,-83),93.6),
+ ('east_pavilion',[117,118],(-385.5,-55,-373.5,-41),57.6),
+ ('block_approach',[119,120],(-443,38,-413,58),122.4),
+ ('court_east',[121,122,127],(-405,41,-376,55),86.4),
+ ('market_west',[123,124],(-479,81,-441,95),108.0),
+ ('market_east',[125,126],(-433,81,-394,95),108.0),
+ ('south_garden_edge',[128,129,130],(-439,105,-410,119),108.0),
+ ('south_garden',[131,132],(-480,145,-466,166),86.4)]
+from shapely.geometry import box as _p6box
+from shapely.ops import unary_union as _p6union
+for site_id,ids,shaft,height in _specs:
+    land=_p6union([_p6box(*lots[i][:4]) for i in ids])
+    if land.geom_type!='Polygon': problems.append(('P6: merged site disconnected',site_id))
+    w_,d_=shaft[2]-shaft[0],shaft[3]-shaft[1]
+    core=DK['structure']['small_core'] if min(w_,d_)<14 else DK['structure']['core']
+    DK['sites'].append(dict(id=site_id,sources=ids,podium=list(land.exterior.coords)[:-1],
+        shaft=shaft,height=height,storeys=round(height/3.6),core=core,
+        bays=[max(1,int(w_/DK['bay'])),max(1,int(d_/DK['bay']))],
+        variant=('pier','paired','recess')[ids[0]%3],accent=('jade','terracotta','cobalt')[ids[0]%3],
+        passage=next((o['passage'] for o in DK['owners'] if o['lot'] in ids and o['passage']),None)))
+DK['source_role']='provenance only; replace old midrise geometry once per site, not once per source lot'
+for st in DK['sites']:
+    sh=_p6box(*st['shaft'])
+    from shapely.geometry import Point as _p6point
+    st['terrace_planters']=[((lots[i][0]+lots[i][2])/2,(lots[i][1]+lots[i][3])/2) for i in st['sources'] if sh.distance(_p6point((lots[i][0]+lots[i][2])/2,(lots[i][1]+lots[i][3])/2))>=3.0]
+
+for st in DK['sites']:
+    r=st['shaft'];w_,d_=r[2]-r[0],r[3]-r[1];cw,cd=st['core']
+    nx,nz=math.ceil((w_-2)/7.2),math.ceil((d_-2)/7.2)
+    xs=[round(-w_/2+1+i*(w_-2)/nx,4) for i in range(nx+1)]
+    zs=[round(-d_/2+1+i*(d_-2)/nz,4) for i in range(nz+1)]
+    if st['id']=='block_approach': xs=[-14,-10,-6,0,7,14]
+    st['grid']=dict(x=xs,z=zs,max_span=7.2)
+    st['piers']=[(x,z) for x in xs for z in zs if not(abs(x)<cw/2+0.7 and abs(z)<cd/2+0.7)]
+
 DP=[];DJ=[]
 def dp(id,where,shape,semi,col,role='mass',**kw):
     row=dict(id=id,where=where,shape=shape,semi=semi,col=col,role=role)
@@ -3931,7 +3974,7 @@ def dp(id,where,shape,semi,col,role='mass',**kw):
     if shape=='box': row['reason']='flush floor or sealed interior infill; rounded seams would leave cracks'
     row.update(kw); DP.append(row)
 dp('foundation','surveyed footing below ground; at least 0.5 embed','box',('W/2',0.25,'D/2'),'solid','floor')
-dp('podium_column','public loggia ends at slab underside','clipped',(0.3,3.13,0.3),'solid','post',join='podium_bearing')
+dp('podium_column','secondary podium canopy support only, not the skyscraper load path','clipped',(0.7,3.13,0.7),'solid','post',join='podium_bearing')
 dp('podium_floor','roof/deck slab top +6.5; through-route voids cut out','box',('W/2',0.12,'D/2'),'landing','floor')
 dp('private_mass','sealed above podium, recessed facade bays; passages subtracted','box',('innerW/2','privateH/2','innerD/2'),'solid')
 dp('bay_pier','between recessed facade bays, within footprint','clipped',(0.18,'clearH/2',0.3),'solid','post',join='bay_frame')
@@ -3960,7 +4003,7 @@ dp('garden_column','garden supports at the core corners, no floating upper capsu
 dp('south_skin','recessed sealed pale facade within 20 m square','wall',(10.0,'housingH/2',10.0),'solid','wall',outline='glazing_seat')
 dp('dune_slab','superellipse balcony profile with sampled smooth ripple, bounded by shaft','profile',(13.0,0.12,13.0),'landing')
 dp('dune_screen','rounded shade panels behind balcony clear route','clipped',(0.1,1.2,0.6),'solid','post',join='balcony_seat')
-dp('colonnade_post','south two-storey base supports at inner facade corners','clipped',(0.4,3.63,0.4),'solid','post',join='podium_bearing')
+dp('colonnade_post','south primary piers continuous through colonnade and upper frame','clipped',(0.7,'southH/2',0.7),'solid','post',join='load_path')
 dp('lift_wall','shared lift enclosure with real landing openings','wall',('shaftW/2','rise/2',0.12),'solid','wall',outline='lift_opening')
 dp('lift_car','shared cabin, usable by hero and Xiao; clear 2 x 2.4','box',(1.0,1.4,1.2),'landing')
 dp('lift_door','shared sliding door leaves, open at served stop','clipped',(0.6,1.4,0.06),'solid','leaf',join='lift_opening')
@@ -3973,7 +4016,7 @@ dp('planter','physical raised planter with planted soil, not route blocker','egg
 dp('plant','shared NatureProps vegetation; substantial trunk physical','egg',('shared_radius','shared_height/2','shared_radius'),'solid',eps=(3.0,3.0))
 dp('identity_inlay','unlettered entrance colour/shape inlay, flush decorative finish','decal',(0.4,0.4,0.002),'decorative')
 def dj(id,kind,parts,plane,rule): DJ.append(dict(id=id,kind=kind,parts=parts,plane=plane,rule=rule))
-dj('podium_bearing','seated',['foundation','podium_column','podium_floor','colonnade_post'],'midrise +6.26; south +7.26','feet cap at ground; heads cap at slab underside; sizes derive from owner height')
+dj('podium_bearing','seated',['foundation','podium_column','podium_floor'],'midrise +6.26; south +7.26','feet cap at ground; heads cap at slab underside; sizes derive from owner height')
 dj('bay_frame','meet',['bay_pier','bay_head','private_mass'],'bay jamb/head shared planes within original footprint','one fitted bay grid; cap heads and piers; sealed backing recessed 0.6')
 dj('glazing_seat','punched',['window_wall','glazing','window_trim','south_skin'],'same superellipse cutter at outer wall','glazing is cutter intersected with shell; no painted fake opening')
 dj('passage_cut','punched',['passage_wall','private_mass','foundation','portal'],'COURT_WAYS passage width/height, ground threshold','subtract passage from every overlapping owner solid and foundation; cap reveals')
@@ -3987,6 +4030,13 @@ dj('balcony_seat','meet',['dune_slab','south_skin','dune_screen','guard'],'south
 dj('lift_opening','punched',['lift_wall','lift_car','lift_door','wind_core','north_core','tower_floor'],'served stop top = car floor = landing top','cut shaft from slabs; stop doors and guards clear actual entry; no lift doors on unserved private floors')
 dj('site_bearing','seated',['site_post','site_beam','site_roof'],'pergola top +3.6; pavilion/bridge top +6.5','posts cap at roof underside; glass bridge meets existing hotel threshold; all within recorded site')
 dj('furniture_bearing','seated',['bench_leg','bench_seat','planter','plant'],'ground 0; bench top +0.48','legs meet seat underside; planting rooted; no object in door clearances')
+dp('south_core','continuous 6 x 8 m south core from foundation to roof','wall',(3.0,75.0,4.0),'solid','wall',outline='core_entry')
+dp('midrise_core','continuous core from foundation to roof; plain sealed service enclosure','wall',('coreW/2','height/2','coreD/2'),'solid','wall',outline='core_entry')
+dp('load_pier','1.4 m primary piers aligned with shaft corners, continuous through podium','clipped',(0.7,'height/2',0.7),'solid','post',join='load_path')
+dp('transfer_girder','0.8 x 1.2 deep perimeter and cross girders below podium slab','clipped',('span/2',0.6,0.4),'solid','beam',join='load_path')
+dp('podium_wall','0.4 m inhabited podium enclosure with coordinated public openings','wall',('run/2',3.13,0.2),'solid','wall',outline='core_entry')
+dj('load_path','seated',['foundation','midrise_core','south_core','colonnade_post','load_pier','transfer_girder','podium_floor','private_mass'],'foundation 0; midrise girder bottom +5.06/top +6.26, slab +6.5; south girder +6.06 to +7.26, slab +7.5','continuous core and aligned piers carry shaft; girder caps meet piers; no entire tower perched on facade mullions')
+dj('core_entry','punched',['midrise_core','podium_wall','portal'],'ground threshold 0; entry clear 2.4 x 2.8','single cutter coordinates reveals and glass; keep court-8 passage clear, including core and girders')
 DK['parts']=DP; DK['joins']=DJ
 parts_checks('Downtown',DP,DJ)
 if len(DK['owners'])!=len([l for l in lots if l[5]=='midrise']): problems.append(('P6: owner coverage',))
@@ -4044,6 +4094,39 @@ def _p6_geometry_checks():
     if not {0.0,6.5,W['deck']}==set(W['stops']): problems.append(('P6: Windspire public stops drifted',))
     DK['checks']=dict(south_min_clear=round(min(clearances),4),capsules_within_shaft=True,owners=len(DK['owners']))
 _p6_geometry_checks()
+def _p6_site_checks():
+    from shapely.geometry import Polygon
+    src=[i for st in DK['sites'] for i in st['sources']]
+    if sorted(src)!=sorted(o['lot'] for o in DK['owners']) or len(src)!=len(set(src)):
+        problems.append(('P6: merged source coverage/duplicates',))
+    gaps=[]
+    for st in DK['sites']:
+        sh=_p6box(*st['shaft']);land=Polygon(st['podium'])
+        for axis in ('x','z'):
+            grid=st['grid'][axis]
+            if any(b-a>7.2001 for a,b in zip(grid,grid[1:])): problems.append(('P6: unsupported primary span',st['id'],axis))
+        if st['passage']:
+            px=st['passage']['road_end'][0]-(st['shaft'][0]+st['shaft'][2])/2
+            if any(abs(x-px)<st['passage']['w']/2+0.7-1e-6 for x,z in st['piers']):
+                problems.append(('P6: primary pier intrudes into passage',st['id']))
+
+        if not land.covers(sh): problems.append(('P6: shaft outside merged site',st['id']))
+        if min(st['shaft'][2]-st['shaft'][0],st['shaft'][3]-st['shaft'][1])<12:
+            problems.append(('P6: tall sliver persists',st['id']))
+        for other in DK['sites']:
+            if other['id']<=st['id']: continue
+            gap=sh.distance(_p6box(*other['shaft']));gaps.append(gap)
+            if gap<8-1e-6: problems.append(('P6: shafts too close',st['id'],other['id'],gap))
+        for n in (12,13,14,15):
+            gap=sh.distance(_p6box(*TOWER_SITE[n]['shaft']))
+            # The P17 climb wall deliberately remains six metres from BLOCK.
+            minimum=6 if st['id']=='block_approach' and n==13 else 8
+            if gap<minimum-1e-6: problems.append(('P6: landmark separation',st['id'],n,gap))
+    approach=next(st for st in DK['sites'] if st['id']=='block_approach')
+    if approach['shaft'][0]!=-443 or approach['shaft'][1]>55 or approach['shaft'][3]<55 or approach['height']!=122.4:
+        problems.append(('P6: P17 climb interface moved',))
+    DK['checks'].update(sites=len(DK['sites']),min_shaft_gap=round(min(gaps),3),source_lots=len(src))
+_p6_site_checks()
 
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)

@@ -1858,6 +1858,22 @@ storeys (65 to 122 m)**, a third to a half of the towers' height, so the
 towers rise out of a city rather than over a plain, as in Hong Kong's
 Central or Tokyo's Marunouchi.
 
+**Downtown mid-rise revision (user, 2026-10-19).** Merge the 23 generated
+mid-rise source plots into ten sites. Narrow leftover strips belong to their
+neighbours' podiums, low pavilions or terraces, not independent skyscrapers.
+`DOWNTOWN.sites` records the merged polygon, separate shaft, roof and source
+IDs. Shafts are at least 12 m wide and stand at least 8 m apart; the P17
+approach deliberately retains its existing six-metre gap. Podiums may join
+at ground level, while tall windowed facades stand apart. Heights now range
+from 57.6 to 122.4 m, with the existing three landmark towers unchanged.
+
+Bases are inhabited podiums with selected colonnades and passages, supported
+by continuous cores, substantial aligned piers and transfer girders. Thin
+facade piers are not their primary structure. Court 8's passage, the hotel
+connection and P17's approach wall/roof remain fixed. This revision overrides
+the older instruction to make every generated mid-rise plot a tall building;
+see `moy_pkg_P6.md` revision 2 and its street-level/structural sections.
+
 **1. The Windspire** (the Windworks' headquarters, about 70 storeys, 280 m)
 - **Idea:** the city's wind made into a building.
 - **References:**

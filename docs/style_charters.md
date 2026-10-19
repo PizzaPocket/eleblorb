@@ -332,3 +332,17 @@ locked plots, routes, heights and the three tower identities remain binding.
 | Twisted triangle and transfer slot | existing Windspire concept, city.md 7c | building 12 only |
 | Plug-in studio and open garden floor | existing capsule-tower concept | building 14 only |
 | Continuous rippling balcony | existing dune-tower concept | building 15 only |
+
+### Downtown P6 revision 2: sites and primary structure
+
+User-authorized 2026-10-19. Ten consolidated sites replace the 23 source
+plots as tall-building owners. Podium footprints follow merged plot unions;
+separate shafts have minimum width 12 m and checked 8 m clear gaps. The
+P17 approach retains its six-metre interface. Low podiums can join deliberately.
+
+The 0.36 m facade piers remain secondary. Primary support is continuous
+6 × 8 m (or recorded 4 × 6 m) core, 1.4 m aligned piers on at most 7.2 m
+spans and 0.8 × 1.2 m girders beneath the podium slab. Enclosed storefront
+and service shells alternate with explicit public openings; a completely
+open base on thin perimeter posts is excluded. `DOWNTOWN` now binds 47 part
+templates and 16 joins. These are architectural game-design dimensions.
