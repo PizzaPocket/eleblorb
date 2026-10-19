@@ -146,7 +146,7 @@ line** (user, 2026-10-18: the first build had two, a sweep and a chin line):
 
 **The pilot** fills the helmet: the head's own shape, inset from the shell
 (0.87 in the model) so that it and its eyes stay inside; the game's own
-blorb eyes on its skin, about 0.04 m wide, **lying flat on it** (each turned to the skin's normal where it sits, not pitched), coloured by the blorb rule
+blorb eyes on its skin, about 0.04 m wide, **lying flat and upright on it** (each set in the skin's own frame: its thin axis on the skin's normal where it sits, its long axis along the skin's up; neither pitched nor rolled), coloured by the blorb rule
 (`blorb.gd`); its core inside. A city blorb glows; Blorbus does not.
 
 **Rig:** publishes the rig-neutral joints through its own
@@ -292,7 +292,7 @@ data and this brief disagreed.
 - 2026-10-18 (user): the mech's visor is **one line**, not a sweep and a chin line; the shoulder
   pieces are **low rounded shells close to the body, inside the blorb chest**; the model
   page has a **Blorb suit** toggle.
-- 2026-10-18 (user): the shoulder shell is a **cover over the shoulder joint**, not a pad beside it (the joint must not sit on the pad); the pilot's eyes lie flat on its skin, not pitched up.
+- 2026-10-18 (user): the shoulder shell is a **cover over the shoulder joint**, not a pad beside it (the joint must not sit on the pad); the pilot's eyes lie flat and upright on its skin, not pitched up or rolled; the shoulder joints must not clip through the shells (the model measures every vertex of the ball and ring against the shell).
 - 2026-10-18 (planning, found while scheduling): the climb's balconies were 7.2 m apart
   and the hero jumps 1.36 m, so they become a fire escape of six ramps (31°) with a landing
   each, the last level with the 30% ring, then a bracket every 1.2 m; the base is set back
