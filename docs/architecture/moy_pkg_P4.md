@@ -290,6 +290,25 @@ rendered before/after summaries, and Old High Street/court noon screenshots.
 Keep the 99-owner integration; complete the existing brief rather than
 accepting approximations or writing a smaller replacement specification.
 
+0. **Confirmed winding fault: fix before further facade work.** Reviewer
+   inspection of actual baked ConcavePolygonShape3D arrays found 315 roof
+   triangles facing down and zero facing up in 96 parsed P4 house bodies.
+   Wall fronts were mixed: 288 inward, 726 outward. This scan is a verified
+   subset, not a claim that all 99 bodies were parsed.
+   `_polygon_building` reverses Geometry2D's triangulated roof order and
+   emits walls without normalising the footprint orientation. The assigned
+   UP/outward normals do not correct reversed vertex winding; wall normals
+   can also disagree with the actual front. `_poly_floor` uses the same
+   reversed top-face order and must be checked for court/pocket paving.
+   Use Godot's clockwise convention: front = (c-a) cross (b-a). Normalise
+   ring orientation or emit each face toward its explicit expected outside,
+   including concave footprints. Re-bake all affected meshes/collision.
+   Prove positive upward roof/floor fronts and exterior-facing walls on
+   both CW and CCW rectangle/concave input fixtures, and representative
+   final baked houses. Render from outside/above with default back-face
+   culling and exercise top/support collision. Do not fix this by disabling
+   culling, flipping only shading normals, or hiding a tiny BoxMesh cap.
+
 1. **Finish the scheduled house forms.** Implement all 51 part templates and
    10 joins, including distinct stone/earth bases, battered superellipse lifts
    and horns, cornices, patterned friezes, surface-fitted openings and qamariya,

@@ -336,6 +336,10 @@ do not replace this with another massing pass. The following work is required:
    City-wide performance targets and optimization remain deferred; loading
    correctness, unsafe support loss and new blocking geometry remain blockers.
 
+**Shared geometry priority:** P4's first-review item 0 records confirmed
+roof/wall winding faults. Correct shared polygon/floor helpers before final
+P3/P4 baking and traversal proof; this does not waive either kit schedule.
+
 **Next build order:** finish P3 properly first (P4's pencil infill shares its
 tile-house grammar), then finish P4 from its first-review section. Keep
 separate commits/diagnostics and do not redesign the locked layout.
