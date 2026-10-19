@@ -303,3 +303,49 @@ by the cloud network policy. Specific host additions have been saved in the
 environment configuration draft. No fresh photo research is claimed yet.
 Inspect and cite actual references, then present revised model alternatives
 before replacing the provisional kit palette and finalising this brief.
+
+## 12. Accepted visual direction and SuperEgg handoff
+
+User, 2026-10-19: the colourful concept direction is accepted for development.
+Reference: [colour concept](../drawings/references/moy_north_estate_colour_concept.png).
+Coral/cobalt twins share an arch motif; sunflower/cream frames and shaded teal
+galleries distinguish the slab blocks; block identity repeats at entrances
+through colour, motif and numerals. This approves the visual direction, not
+every depicted dimension or detail. Existing site/height data still wins.
+The block numerals in the concept illustration are illustrative: the build
+must retain the actual numbered building identities from the plan.
+
+**User clarification:** some elongated forms in the browser model look
+pointed or tipped. Those are approximation/sampling artifacts, **not intended
+SuperEgg profiles**. Do not copy the browser mesh or the illustration's
+geometry into the build. The model is a composition reference; the checked
+parts/joins schedule, this clarification, and the game's own builders govern
+actual geometry. P5 remains in design review until the detailed colour/feature
+schedule is updated.
+
+| Element | Intended construction | Ends / joins |
+|---|---|---|
+| Columns, posts, gallery guards, beams and sills | Square-ended structural SuperEggs, normally EPSILON_FLAT = 5.5; dimensions are half-sizes, not a recipe to stretch a coarse sphere | Clip and cap at shared bearing/miter planes; no spikes, pointed tips or rounded gaps at supports |
+| Entrance frames, sunshades and canopy edges | Broad softened rectangular members or an authored superellipse profile; visibly full-bodied along the span | Resolve corners from the same opening/section and explicit join planes; no spear-like terminal vertices or intersecting rounded ends |
+| Long linkway roofs / bridge canopy | Authored clipped SuperEgg slabs or an appropriate constant-section profile, with sufficient longitudinal and corner sampling | Real planar caps and closed undersides; shared datum and complete matching cut profiles at joints |
+| Doors, windows and large arch openings | Superellipse outlines, with glazing and trim derived from one aperture; open route thresholds cut flat | No pinched arch crowns, floating trim, rounded threshold lips or fake openings |
+| Floor/ceiling infill and hidden structure | Plain structural slabs/boxes where needed for complete coverage, as already justified by the schedule | One surface owner; no doubled collision or gaps disguised by rounded edges |
+| Benches, tables and planters | Rounded SuperEgg members appropriate to their role, supported by the ground and their own legs/bases | No stretched pointed ends; supports must visibly meet the piece they carry |
+| Large colour fields and identity motifs | Painted/decal treatments unless the revised schedule explicitly specifies physical relief | Do not turn painted arches into unsupported structural members or invent tapered solids from graphic shapes |
+
+Implementation uses `scripts/superegg.gd`: `SuperEgg.build_part` for complete
+forms, and `build_clipped_mesh` / `build_clipped_part` for actual cut-and-capped
+solids. Use the engine's `surface_point` parameterisation, exponent convention
+and exact-axis handling; do not port the model's low-resolution SphereGeometry
+vertex transform or its vertex-clamping shortcut. Epsilon below 2 pinches
+profiles and is forbidden here. Increasing squareness alone does not repair
+poor sampling of a long member.
+
+Before assembling the district, render a representative long post, beam,
+guard, canopy junction and entrance frame at true scale beside the hero.
+Inspect side silhouette, both terminal profiles, bearings and underside in
+close-up. Require smooth full profiles, properly capped ends and no accidental
+needle tips/fans or visible gaps. Then inspect the same pieces at gameplay
+distance and confirm their substantial visible volumes have collision.
+Include those isolated proofs and their dimensions/exponents/cut planes in
+the P5 diagnostic. A faithful copy of a pointed browser artifact is a failure.
