@@ -29,3 +29,12 @@ Edit here and republish; the tools in `tools/*_layout.py` and
 | `fire_caldera_3d.html` | local review model | the Fire Caldera with its walkway system (the Gate Terrace and funicular, the Highline and porches, the Renewal horseshoe stair, Oren's spiral stair, the promenade and frontages, service lanes) and the Heartworks' lava vortex under it; x-ray and section views. Rebuild: `python3 tools/fire_caldera_walkways_layout.py --json walk.json`, then `python3 tools/fire_caldera_heartworks_layout.py --json data.json --walkways walk.json [--surface surface.json]` (the surface from `Godot --headless --path . tools/validate_fire_plan.tscn -- --model-json=surface.json`; omit it to keep the page's), and `python3 tools/embed_drawing_data.py docs/drawings/fire_caldera_3d.html data.json` |
 
 Every drawing is updated whenever the plan it shows changes, and republished to the same link. The published copies are private to the owner until shared from the page's Share menu.
+
+### Moy P6: Downtown
+
+`moy_downtown_3d.html` — 23 fitted mid-rise owners and the Windspire, north
+and south tower exteriors, drawn from `CityPlan.DOWNTOWN`. Includes tower,
+street, sky-garden, wind-gap and dusk views, a podium/member section beside
+the exported hero, and the binding 42-part/14-join schedule. Browser labels
+are technical notation; no printed letters or numbers appear on architecture.
+Local page; external artifact publication pending. Brief: `../architecture/moy_pkg_P6.md`.

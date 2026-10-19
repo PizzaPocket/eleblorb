@@ -3894,6 +3894,157 @@ if EK['gallery'] < 1.5 or EK['link']['top']-EK['link']['slab'] < 2.4:
 if EK['bridge']['floor'] != 26*EK['storey'] or EK['centre']['garden_floor'] != 2*EK['storey']:
     problems.append(('P5: sky bridge/Deck datum mismatch',))
 
+
+# ---- P6: Downtown. Geometry schedules only; no locked layout changes.
+DOWNTOWN=dict(version=1,datum=-60.0,printed_marks=False,
+    towers=[12,14,15],storey=3.6,podium=6.5,slab=0.24,wall=0.24,
+    bay=3.6,recess=0.6,guard=1.2,path=2.0,door=(2.4,2.8),
+    palette=dict(stone='#eee2c7',glass='#47767e',shadow='#354c55',
+        terracotta='#c56849',jade='#278b81',coral='#ed8269',gold='#d8ac45',
+        cobalt='#426ca7',leaf='#748c52',ground='#c3b69b'),
+    wind=dict(top=262.0,crown=280.0,turn=90.0,radius=13.8,corner=0.2,
+        storey=3.6,gaps=[72.0,144.0,216.0],gap_h=7.2,transfer=3.6,
+        core=(4.0,6.0),column=1.2,deck=258.4,stops=[0.0,6.5,258.4],
+        cabin=(2.0,2.4),shaft=(2.8,3.2),rotor_z=-7.5,rotor_sweep=4.0,fin=(0.24,0.6),fin_every=3),
+    north=dict(top=175.0,storeys=45,storey=175.0/45,core=(6.0,8.0),
+        start=2*175.0/45,garden=(22*175.0/45,24*175.0/45),
+        side_mode='alternating_opposite_faces',capsule_w=6.4,capsule_d=[6.0,7.5,9.0],capsule_h=3.5,
+        stops=[0.0,22*175.0/45],cabin=(2.0,2.4),shaft=(2.8,3.2)),
+    south=dict(top=150.0,storeys=40,storey=3.75,colonnade=7.5,
+        inner=20.0,outer=26.0,balcony_min=1.5,ripple=1.4,
+        terraces=[142.5,146.25,150.0],terrace_inner=[17.0,14.0],pergola_top=3.6),
+    site=dict(post=0.24,canopy_top=3.6,bench=(2.2,0.48,0.6),planter=(2.0,0.6,1.2)))
+DK=DOWNTOWN
+DK['owners']=[]
+for i,l in enumerate(lots):
+    if l[5]!='midrise': continue
+    w_,d_=l[2]-l[0],l[3]-l[1]
+    DK['owners'].append(dict(lot=i,rect=l[:4],storeys=l[4],height=l[4]*STOREY['midrise'],
+        bays=[max(1,int(w_/DK['bay'])),max(1,int(d_/DK['bay']))],
+        variant=('pier','paired','recess')[i%3],accent=('jade','terracotta','cobalt')[i%3],
+        passage=next((cw['passage'] for cw in COURT_WAYS if cw.get('passage',{}).get('lot')==i),None)))
+DP=[];DJ=[]
+def dp(id,where,shape,semi,col,role='mass',**kw):
+    row=dict(id=id,where=where,shape=shape,semi=semi,col=col,role=role)
+    if shape in ('egg','clipped'): row['eps']=(5.5,5.5)
+    if shape=='profile': row['n']=5.5
+    if shape=='box': row['reason']='flush floor or sealed interior infill; rounded seams would leave cracks'
+    row.update(kw); DP.append(row)
+dp('foundation','surveyed footing below ground; at least 0.5 embed','box',('W/2',0.25,'D/2'),'solid','floor')
+dp('podium_column','public loggia ends at slab underside','clipped',(0.3,3.13,0.3),'solid','post',join='podium_bearing')
+dp('podium_floor','roof/deck slab top +6.5; through-route voids cut out','box',('W/2',0.12,'D/2'),'landing','floor')
+dp('private_mass','sealed above podium, recessed facade bays; passages subtracted','box',('innerW/2','privateH/2','innerD/2'),'solid')
+dp('bay_pier','between recessed facade bays, within footprint','clipped',(0.18,'clearH/2',0.3),'solid','post',join='bay_frame')
+dp('bay_head','bay head/shade, outer face inside footprint','clipped',('bay/2',0.12,0.3),'solid','beam',join='bay_frame')
+dp('window_wall','punched wall; single cutter drives opening and glazing','wall',('bay/2','clearH/2',0.12),'solid','wall',outline='glazing_seat')
+dp('glazing','sealed superellipse glazing derived from window cutter','egg',('windowW/2',1.2,0.04),'solid','window')
+dp('window_trim','superellipse ring, not a solid plaque','profile',('windowW/2+0.08',1.28,0.06),'decorative')
+dp('portal','rounded-head entrance frame with square feet; 2.4 x 2.8 clear','profile',(1.44,1.64,0.18),'solid')
+dp('guard','clipped parapets with real route openings','clipped',('run/2',0.6,0.1),'solid','rail',join='guard_chain')
+dp('roof_cap','roof/parapet head; no unsupported crown stuck on a box','clipped',('run/2',0.12,0.24),'solid','beam',join='guard_chain')
+dp('passage_wall','owner walls split around indexed court passage','wall',('run/2',1.5,0.12),'solid','wall',outline='passage_cut')
+dp('tower_floor','slab trimmed to level profile minus public voids and shaft','profile',('profileW/2',0.12,'profileD/2'),'landing')
+dp('wind_skin','rounded triangle profile twisted at sampled levels; gaps omitted','profile',(13.8,'bandH/2',13.8),'solid')
+dp('wind_core','continuous core; public lift apertures cut at stops','wall',(2.0,131.0,3.0),'solid','wall',outline='lift_opening')
+dp('mega_column','three continuous sampled corner lines through gaps','clipped',(0.6,'segmentL/2',0.6),'solid','post',join='wind_structure')
+dp('transfer_beam','triangular transfer bands above/below each gap','clipped',('segmentL/2',0.3,0.3),'solid','beam',join='wind_structure')
+dp('transfer_diagonal','corner-to-core bracing in transfer band, clear of west-east slot','clipped',(0.24,'segmentL/2',0.24),'solid','beam',join='wind_structure')
+dp('wind_fin','terracotta fin following twist; 0.24 x 0.6 section','clipped',(0.12,'segmentL/2',0.3),'solid','beam',join='fin_chain')
+dp('turbine_hub','one visible rotor hub per wind gap plus crown rotor','egg',(0.55,0.55,0.55),'solid',eps=(2.0,2.0))
+dp('turbine_blade','rounded rotor blade in gap with swept clearance','egg',(0.18,2.2,0.3),'solid',eps=(3.0,3.0))
+dp('crown_post','open observation crown from deck to +274; spire to +280','clipped',(0.15,'L/2',0.15),'solid','post',join='crown_bearing')
+dp('north_core','continuous core above open ground; lift and entry apertures','wall',(3.0,87.5,4.0),'solid','wall',outline='lift_opening')
+dp('capsule_shell','ceramic superellipse shell, recessed sealed studio glazing','egg',(3.2,1.75,'depth/2'),'solid')
+dp('capsule_socket','flat clipped bracket seated between core and capsule','clipped',(0.24,0.3,'L/2'),'solid','beam',join='capsule_seat')
+dp('garden_column','garden supports at the core corners, no floating upper capsules','clipped',(0.3,'gardenH/2',0.3),'solid','post',join='garden_bearing')
+dp('south_skin','recessed sealed pale facade within 20 m square','wall',(10.0,'housingH/2',10.0),'solid','wall',outline='glazing_seat')
+dp('dune_slab','superellipse balcony profile with sampled smooth ripple, bounded by shaft','profile',(13.0,0.12,13.0),'landing')
+dp('dune_screen','rounded shade panels behind balcony clear route','clipped',(0.1,1.2,0.6),'solid','post',join='balcony_seat')
+dp('colonnade_post','south two-storey base supports at inner facade corners','clipped',(0.4,3.63,0.4),'solid','post',join='podium_bearing')
+dp('lift_wall','shared lift enclosure with real landing openings','wall',('shaftW/2','rise/2',0.12),'solid','wall',outline='lift_opening')
+dp('lift_car','shared cabin, usable by hero and Xiao; clear 2 x 2.4','box',(1.0,1.4,1.2),'landing')
+dp('lift_door','shared sliding door leaves, open at served stop','clipped',(0.6,1.4,0.06),'solid','leaf',join='lift_opening')
+dp('site_post','pergola/lobby hall posts on recorded site','clipped',(0.12,'(roofTop-0.24)/2',0.12),'solid','post',join='site_bearing')
+dp('site_beam','pergola/pavilion roof bearing members','clipped',('L/2',0.12,0.12),'solid','beam',join='site_bearing')
+dp('site_roof','pavilion roofs at Deck datum; pergola lattice at +3.6','profile',('W/2',0.12,'D/2'),'landing')
+dp('bench_seat','site seating outside circulation clearances','egg',(1.1,0.09,0.3),'solid',eps=(3.0,3.0))
+dp('bench_leg','bench supports with flat feet','clipped',(0.12,0.195,0.24),'solid','post',join='furniture_bearing')
+dp('planter','physical raised planter with planted soil, not route blocker','egg',(1.0,0.3,0.6),'solid')
+dp('plant','shared NatureProps vegetation; substantial trunk physical','egg',('shared_radius','shared_height/2','shared_radius'),'solid',eps=(3.0,3.0))
+dp('identity_inlay','unlettered entrance colour/shape inlay, flush decorative finish','decal',(0.4,0.4,0.002),'decorative')
+def dj(id,kind,parts,plane,rule): DJ.append(dict(id=id,kind=kind,parts=parts,plane=plane,rule=rule))
+dj('podium_bearing','seated',['foundation','podium_column','podium_floor','colonnade_post'],'midrise +6.26; south +7.26','feet cap at ground; heads cap at slab underside; sizes derive from owner height')
+dj('bay_frame','meet',['bay_pier','bay_head','private_mass'],'bay jamb/head shared planes within original footprint','one fitted bay grid; cap heads and piers; sealed backing recessed 0.6')
+dj('glazing_seat','punched',['window_wall','glazing','window_trim','south_skin'],'same superellipse cutter at outer wall','glazing is cutter intersected with shell; no painted fake opening')
+dj('passage_cut','punched',['passage_wall','private_mass','foundation','portal'],'COURT_WAYS passage width/height, ground threshold','subtract passage from every overlapping owner solid and foundation; cap reveals')
+dj('guard_chain','chain',['guard','roof_cap','tower_floor'],'landing edges and route openings','continuous 1.2 guard; miter corners; cut guards at doors and landings')
+dj('wind_structure','chain',['mega_column','transfer_beam','transfer_diagonal','wind_core','wind_skin'],'sampled shared corner/core planes at gap and transfer levels','columns remain continuous; transfer bands 3.6 deep outside the 7.2 clear slot')
+dj('fin_chain','chain',['wind_fin','wind_skin'],'twist profile samples, omitted inside open gap','segments share cuts and end caps; no tapered pole ends or isolated rods')
+dj('crown_bearing','seated',['crown_post','tower_floor','turbine_hub','turbine_blade'],'observation +258.4; lattice +274; spire +280','crown rooted in shaft structure; rotor swept volume clear of lattice')
+dj('capsule_seat','seated',['capsule_shell','capsule_socket','north_core'],'capsule inner bearing plane against core','socket caps meet core and shell; capsule roof remains landable; no duplicate collision overlap')
+dj('garden_bearing','seated',['garden_column','north_core','tower_floor','capsule_socket'],'north garden floor 22 storeys, soffit 24 storeys minus slab','continuous core and four columns carry upper capsules; clear public garden and lift landing')
+dj('balcony_seat','meet',['dune_slab','south_skin','dune_screen','guard'],'south slab top at each 3.75 m level, min clear balcony 1.5','one slab owns surface; guard follows outer profile; screen stays behind circulation')
+dj('lift_opening','punched',['lift_wall','lift_car','lift_door','wind_core','north_core','tower_floor'],'served stop top = car floor = landing top','cut shaft from slabs; stop doors and guards clear actual entry; no lift doors on unserved private floors')
+dj('site_bearing','seated',['site_post','site_beam','site_roof'],'pergola top +3.6; pavilion/bridge top +6.5','posts cap at roof underside; glass bridge meets existing hotel threshold; all within recorded site')
+dj('furniture_bearing','seated',['bench_leg','bench_seat','planter','plant'],'ground 0; bench top +0.48','legs meet seat underside; planting rooted; no object in door clearances')
+DK['parts']=DP; DK['joins']=DJ
+parts_checks('Downtown',DP,DJ)
+if len(DK['owners'])!=len([l for l in lots if l[5]=='midrise']): problems.append(('P6: owner coverage',))
+if DK['printed_marks'] or DK['podium']!=DECK['level']: problems.append(('P6: marks or Deck mismatch',))
+for o in DK['owners']:
+    if o['height']!=lots[o['lot']][4]*STOREY['midrise'] or min(o['bays'])<1: problems.append(('P6: owner dimensions',o['lot']))
+    if min(o['rect'][2]-o['rect'][0],o['rect'][3]-o['rect'][1])<2*DK['recess']+1.5: problems.append(('P6: infill too narrow',o['lot']))
+for n,key in [(12,'wind'),(14,'north'),(15,'south')]:
+    if DK[key]['top']!=HEIGHTS[n]: problems.append(('P6: tower height',n))
+if DK['wind']['crown']!=CROWNS[12] or DK['wind']['radius']*2>28: problems.append(('P6: Windspire envelope',))
+if DK['south']['outer']!=26 or (DK['south']['outer']-DK['south']['inner'])/2-DK['south']['ripple']<DK['south']['balcony_min']: problems.append(('P6: dune balcony clearance',))
+for y in DK['wind']['gaps']:
+    if not DK['wind']['transfer']<y<y+DK['wind']['gap_h']+DK['wind']['transfer']<DK['wind']['deck']: problems.append(('P6: wind gap levels',y))
+if not DK['north']['start']<DK['north']['garden'][0]<DK['north']['garden'][1]<175: problems.append(('P6: north levels',))
+
+
+# Sampled geometry checks prevent envelope and circulation drift in P6.
+def _p6_geometry_checks():
+    from shapely.geometry import Polygon as P6Polygon
+    def sp(v): return math.copysign(abs(v)**(2/5.5),v) if abs(v)>1e-12 else 0.0
+    S=DK['south']; clearances=[]
+    for j in range(2,41):
+        scale=1-0.07*(j-37) if j>37 else 1.0
+        inner=S['inner'] if j<=38 else S['terrace_inner'][j-39]
+        # At terrace slab +142.5/+146.25, the facade above steps immediately.
+        if j==38: inner=S['terrace_inner'][0]
+        if j==39: inner=S['terrace_inner'][1]
+        outer=[]; inside_=[]
+        for i in range(256):
+            a=i*math.pi/128; r=(S['outer']/2-S['ripple']*(.5+.5*math.sin(3*a+.43*j)))*scale
+            outer.append((r*sp(math.cos(a)),r*sp(math.sin(a))))
+            inside_.append((inner/2*sp(math.cos(a)),inner/2*sp(math.sin(a))))
+        op,ip=P6Polygon(outer),P6Polygon(inside_)
+        if not op.is_valid or not op.covers(ip): problems.append(('P6: south profile intersects private volume',j))
+        clear=op.boundary.distance(ip.boundary)-0.08
+        clearances.append(clear)
+        if clear<1.5-0.01: problems.append(('P6: south guard reduces route below 1.5',j,clear))
+        if any(max(abs(x),abs(z))>13.00001 for x,z in outer): problems.append(('P6: south outside shaft',j))
+    N=DK['north']
+    for j in range(2,45):
+        y=j*N['storey']
+        if N['garden'][0]-1e-8<=y<N['garden'][1]-1e-8: continue
+        for side in range(4):
+            if side%2!=j%2: continue
+            for bay in range(2):
+                if j>40 and (j+side+bay)%3==0: continue
+                dep=N['capsule_d'][(j+side+bay)%3]; x=(-3.35,3.35)[bay]
+                for xx,zz in [(x-N['capsule_w']/2,4),(x+N['capsule_w']/2,4+dep)]:
+                    a=side*math.pi/2; rx=xx*math.cos(a)+zz*math.sin(a); rz=-xx*math.sin(a)+zz*math.cos(a)
+                    if abs(rx)>14.00001 or abs(rz)>13.00001: problems.append(('P6: capsule outside shaft',j,side,bay))
+                if y+N['capsule_h']>N['top']: problems.append(('P6: capsule above envelope',j))
+    W=DK['wind']
+    if abs(W['rotor_z'])-W['rotor_sweep']<W['core'][1]/2+0.3: problems.append(('P6: rotor sweeps into core',))
+    if DK['owners'][9]['lot']!=119 or DK['owners'][9]['passage'] is None: problems.append(('P6: court 8 passage missing',))
+    if not {0.0,6.5,W['deck']}==set(W['stops']): problems.append(('P6: Windspire public stops drifted',))
+    DK['checks']=dict(south_min_clear=round(min(clearances),4),capsules_within_shaft=True,owners=len(DK['owners']))
+_p6_geometry_checks()
+
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
@@ -3947,6 +4098,7 @@ w("const PRECINCTS := [")
 for pr in PRECINCTS: w("\t[%s]," % ", ".join(v2r(r) for r in pr))
 w("]")
 w("const ESTATE := %s" % lit(ESTATE))
+w("const DOWNTOWN := %s" % lit(DOWNTOWN))
 w("const OMITTED_STREETS := %s" % lit(OMITTED_STREETS))
 w("")
 w("## The numbered buildings of the schedule. rect is the footprint; null for")
@@ -4090,5 +4242,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],pockets=OLD_TOWN['_pockets'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,market_house=MARKET_HOUSE,arcade_roof=ARCADE_ROOF,lamp_lane=LAMP_LANE,court_ways=COURT_WAYS,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,downtown=DOWNTOWN,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],pockets=OLD_TOWN['_pockets'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,market_house=MARKET_HOUSE,arcade_roof=ARCADE_ROOF,lamp_lane=LAMP_LANE,court_ways=COURT_WAYS,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

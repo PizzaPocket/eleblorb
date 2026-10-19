@@ -289,3 +289,46 @@ openings; this charter fixes how that geometry is expressed in the game.
 ## Other kingdoms
 
 Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), and the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.
+
+## Moy: Downtown (P6)
+
+2026-10-19. P6 develops the already approved city.md section 7c concepts;
+locked plots, routes, heights and the three tower identities remain binding.
+
+- **Primary, about 75 percent:** tropical modern podium-and-tower fabric:
+  flat roofs, recessed modular glazing, concrete/ceramic structure, deep
+  shade, public colonnades and inhabited roof gardens. The shared Western
+  city grammar supplies the street blocks, podiums and horizontal bands.
+- **Secondary, about 20 percent:** desert shading, applied to terracotta
+  fins, balcony screens and pale ceramic reveals. No imported pitched roofs,
+  historic ornament or unrelated wall system.
+- **Landmark accent, about 5 percent:** the already planned tower systems:
+  wind-driven twisting triangle, plug-in capsules and dune balcony profiles.
+  These distinguish the three towers; ordinary mid-rises do not copy them.
+- **Palette:** pale ceramic/stone structure about 60 percent; recessed dark
+  blue-green glass and shade about 30; jade, terracotta, cobalt and restrained
+  gold/coral about 10. The north tower's capsules deliberately concentrate
+  colour. Use `DOWNTOWN.palette`, not an unrelated rainbow per building.
+- **Kit:** flat 0.24 m slabs, 1.2 m parapets; fitted 3.6 m nominal facade
+  bays; 0.36 m piers and 0.24 m shade heads; 0.6 m recess; square-ended
+  exponent-5.5 SuperEgg structure; rounded modular openings from shared
+  cutters. All parts and bearing/cutting joins live in `DOWNTOWN`.
+- **Hierarchy:** mid-rises form a repeated shaded base; Windspire is tallest
+  with terracotta verticals and open wind slots; north is stepped coloured
+  ceramic; south is pale, horizontal and rippled. BLOCK stays P17's dark
+  exception. Gardens/colonnades retain a public life at each tower's foot.
+- **Variation:** mid-rise owner data fixes single-pier, paired-pier or
+  recessed-bay rhythm and one accent; narrow infill receives fewer fitted
+  bays. Upper heights and frontage dimensions vary with the locked lots.
+- **Exclusions:** printed letters/words/numerals; market tile-house balconies
+  pasted onto offices; Old Moy gypsum or crenellations; generic box towers
+  with decorative grids; pinched stretched meshes; unsupported capsules or
+  transfer gaps; rooftop props standing in for structural form.
+
+| Element | Tradition / source | Application |
+|---|---|---|
+| Podium, colonnade, recessed bay | tropical modern city fabric | all mid-rises |
+| Deep fin and screen | desert climate adaptation | named shading members |
+| Twisted triangle and transfer slot | existing Windspire concept, city.md 7c | building 12 only |
+| Plug-in studio and open garden floor | existing capsule-tower concept | building 14 only |
+| Continuous rippling balcony | existing dune-tower concept | building 15 only |
