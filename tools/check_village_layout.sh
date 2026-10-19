@@ -2,7 +2,7 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-GODOT_BIN=/Applications/Godot.app/Contents/MacOS/Godot
+GODOT_BIN=${GODOT_BIN:-/Applications/Godot.app/Contents/MacOS/Godot}
 
 # The project's import cache is shared with the editor. A simultaneous editor
 # and headless process has corrupted it before, so validation fails closed and
