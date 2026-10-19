@@ -683,6 +683,21 @@ func _cell_clearance(cell:Dictionary)->bool:
 	query.exclude = _dynamic_excludes.duplicate()
 	query.exclude.append((cell.body as CollisionObject3D).get_rid())
 	var clear := state.intersect_ray(query).is_empty()
+	# A cell inside another solid (a deck buried in a block or under a skirt) is not a place to stand, and a ray that
+	# starts inside a convex shape sees nothing: ask the point itself.
+	if clear and not _cli_opts.has("no-burial-test"):
+		var inside := PhysicsPointQueryParameters3D.new()
+		inside.position = point + Vector3.UP * 0.15   # a lip under 15 cm is a step, not a burial
+		inside.collision_mask = _static_mask
+		inside.exclude = query.exclude
+		clear = true
+		for result in state.intersect_point(inside, 8):
+			# Only a body tagged solid_fill (a skirt under a flight, a fill under a helix) buries a cell. A general test
+			# rejects every deck a few centimetres under an overlapping neighbour and halves the reached cells.
+			var holder := result.get("collider") as Node
+			if holder != null and _body_has_meta(holder, &"solid_fill"):
+				clear = false
+				break
 	_clearance_cache[id] = clear
 	return clear
 

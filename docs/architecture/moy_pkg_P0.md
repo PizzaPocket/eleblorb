@@ -479,9 +479,12 @@ build.
   `--debug-cell`.
 - **Fixtures:** 10/10, with new pairs for a concave closed-section deck, a deck
   with no visual, and a narrow railed belt.
-- **Baseline:** `checks/moy-2026-10-19.*`, 274 s, the measured "now" for the
-  geometry after P1's fourth build: overlap 403, buried 4, water 0, reach 52, trap
-  4, headroom 65, underside 0, solid 219, guard 2,733.
+- **Solid fills:** a cell inside a body tagged `solid_fill` is not standable (the
+  rule is not general; see the diagnostic).
+- **Baseline:** `checks/moy-2026-10-19.*`, 282 s, the measured "now" for the
+  geometry after P1's fourth build and its skirts: overlap 405, buried 4, water 0,
+  reach 52, trap 0, headroom 39 (21 blocking, all outside P1), underside 0, solid
+  219, guard 2,769.
 
 **Result: done.** `underside` gates a package from here.
 
