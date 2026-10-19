@@ -3769,6 +3769,99 @@ def _p3():
             if a_ is not b2 and abs(a_['c'][0]-b2['c'][0])<LP['stall']['w'] and a_['side']!=b2['side']: problems.append(('Lamp Lane: stalls face each other across it',a_['c']))
     globals().update(ARCADE_ROOF=ARC,LAMP_LANE=dict(x=(round(lx0,2),round(lx1,2)),z=(lz0,lz1),lanterns=lanterns,lantern_y=LP['lantern_y'],stalls=stalls,stall=LP['stall']),COURT_WAYS=ways)
 _p3()
+# ---- P5: the North Estate kit (2026-10-19). Existing sites and heights are locked.
+ESTATE['kit'] = dict(
+    version=1, buildings=[17,18,19,20,21,22,49,50,53],
+    civic=[23,51], datum=-60.0, storey=3.25, void_clear=3.01,
+    slab=0.24, wall=0.16, gallery=1.8, guard=1.2, bay=3.2,
+    column=0.55, column_pitch=6.4, door=(1.5,2.4), landing=2.0,
+    lift=dict(shaft=(2.8,3.2),cabin=(2.0,2.4),door=(1.5,2.4)),
+    bridge=dict(floor=84.5,width=2.0,guard=1.2,roof=87.5),
+    link=dict(top=3.0,width=3.2,slab=0.24,post=0.18,pitch=6.4),
+    roof=dict(guard=1.2,headroom=2.4),
+    centre=dict(public_floor=0.0,upper_floor=3.25,garden_floor=6.5,roof_top=8.0),
+    hawker=dict(floor=0.0,eave=4.5,roof_top=6.0,aisle=2.0),
+    palette=dict(wall='#e3d6bc',frame='#f2e9d7',accent='#4f9b96',panel='#d9a267',roof='#647c7d',glass='#526b72'),
+    blocks=[
+      dict(n=n,storeys=storeys,court=court,kind=kind,
+           court_point=(-628,-146) if court=='west' else (-520,-154))
+      for n,storeys,court,kind in [
+        (17,28,'west','slab'),(18,32,'east','slab'),(19,36,'east','point'),
+        (20,40,'west','point'),(21,40,'west','point'),(22,14,'west','slab'),
+        (49,16,'west','slab'),(50,34,'east','slab'),(53,24,'west','slab')]],
+    scope='public void decks, court-facing galleries, lifts to every gallery and roof; flats sealed; hawker fit-out P13f',
+)
+EK=ESTATE['kit']
+# W,D are each existing building's local dimensions, H its recorded roof height.
+# Repetition endpoints are fitted inside the locked envelope, not added outside it.
+EP=[]
+def ep(id,what,shape,semi,col,role,**kw):
+    row=dict(id=id,what=what,shape=shape,semi=semi,col=col,role=role)
+    if shape in ('egg','clipped'): row['eps']=(5.5,5.5)
+    if shape=='box': row['reason']='flush structural infill or floor; no rounded seam at a bearing'
+    row.update(kw); EP.append(row)
+ep('footing','embedded structural foundation on surveyed terrain','box',('W/2',0.25,'D/2'),'solid','floor')
+ep('void_column','columns inside the footprint on fitted structural bays','clipped',(0.275,1.505,0.275),'solid','post',join='column_bearing')
+ep('void_soffit','first slab top at +3.25, underside +3.01','box',('W/2',0.12,'D/2'),'solid','floor')
+ep('floor','upper floor infill excluding lift shaft','box',('W/2',0.12,'D/2'),'landing','floor')
+ep('outer_wall','single wall with punched superellipse windows','wall',('face/2','storey_clear/2',0.08),'solid','wall',outline='window_seat')
+ep('window','sealed flat window cutter and its fitted dark glazing','egg',(0.65,0.85,0.04),'solid','window')
+ep('window_sill','clipped sill seated on its window surround','clipped',(0.75,0.06,0.12),'solid','beam',join='window_seat')
+ep('window_trim','superellipse frame around the same aperture','egg',(0.75,0.95,0.06),'decorative','trim')
+ep('gallery_floor','court-side gallery within the footprint','box',('face/2',0.12,0.9),'landing','floor')
+ep('gallery_guard','continuous solid guard with explicit route openings','clipped',('run/2',0.6,0.08),'solid','rail',join='guard_openings')
+ep('gallery_post','square-ended post at guard ends and bays','clipped',(0.08,0.6,0.08),'solid','post',join='guard_openings')
+ep('flat_door','sealed door on gallery wall; private flats unbuilt','clipped',(0.75,1.2,0.08),'solid','door',join='door_threshold')
+ep('door_trim','piped superellipse door surround','egg',(0.85,1.3,0.08),'decorative','trim')
+ep('lift_wall','shaft enclosure with punched floor doors','wall',(1.4,'shaft_height/2',1.6),'solid','wall',outline='door_threshold')
+ep('lift_cabin','moving enclosed cabin with real floor and guards','box',(1.0,1.2,1.2),'solid','body')
+ep('lift_landing','level landing outside shaft, route through guard','box',(1.0,0.12,1.0),'landing','floor')
+ep('roof_floor','roof slab within existing roof height','box',('W/2',0.12,'D/2'),'landing','floor')
+ep('roof_guard','roof edge guard, open only at authored routes','clipped',('run/2',0.6,0.08),'solid','rail',join='guard_openings')
+ep('bridge_floor','existing bridge polygon, walking top +84.5','box',('span/2',0.12,1.0),'landing','floor')
+ep('bridge_guard','two side guards, no rail across either end','clipped',('span/2',0.6,0.08),'solid','rail',join='bridge_landings')
+ep('bridge_canopy','square-ended superellipse canopy clipped to landings','clipped',('span/2',0.12,1.0),'solid','roof',join='bridge_landings')
+ep('link_post','linkway posts outside 1.5 m clear walking strip','clipped',(0.09,1.38,0.09),'solid','post',join='link_bearing')
+ep('link_roof','walkable clipped SuperEgg slab along each polyline segment','clipped',('segment/2',0.12,1.6),'landing','roof',join='link_corners')
+ep('bench','softened square-ended seat','egg',(1.1,0.09,0.28),'solid','seat')
+ep('bench_leg','seat supports','egg',(0.09,0.2,0.2),'solid','post')
+ep('chess_table','table outside through routes','egg',(0.45,0.06,0.45),'solid','table')
+ep('chess_base','single table pedestal','egg',(0.14,0.36,0.14),'solid','post')
+ep('mailbox','grouped letterboxes beside lift without blocking lobby','egg',(0.6,0.45,0.18),'solid','body')
+ep('planter','bounded planting bed on court/garden edges','egg',(1.0,0.3,0.5),'solid','body')
+ep('pavilion_post','pavilion column at existing centre point','clipped',(0.16,1.38,0.16),'solid','post',join='link_bearing')
+ep('pavilion_roof','squarish clipped canopy over pavilion, radius 3.2','clipped',(3.2,0.16,3.2),'landing','roof',join='link_bearing')
+ep('hawker_column','open-sided hall columns','clipped',(0.275,2.25,0.275),'solid','post',join='civic_roof')
+ep('hawker_roof','shallow vented roof within 6 m envelope','clipped',('W/2',0.75,'D/2'),'solid','roof',join='civic_roof')
+ep('centre_wall','centre walls with real public entry openings','wall',('face/2','storey_clear/2',0.08),'solid','wall',outline='door_threshold')
+ep('laundry_pole','paired slender laundry rods on outward faces','egg',(0.025,0.025,0.7),'decorative','trim')
+ep('block_number','numeral painted on facade, not a new mesh','box',('glyph/2','glyph/2',0.001),'decorative','mark')
+EJ=[
+ dict(id='column_bearing',kind='seated',parts=['void_column','void_soffit','footing'],plane='footing top 0, column top 3.01, slab underside 3.01',rule='clip column ends to the shared bearing planes; no rounding gap'),
+ dict(id='floor_wall',kind='meet',parts=['floor','outer_wall','gallery_floor'],plane='shared floor perimeter and gallery inner edge',rule='private sealed volume ends at gallery wall; one floor collider owns each surface'),
+ dict(id='window_seat',kind='punched',parts=['outer_wall','window','window_sill','window_trim'],plane='same superellipse aperture through wall',rule='derive glazing and trim from one cutter, sill clipped at the wall surface'),
+ dict(id='door_threshold',kind='punched',parts=['flat_door','door_trim','lift_wall','lift_landing'],plane='door foot equals landing top',rule='lift doors open a real shaft aperture; private doors remain sealed; no below-floor round lip'),
+ dict(id='guard_openings',kind='chain',parts=['gallery_guard','gallery_post','roof_guard'],plane='route opening side planes at each lift/bridge',rule='end and cap guards at clear opening; no railing across a public route'),
+ dict(id='bridge_landings',kind='chain',parts=['bridge_floor','bridge_guard','bridge_canopy','lift_landing'],plane='bridge top and both gallery landings at +84.5',rule='derive in-footprint landing tongues to meet existing bridge ends; one continuous walk surface, no overlapping colliders'),
+ dict(id='link_bearing',kind='seated',parts=['link_post','link_roof','pavilion_post','pavilion_roof'],plane='roof underside and column top coincide',rule='clip feet to surveyed ground and heads to underside; roof top +3.0 for links'),
+ dict(id='link_corners',kind='chain',parts=['link_roof'],plane='angle bisector at every polyline vertex',rule='miter and cap both ends at shared plane and top +3.0; no intersecting double slabs'),
+ dict(id='civic_roof',kind='seated',parts=['hawker_column','hawker_roof','centre_wall','roof_floor'],plane='hawker eave +4.5 and roof top +6; centre garden +6.5',rule='support bearing lines continuously, no bowl under roof; roof garden connects existing Deck bridge at its datum'),
+ dict(id='furniture_bearing',kind='seated',parts=['bench','bench_leg','chess_table','chess_base','mailbox','planter'],plane='ground or floor top',rule='supports meet seats/table; keep furniture out of route and door-clearance boxes'),
+]
+EK['parts']=EP; EK['joins']=EJ
+parts_checks('North Estate',EP,EJ)
+if set(EK['buildings']) != {x['n'] for x in B if x['kind']=='estate'}:
+    problems.append(('P5: estate block coverage differs',))
+for row in EK['blocks']:
+    if abs(HEIGHTS[row['n']] - row['storeys']*EK['storey']) > 0.6:
+        problems.append(('P5: height/storey mismatch',row['n']))
+    if HEIGHTS[row['n']]-(row['storeys']-1)*EK['storey']-EK['slab'] < EK['roof']['headroom']:
+        problems.append(('P5: top gallery lacks headroom',row['n']))
+if EK['gallery'] < 1.5 or EK['link']['top']-EK['link']['slab'] < 2.4:
+    problems.append(('P5: public clearance too small',))
+if EK['bridge']['floor'] != 26*EK['storey'] or EK['centre']['garden_floor'] != 2*EK['storey']:
+    problems.append(('P5: sky bridge/Deck datum mismatch',))
+
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
