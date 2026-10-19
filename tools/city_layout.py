@@ -2845,7 +2845,7 @@ TH_JOINS=[
  dict(id='punched',kind='punched',parts=['light','window','surround','qamariya','mafraj_window','door_opening','shop_opening','wind_mouth','passage_arch'],plane='through the wall',rule='one closed cutter per opening; a doorway or shopfront is its leaves\' own silhouette (outline) grown by its clearance, so frame and door are one shape; an opening that reaches the floor (floor) is flat there; the glass is the cutter intersected with the wall, the gypsum ring the cutter grown by its ring less the cutter'),
 ]
 TOWER_HOUSE['parts']=TH_PARTS; TOWER_HOUSE['joins']=TH_JOINS
-SHAPES=('egg','clipped','profile','wall','punched','box','decal','arch')
+SHAPES=('egg','clipped','profile','wall','punched','box','decal','arch','facet')
 SQUARE=('post','rail','slab','beam','sill','merlon','band','leaf','box_window','course')
 def parts_checks(tag,PARTS,JOINS):
     # the rules every kit's schedule keeps: known shapes and joins, square members square, every clipped part cut by
@@ -2854,7 +2854,7 @@ def parts_checks(tag,PARTS,JOINS):
     if len(ids)<len(PARTS): problems.append((tag+' parts: an id used twice',))
     for p in PARTS:
         if p['shape'] not in SHAPES: problems.append((tag+' parts: unknown shape',p['id']))
-        if p['shape']=='box' and not p.get('reason'): problems.append((tag+' parts: a box with no reason',p['id']))
+        if p['shape'] in ('box','facet') and not p.get('reason'): problems.append((tag+' parts: a box or a facet with no reason',p['id']))
         if p['shape'] in ('egg','clipped'):
             if min(p['eps'])<2.0: problems.append((tag+' parts: an egg below exponent 2 pinches',p['id']))
             # a leaf cut at the floor keeps world_door.gd's softer lower exponent: its lower half is cut away
@@ -2871,7 +2871,8 @@ def parts_checks(tag,PARTS,JOINS):
         if j['kind']=='split' and j['cuts']:
             # the leaves rebuild the parent: n cuts make n+1 leaves of the part's width
             leaf=[p for p in PARTS if p['id']==j['parts'][0]][0]
-            if abs((len(j['cuts'])+1)*leaf['semi'][0]-j['parent'][0])>0.01: problems.append((tag+' joins: the leaves do not make the parent',j['id']))
+            ax=[k for k in range(3) if j['cuts'][0][k]][0]
+            if abs((len(j['cuts'])+1)*leaf['semi'][ax]-j['parent'][ax])>0.01: problems.append((tag+' joins: the leaves do not make the parent',j['id']))
     P_={p['id']:p for p in PARTS}
     for p in PARTS:
         # an opening drawn from a leaf: the leaf reaches below the floor to be cut there, and the opening is its height
@@ -3227,6 +3228,391 @@ def _mh_parts_checks():
     if 2*P_['entrance']['semi'][1]>hk['h']-0.5: problems.append(('market parts: the Helmsmith\'s entrance too tall for his shop floor',))
     if P_['counter']['semi'][1]+P_['counter_top']['semi'][1]*2>1.2: problems.append(('market parts: the counter too tall to serve over',))
 _mh_parts_checks()
+## The BLOCK tower's parts and joins (package P17, 2026-10-18, at the user's direction): every visible piece of the tower's
+## outside, the climb to it, the three places inside, the lift, and the blorb mech, its shape and how it meets its
+## neighbours, decided here so the build follows one schedule and the model draws the same one. The vocabulary is the
+## tower house's (TH_PARTS), with one more shape: facet (a flat plate on three or four stated corners, for the folds of the
+## crown, where two planes must meet on a straight edge and an egg would leave a gap). Tower frame: origin the shaft's
+## centre on the forecourt, x east, y up, z south (the plaza face is z -12); semi is half-sizes (across the face, up, out of
+## it) in metres; 'fit' is what the plan's numbers set. g: the place the part belongs to. col: solid, landing, decorative,
+## open. Where a part repeats, `where` says how, from BLOCK_TOWER['sched'].
+_SH=TOWER_SITE[13]['shaft']; _OX,_OZ=(_SH[0]+_SH[2])/2,(_SH[1]+_SH[3])/2
+_BW,_BD=_SH[2]-_SH[0],_SH[3]-_SH[1]
+_CR=BLOCK_TOWER['crown']; _RG=_CR['ridge']
+_XW=-_BW/2+_RG['x_west']; _XE=_BW/2-_RG['x_east']; _ZF=-_BD/2+_RG['z_front']; _ZB=-_BD/2+_RG['z_back']
+_TOP=BLOCK_TOWER['shaft_top']
+## the crown's corners in the tower frame: the shaft's four top corners and the ridge's four ends
+BT_PT=dict(NW=(-_BW/2,_TOP,-_BD/2),NE=(_BW/2,_TOP,-_BD/2),SE=(_BW/2,_TOP,_BD/2),SW=(-_BW/2,_TOP,_BD/2),
+           Wf=(_XW,_CR['top'],_ZF),Wb=(_XW,_CR['top'],_ZB),Ef=(_XE,_CR['top_east'],_ZF),Eb=(_XE,_CR['top_east'],_ZB))
+BLOCK_TOWER['sched']=dict(
+  frame=dict(origin=(_OX,_OZ),shaft=(_BW,_BD)),
+  wall=1.0, base_wall=1.2, crown_t=0.5,
+  door=dict(w=2.2,h=3.0,hinge='west',swing='out'),
+  hood=dict(w=4.5,h=1.3,out=1.4,ns=[-9.75,-3.25,3.25,9.75],ew=[-4.0,4.0]),
+  louvre=dict(w=2.4,h=2.2,sill=79.0,sill_w=3.0,sill_out=1.2),
+  # what the hero's jump clears: apex = jump_velocity^2 / (2 g), g = 9.8 x JUMP_GRAVITY_SCALE; reach = apex time x move_speed
+  hop=dict(rise=1.2,leap=2.2,apex=11.3**2/(2*9.8*4.8),reach=2*11.3/(9.8*4.8)*6.0),
+  fire=dict(rise=7.5,run=12.5,flights=6,ramp_w=1.5,landing_z=2.4,landing_out=2.4,z_south=-4.0,rail_h=1.1,post_every=2.5),
+  bracket=dict(w=0.9,t=0.18,out=0.7,first=46.2,step=1.2,count=29,z=0.5),
+  slit=dict(at=[-10.0,-6.0,-2.0,2.0,6.0,10.0],w=0.35),
+  inside=dict(
+    floors=dict(lobby=0.0,way_in=79.0,crown=150.0),
+    lobby=dict(inner=(15.6,13.6),clear=7.8,slab=0.4),
+    plant=dict(inner=(24.0,22.0),clear=3.6,slab=0.3),
+    arena=dict(inner=(24.0,22.0),slab=0.7),
+    core=dict(rect=(0.0,-2.0,7.0,5.0),top=156.0),
+    lift=dict(at=(3.5,1.5),cavity=3.6,stops=[0.0,79.0,150.0],car=dict(outer=3.2,clear=2.4,floor=0.28,wall=0.12,roof=0.12),door=dict(w=1.5,h=2.4)),
+    gallery=dict(x=(-8.6,8.6),z=(2.0,7.0),y=164.0,glass_h=2.8,glass_bays=4),
+    stair=dict(w=2.0,rise=0.2,run=0.29,treads=35,a=dict(x=-10.4,z0=2.0,y0=150.0),landing=dict(x=(-11.4,-6.6),z=(-10.4,-8.15),y=157.0),b=dict(x=-7.6,z0=-8.15,y0=157.0)),
+    stations=dict(hero=(3.5,150.0,-4.0),boss=(7.0,150.0,-8.0),kask=(1.0,164.0,3.4),pinestein=(3.6,164.0,3.4))))
+BT_PARTS=[
+ # ---- the body
+ dict(g='body',id='base_wall',what='the base, 18 by 16 m, set back 4 m from the shaft and 9 m high: the lobby\'s walls, the door punched in the plaza face',shape='wall',semi=(9.0,4.5,8.0),t=1.2,mat='base_tile',col='solid',role='wall',where='plan 18 x 16 about the shaft\'s centre, y 0 to 9'),
+ dict(g='body',id='base_post',what='a pilaster at each corner of the base, the full height, cut flat at the forecourt and under the shaft',shape='clipped',semi=(0.45,'fit',0.45),eps=(5.5,5.5),mat='base_tile',col='solid',role='post',join='col_ends',where='four, centred on the base\'s corners (x 9, z 8)'),
+ dict(g='body',id='shaft_wall',what='the shaft: blue-black glazed brick, 26 by 24 m, sheer from 9 to 150 m, hanging 4 m over the base; its underside (the soffit) is a built face over the forecourt',shape='wall',semi=(13.0,70.5,12.0),t=1.0,mat='brick_blue',col='solid',role='wall',where='plan 26 x 24, y 9 to 150; the louvre punched in the east face; one wall thick, the storeys behind it solid mass'),
+ dict(g='body',id='corner_post',what='a pilaster at each corner of the shaft, the full height, cut flat at the soffit and at the crown\'s springing',shape='clipped',semi=(0.5,'fit',0.5),eps=(5.5,5.5),mat='brick_blue_dark',col='solid',role='post',join='col_ends',where='four, centred on the shaft\'s corners (x 13, z 12), y 9 to 150'),
+ dict(g='body',id='shaft_slit',what='a hairline slit course, every 4 m across each face, from the soffit to the crown (the crown\'s continue it)',shape='decal',semi=(0.175,'fit',0.0),mat='slit_dark',col='decorative',role='paint',where='six a face at x or z of -10, -6, -2, 2, 6, 10; 24 in all'),
+ dict(g='body',id='vent_hood',what='a vent hood, 4.5 m wide, 1.3 m deep and 1.4 m proud, its top a flat landing at the ring\'s height; the climber\'s only holds on the tower',shape='clipped',semi=(2.25,0.65,1.4),eps=(5.5,5.5),mat='hood_ceramic',col='landing',role='slab',join='against_wall',where='three rings at 45, 82.5 and 120 m (the top of each hood at the ring); a ring has 4 on the plaza face and 4 on the back (x -9.75, -3.25, 3.25, 9.75) and 2 on each side (z -4, 4): 36'),
+ dict(g='body',id='vent_grille',what='the grille under a hood, painted',shape='decal',semi=(1.9,0.5,0.0),mat='slit_dark',col='decorative',role='paint',where='one under each hood but the open louvre\'s'),
+ # ---- the openings
+ dict(g='openings',id='door_opening',what='the one door\'s opening in the base\'s plaza face: the leaf\'s own silhouette with its clearance, flat at the forecourt',shape='punched',outline='door_leaf',clear=0.015,semi=(1.1,1.5,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched',at=(1.0,0.0,-8.0),where='x +1 (the plan\'s door, world x -461), in the base wall 4 m behind the shaft\'s face'),
+ dict(g='openings',id='door_leaf',what='the one door, one leaf on one hinge as world_door.gd builds it, black steel; shut and bare from outside, it opens outward from the lobby after the fight',shape='clipped',semi=(1.085,1.71,0.025),centre=1.27,eps=(5.5,4.0),mat='door_black',col='solid',role='leaf',join='floor_cut',hinge='west jamb',swing='outward, 78 degrees'),
+ dict(g='openings',id='door_surround',what='the steel ring round the door: the opening\'s outline grown by its ring',shape='punched',outline='door_opening',ring=0.14,semi=(1.24,1.64,0.05),floor=True,mat='steel_dark',col='decorative',role='trim',join='punched'),
+ dict(g='openings',id='louvre_opening',what='the open louvre\'s opening in the east face: its leaves\' own silhouette with the clearance, flat at the plant floor, a hood above its head',shape='punched',outline='louvre_set',clear=0.015,semi=(1.2,1.1,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched',at=(13.0,79.0,-4.0),where='east face, z -4 (the plan\'s world z 55), y 79.0 to 81.2'),
+ dict(g='openings',id='louvre_leaf',what='one louvred shutter of the open louvre, thrown back flat on the wall beside the opening, lit warm',shape='clipped',semi=(0.5925,1.31,0.03),centre=0.87,eps=(5.5,4.0),mat='louvre_warm',col='solid',role='leaf',join='floor_cut',where='two, hinged at the outer jambs'),
+ dict(g='openings',id='louvre_slats',what='the slats in each louvre leaf, in relief',shape='decal',semi=(0.5,1.0,0.0),mat='louvre_warm',col='decorative',role='paint'),
+ dict(g='openings',id='louvre_surround',what='the steel ring round the louvre\'s opening',shape='punched',outline='louvre_opening',ring=0.12,semi=(1.32,1.22,0.05),floor=True,mat='steel_dark',col='decorative',role='trim',join='punched'),
+ dict(g='openings',id='louvre_sill',what='the ledge in front of the opening, flush with the plant floor inside: where the climb arrives',shape='clipped',semi=(1.5,0.08,1.2),eps=(5.5,5.5),mat='hood_ceramic',col='landing',role='sill',join='against_wall',at=(13.0,79.0,-4.0),top=79.0),
+ dict(g='openings',id='eye_slit',what='the eye: one azure slit in the crown\'s plaza facet, 1.2 by 24 m, the cutter through the shell; its glass is the cutter intersected with the shell',shape='punched',n=8.0,semi=(0.6,12.0,'wall'),mat='azure',col='solid',role='opening',join='punched',at=(-2.5,180.0,-10.548),where='in facet crown_n1, centred between y 168 and 192, x on the ridge\'s middle'),
+ dict(g='openings',id='eye_surround',what='the steel ring round the eye',shape='punched',outline='eye_slit',ring=0.1,semi=(0.7,12.1,0.04),mat='steel_dark',col='decorative',role='trim',join='punched'),
+ # ---- the crown
+ dict(g='crown',id='crown_n1',what='the plaza face, the west and bigger half: shaft top edge NW-NE to the ridge\'s west end; carries the eye',shape='facet',pts=('NW','NE','Wf'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='folded planes meet on straight edges; an egg would round them and open a gap'),
+ dict(g='crown',id='crown_n2',what='the plaza face, the east half',shape='facet',pts=('NE','Ef','Wf'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='as crown_n1'),
+ dict(g='crown',id='crown_s1',what='the back slope, the east and bigger half: the one long slope the gallery hangs from',shape='facet',pts=('SE','SW','Wb'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='as crown_n1'),
+ dict(g='crown',id='crown_s2',what='the back slope, the ridge end',shape='facet',pts=('SE','Wb','Eb'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='as crown_n1'),
+ dict(g='crown',id='crown_w',what='the west face: a plane through the shaft\'s west edge and the ridge\'s west end',shape='facet',pts=('SW','NW','Wf','Wb'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='as crown_n1'),
+ dict(g='crown',id='crown_e',what='the east face: a plane through the shaft\'s east edge and the ridge\'s east end',shape='facet',pts=('NE','SE','Eb','Ef'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='as crown_n1'),
+ dict(g='crown',id='crown_ridge',what='the ridge: a 2 m flat on the cant, 212 m at the west end, 198 m at the east',shape='facet',pts=('Wf','Ef','Eb','Wb'),t=0.5,mat='crown_dark',col='solid',role='facet',join='crown_fold',reason='as crown_n1'),
+ dict(g='crown',id='crown_slit',what='the shaft\'s slits continued up the plaza and back faces to the ridge, converging, in relief',shape='decal',semi=(0.175,'fit',0.0),mat='slit_dark',col='decorative',role='paint',where='six on each of the plaza and back faces; each runs from its slit at the springing to the ridge at the same fraction of the ridge\'s length'),
+ dict(g='crown',id='crown_rib',what='a rib on the inside of the plaza and back faces, under each slit, seen from the arena',shape='clipped',semi=(0.15,'fit',0.18),eps=(5.5,5.5),mat='crown_rib',col='landing',role='post',join='rib_ends',where='six on each of those faces'),
+ # ---- the climb
+ dict(g='climb',id='fire_ramp',what='a flight of the fire escape on the east neighbour\'s west face: 12.5 m long, 7.5 m up (31 degrees), 1.5 m wide, alternating north and south',shape='clipped',semi=(0.75,0.08,'fit'),eps=(5.5,5.5),mat='steel_galv',col='landing',role='slab',join='ramp_ends',where='six flights, y 0 to 45; the first starts on the ground at z -5.2 and climbs north'),
+ dict(g='climb',id='fire_landing',what='a landing of the fire escape, the balcony of the brief: 2.4 along the face and 2.4 out of it, its top at 7.5, 15 ... 45 m',shape='clipped',semi=(1.2,0.07,2.4),eps=(5.5,5.5),mat='steel_galv',col='landing',role='slab',join='against_wall',where='six, at the north end for odd flights\' tops and the south end for even; the sixth at y 45, z -4, level with the 30% ring'),
+ dict(g='climb',id='fire_post',what='a rail post on the fire escape, every 2.5 m along the ramps and at the landings\' corners',shape='clipped',semi=(0.03,'fit',0.03),eps=(5.5,5.5),mat='steel_galv',col='solid',role='post',join='col_ends',where='along the outer edge of each ramp and landing'),
+ dict(g='climb',id='fire_rail',what='the top bar of the fire escape\'s rail, 1.1 m up, between posts',shape='clipped',semi=('fit',0.03,0.03),eps=(5.5,5.5),mat='steel_galv',col='landing',role='rail',join='rail_bays',where='along the outer edge of each ramp and landing, open at the sixth landing\'s tower edge (the leap)'),
+ dict(g='climb',id='rail_bracket',what='a bracket of the window-cleaning rail on the tower\'s east face, between the two hoods: a hold every 1.2 m, alternating either side of the face\'s middle',shape='clipped',semi=(0.45,0.09,0.7),eps=(5.5,5.5),mat='steel_dark',col='landing',role='slab',join='against_wall',where='29 on the east face, tops at y 46.2 + 1.2 n (to 79.8), z +/- 0.5 alternately'),
+ dict(g='climb',id='rail_bar',what='the rail itself, a bar up the face behind the brackets',shape='clipped',semi=(0.05,'fit',0.05),eps=(5.5,5.5),mat='steel_dark',col='decorative',role='post',join='col_ends',where='one, z 0, y 45 to 80, 0.25 m proud'),
+ # ---- the lobby
+ dict(g='lobby',id='lobby_floor',what='the lobby floor, bare dark stone, flush with the forecourt',shape='box',semi=(7.8,0.2,6.8),mat='lobby_stone',col='solid',role='slab',reason='a floor fills to the walls: a rounded slab would leave open corners',top=0.0),
+ dict(g='lobby',id='lobby_ceiling',what='the lobby\'s ceiling, 7.8 m up: double height',shape='box',semi=(7.8,0.2,6.8),mat='lobby_dark',col='solid',role='slab',reason='as lobby_floor',top=8.2),
+ dict(g='lobby',id='lobby_strip',what='a ceiling light strip, cold white',shape='egg',semi=(2.0,0.05,0.12),eps=(5.5,5.5),mat='lamp_cold',col='decorative',role='lamp',where='four, in two rows at z -3 and 3, x -4 and 4, under the ceiling'),
+ dict(g='lobby',id='door_bar',what='the push bar across the door\'s inside face',shape='clipped',semi=(0.7,0.03,0.03),eps=(5.5,5.5),mat='steel_dark',col='decorative',role='rail',join='against_wall',where='one, 1.0 m up the door\'s inside face'),
+ # ---- the lift
+ dict(g='lift',id='core_wall',what='the services core, 7 by 7 m, from the pit (0.5 m under the lobby floor) up through every storey to 156 m, the lift\'s shaft cut through it and a landing door punched at each stop',shape='wall',semi=(3.5,78.25,3.5),mat='core_concrete',col='solid',role='wall',where='x 0 to 7, z -2 to 5, y -0.5 to 156; seen in the lobby, the way in and the arena'),
+ dict(g='lift',id='lift_cavity',what='the lift shaft: one closed cutter, 3.6 m square, from the pit to 154 m, the core closed above it',shape='punched',n=12.0,semi=(1.8,77.25,1.8),mat='shadow',col='open',role='opening',join='punched',at=(3.5,76.75,1.5)),
+ dict(g='lift',id='lift_landing',what='a landing door\'s opening in the core\'s plaza face: the leaf\'s own silhouette with its clearance, flat at the floor',shape='punched',outline='lift_door_leaf',clear=0.015,semi=(0.75,1.2,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched',where='three: the lobby (y 0), the way in (y 79.0), the arena (y 150), at x 3.5 on the core\'s north face (z -2)'),
+ dict(g='lift',id='lift_door_leaf',what='a landing door, one leaf on one hinge, thrown open into the landing while the car is at it',shape='clipped',semi=(0.735,1.41,0.025),centre=0.97,eps=(5.5,4.0),mat='door_black',col='solid',role='leaf',join='floor_cut',hinge='east jamb',swing='outward, 78 degrees'),
+ dict(g='lift',id='lift_surround',what='the steel ring round a landing door',shape='punched',outline='lift_landing',ring=0.1,semi=(0.85,1.3,0.04),floor=True,mat='steel_dark',col='decorative',role='trim',join='punched'),
+ dict(g='lift',id='car_floor',what='the car\'s floor, 3.2 m square, its top on the landing\'s floor',shape='box',semi=(1.6,0.14,1.6),mat='car_steel',col='solid',role='slab',reason='a floor fills to the walls',top=0.0),
+ dict(g='lift',id='car_wall',what='a wall of the open-fronted car (west, east, back), 2.4 m clear, cut flat at floor and roof',shape='clipped',semi=(0.06,'fit',1.6),eps=(5.5,5.5),mat='car_steel',col='solid',role='slab',join='car_ends',where='three, on the car\'s west, east and south sides'),
+ dict(g='lift',id='car_roof',what='the car\'s roof',shape='box',semi=(1.6,0.06,1.6),mat='car_steel',col='solid',role='slab',reason='a roof fills to the walls',top=2.52),
+ dict(g='lift',id='car_panel',what='the call panel on the car\'s east wall, where "Up" and "Down" are offered',shape='clipped',semi=(0.2,0.3,0.04),eps=(5.5,5.5),mat='lamp_cold',col='decorative',role='slab',join='against_wall',where='one, 1.1 m up the east wall'),
+ dict(g='lift',id='car_lamp',what='the car\'s ceiling lamp',shape='egg',semi=(0.3,0.05,0.3),eps=(2.2,3.0),mat='lamp_cold',col='decorative',role='lamp'),
+ # ---- the way in
+ dict(g='plant',id='plant_floor',what='the plant floor, 24 by 22 m, its top at 79.0, the lift cavity open through it',shape='box',semi=(12.0,0.15,11.0),mat='plant_steel',col='solid',role='slab',reason='a floor fills to the walls',top=79.0),
+ dict(g='plant',id='plant_ceiling',what='the plant\'s ceiling, 3.6 m clear above the floor',shape='box',semi=(12.0,0.15,11.0),mat='lobby_dark',col='solid',role='slab',reason='as plant_floor',top=82.9),
+ dict(g='plant',id='plant_fan',what='a wall fan, a disc 2.6 m across, running slowly',shape='clipped',semi=(1.3,1.3,0.25),eps=(2.0,2.0),mat='fan_grey',col='solid',role='disc',join='against_wall',where='ten: four on each of the north and south walls at x -9, -3, 3, 9 and two on the east wall at z -9 and 5, their centres 1.6 m up'),
+ dict(g='plant',id='plant_duct',what='a duct block on the floor, a low landing',shape='clipped',semi=(1.1,0.5,1.5),eps=(5.5,5.5),mat='duct_grey',col='landing',role='slab',join='seated',where='four, at (x, z) = (-8, -6), (-4, -6), (-8, 6), (-4, 6)'),
+ dict(g='plant',id='plant_pipe',what='an overhead pipe, 18 m long, under the ceiling',shape='clipped',semi=(9.0,0.22,0.22),eps=(5.5,5.5),mat='duct_grey',col='solid',role='beam',join='pipe_ends',where='one, x -9 to 9, z 7, y 82.0'),
+ dict(g='plant',id='plant_lamp',what='a warm pendant over the floor, the louvre\'s colour',shape='egg',semi=(0.25,0.2,0.25),eps=(2.2,3.0),mat='louvre_warm',col='decorative',role='lamp',where='three, at z -8, 0, 8 on x -6'),
+ # ---- the arena
+ dict(g='arena',id='arena_floor',what='the arena floor, 24 by 22 m at 150.0, the lift cavity open through it',shape='box',semi=(12.0,0.35,11.0),mat='arena_stone',col='solid',role='slab',reason='a floor fills to the walls',top=150.0),
+ dict(g='arena',id='gallery_floor',what='the gallery floor, on the back slope, 164 m up, running into the shell behind',shape='box',semi=(8.6,0.15,2.5),mat='plant_steel',col='landing',role='slab',reason='a floor fills to the walls; its back is cut by the shell',top=164.0),
+ dict(g='arena',id='gallery_glass',what='the gallery\'s glass, facing the arena, floor to rail, in bays between posts',shape='clipped',semi=(2.15,1.4,0.04),eps=(5.5,5.5),mat='glass',col='solid',role='slab',join='glass_bays',where='four, x -8.6 to 8.6 at z 2'),
+ dict(g='arena',id='gallery_post',what='a post of the gallery\'s front',shape='clipped',semi=(0.06,'fit',0.06),eps=(5.5,5.5),mat='steel_dark',col='solid',role='post',join='col_ends',where='five, at the bays\' ends'),
+ dict(g='arena',id='gallery_rail',what='the gallery\'s top rail over the glass, 2.8 m up',shape='clipped',semi=('fit',0.04,0.05),eps=(5.5,5.5),mat='steel_dark',col='landing',role='rail',join='rail_bays'),
+ dict(g='arena',id='stair_tread',what='a tread of the gallery stair, 0.2 up and 0.29 along, a solid step 0.4 deep',shape='clipped',semi=(1.0,0.2,0.145),eps=(5.5,5.5),mat='plant_steel',col='landing',role='slab',join='stair_run',where='two flights of 35 (A along the west wall going north from the floor, B back going south to the gallery)'),
+ dict(g='arena',id='stair_landing',what='the stair\'s turn, 4.8 by 2.25 m at 157 m',shape='box',semi=(2.4,0.2,1.125),mat='plant_steel',col='landing',role='slab',reason='a floor fills to the walls',top=157.0),
+ dict(g='arena',id='stair_post',what='a post of the stair\'s rails, every 2.5 m',shape='clipped',semi=(0.04,'fit',0.04),eps=(5.5,5.5),mat='steel_dark',col='solid',role='post',join='col_ends',where='along A\'s east side, both sides of B, the landing\'s east edge'),
+ dict(g='arena',id='stair_rail',what='the stair\'s handrail, 1.0 m above the nosing, between posts',shape='clipped',semi=('fit',0.03,0.03),eps=(5.5,5.5),mat='steel_dark',col='landing',role='rail',join='rail_bays'),
+]
+## ---- the mech: built on the hero's own rig, every joint his x 1.05. at: a joint (the left; the right mirrors in x) and an
+## offset in the mech's metres; a tube runs from one joint (+ offset) to another and is cut flat at both, the ball of the
+## joint covering the cut. The hero's hands, feet and head are his own SuperEggs at the mech's scale.
+BT_MECH=dict(
+  scale=1.05,
+  joints=dict(leg=(0.0985,0.9025,0.0),knee=(0.1135,0.466,0.0),ankle=(0.1275,0.067,0.0),arm=(0.2195,1.4915,0.0),elbow=(0.2605,1.2,0.0),
+              wrist=(0.298,0.9365,0.0),hand=(0.304,0.8915,0.0),neck=(0.0,1.5865,0.0),hips=(0.0,0.988,-0.0025),chest=(0.0,1.444,0.0),head_centre=(0.0,1.746,0.0)),
+  hero=dict(head=(0.126,0.150,0.120),hand=(0.061,0.0645,0.033),foot=(0.07,0.0435,0.1295),foot_off=(0.0005,-0.0105,0.0455),height=1.896),
+  # the game's exported city-blorb chest (hero scale), the shell the shoulder pads must stay inside
+  chest_blorb=dict(c=(0.0,1.425,0.0),semi=(0.292,0.19,0.205)),
+  seam=0.014, plates_pad=0.08, chest_h=0.15,
+  head_cut='glass where z > 0.02 + 0.85 x (max(0, -y) / 0.62)^3, in the head\'s own frame normalized to its half-sizes (x, y, z each over its semi); one curve: along the crown\'s front half it is the plane z = 0.02, below the temples it sweeps forward and down and closes at the chin',
+  hinge='at the crown: (0, head centre y + 0.96 x semi y, head centre z - 0.01), swinging up and forward 72 degrees',
+  pilot_inset=0.87, eye_w=0.04,
+  capsule=dict(r=0.28,h=1.99),
+  suit='worn through BlorbSuitController on the mech\'s pivot map, suit_rig_scale 1.05; the head blorb over the helmet')
+BT_PARTS+=[
+ # legs (each side)
+ dict(g='mech',id='hip_ball',what='the hip actuator',shape='egg',semi=(0.05,0.05,0.05),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='leg',off=(0,0,0),mirror=True),
+ dict(g='mech',id='thigh',what='the thigh, a slim tube joint to joint, cut flat at both joints',shape='clipped',semi=(0.04,'fit',0.04),eps=(3.0,3.0),ext=0.01,mat='metal_black',col='decorative',role='limb',join='socket_cut',tube=(('leg',(0,0,0)),('knee',(0,0,0))),mirror=True),
+ dict(g='mech',id='knee_ball',what='the knee actuator',shape='egg',semi=(0.043,0.043,0.043),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='knee',off=(0,0,0),mirror=True),
+ dict(g='mech',id='knee_ring',what='a band of light round the knee, a thin disc proud of the ball',shape='egg',semi=(0.047,0.0045,0.047),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='ring',on='knee',off=(0,0,0),axis='x',mirror=True),
+ dict(g='mech',id='shin',what='the shin, a tube knee to ankle, cut flat at both',shape='clipped',semi=(0.034,'fit',0.034),eps=(3.0,3.0),ext=0.01,mat='metal_black',col='decorative',role='limb',join='socket_cut',tube=(('knee',(0,0,0)),('ankle',(0,0,0))),mirror=True),
+ dict(g='mech',id='shin_piston',what='a slim piston behind each shin, a rod from the knee\'s back to the ankle\'s',shape='egg',semi=(0.011,'fit',0.011),eps=(3.0,3.0),mat='metal_black',col='decorative',role='limb',tube=(('knee',(0,-0.07,-0.05)),('ankle',(0,0.09,-0.04))),mirror=True),
+ dict(g='mech',id='ankle_ball',what='the ankle actuator, grown to cover the shin\'s cut',shape='egg',semi=(0.037,0.037,0.037),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='ankle',off=(0,0,0),mirror=True),
+ dict(g='mech',id='foot',what='the hero\'s own foot at the mech\'s scale, solid, black',shape='egg',semi=(0.0735,0.0457,0.136),eps=(3.0,3.0),mat='metal_black',col='decorative',role='foot',on='ankle',off=(0.0005,-0.011,0.0478),yaw=7.0,mirror=True),
+ # torso
+ dict(g='mech',id='pelvis',what='the pelvis, the hero\'s hip volume as a plate, its top on the abdomen\'s foot',shape='clipped',semi=(0.15,0.07,0.095),eps=(5.5,5.5),mat='metal_black',col='decorative',role='plate',join='torso_stack',on='hips',off=(0,0.01,0.0026)),
+ dict(g='mech',id='abdomen_lower',what='the lower armoured plate of the robot abdomen, cut at the seam',shape='clipped',semi=(0.14,0.0627,0.095),eps=(5.5,5.5),mat='metal_black',col='decorative',role='plate',join='torso_stack',on='hips',off=(0,0.1387,0.0026)),
+ dict(g='mech',id='abdomen_light',what='the band of light between the two plates, recessed in the seam',shape='egg',semi=(0.128,0.01,0.086),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='band',on='hips',off=(0,0.2044,0.0026)),
+ dict(g='mech',id='abdomen_upper',what='the upper armoured plate, cut at the seam and under the chest',shape='clipped',semi=(0.155,0.0627,0.1),eps=(5.5,5.5),mat='metal_black',col='decorative',role='plate',join='torso_stack',on='hips',off=(0,0.2701,0.0026)),
+ dict(g='mech',id='chest',what='the chest, soft above and flat below, its foot on the upper plate',shape='clipped',semi=(0.18,0.15,0.105),eps=(3.0,5.5),mat='metal_black',col='decorative',role='plate',join='torso_stack',on='chest',off=(0,0,0)),
+ dict(g='mech',id='chest_plate',what='the bright steel plate on the chest, the only bright metal',shape='egg',semi=(0.13,0.1,0.02),eps=(5.5,5.5),mat='steel_bright',col='decorative',role='plate',on='chest',off=(0,0.01,0.092)),
+ dict(g='mech',id='chest_slit',what='a vertical slit of light down the chest plate',shape='egg',semi=(0.008,0.07,0.005),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='band',on='chest',off=(0,0.01,0.113)),
+ # arms
+ dict(g='mech',id='shoulder_ball',what='the shoulder actuator',shape='egg',semi=(0.05,0.05,0.05),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='arm',off=(0,0,0),mirror=True),
+ dict(g='mech',id='shoulder_ring',what='a band of light round the shoulder',shape='egg',semi=(0.054,0.0045,0.054),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='ring',on='arm',off=(0,0,0),axis='x',mirror=True),
+ dict(g='mech',id='shoulder_shell',what='the shoulder pad: a low, rounded shell lying close on the shoulder, tilted 18 degrees down toward the arm, cut flat where it lies, wholly inside the blorb chest',shape='clipped',semi=(0.06,0.035,0.075),eps=(2.4,2.4),mat='metal_black',col='decorative',role='shell',join='shoulder_seat',on='arm',off=(-0.0405,0.014,0.0),tilt=18.0,mirror=True),
+ dict(g='mech',id='upper_arm',what='the upper arm, a tube shoulder to elbow, cut flat at both',shape='clipped',semi=(0.03,'fit',0.03),eps=(3.0,3.0),ext=0.01,mat='metal_black',col='decorative',role='limb',join='socket_cut',tube=(('arm',(0,0,0)),('elbow',(0,0,0))),mirror=True),
+ dict(g='mech',id='elbow_ball',what='the elbow actuator',shape='egg',semi=(0.036,0.036,0.036),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='elbow',off=(0,0,0),mirror=True),
+ dict(g='mech',id='forearm',what='the forearm, a tube elbow to wrist, cut flat at both',shape='clipped',semi=(0.027,'fit',0.027),eps=(3.0,3.0),ext=0.005,mat='metal_black',col='decorative',role='limb',join='socket_cut',tube=(('elbow',(0,0,0)),('wrist',(0,0,0))),mirror=True),
+ dict(g='mech',id='wrist_ball',what='the wrist actuator, grown to cover the forearm\'s cut',shape='egg',semi=(0.03,0.03,0.03),eps=(2.0,2.0),mat='metal_black',col='decorative',role='ball',on='wrist',off=(0,0,0),mirror=True),
+ dict(g='mech',id='hand',what='the hero\'s own hand at the mech\'s scale: solid, no fingers, black',shape='egg',semi=(0.064,0.0677,0.0347),eps=(3.0,3.0),mat='metal_black',col='decorative',role='hand',on='hand',off=(0,0,0),yaw=-97.0,mirror=True),
+ # neck and head
+ dict(g='mech',id='neck',what='a slim column on the neck joint, no collar',shape='egg',semi=(0.026,0.035,0.026),eps=(3.0,3.0),mat='metal_black',col='decorative',role='limb',on='neck',off=(0,0.005,-0.005)),
+ dict(g='mech',id='neck_ring',what='a band of light round the neck',shape='egg',semi=(0.03,0.0045,0.03),eps=(5.5,5.5),mat='blorb_light',col='decorative',role='ring',on='neck',off=(0,0.01,-0.005),axis='y'),
+ dict(g='mech',id='head_shell',what='the hero\'s head shape at the mech\'s scale, the black shell: the back half, the jaw and the whole underside of the chin, behind the one line',shape='egg',semi=(0.1323,0.1575,0.126),eps=(2.5,2.5),mat='metal_black',col='decorative',role='head',join='head_split',on='head_centre',off=(0,0,0)),
+ dict(g='mech',id='head_visor',what='the glass visor: the same head shape, the front of the one line (crown\'s front half, temples, face, the front of the chin); it hinges at the crown',shape='egg',semi=(0.1323,0.1575,0.126),eps=(2.5,2.5),mat='visor_glass',col='decorative',role='head',join='head_split',on='head_centre',off=(0,0,0)),
+ dict(g='mech',id='pilot_body',what='the pilot: the head shape inset to 0.87 inside the shell; a city blorb glows, Blorbus does not',shape='egg',semi=(0.1151,0.137,0.1096),eps=(2.5,2.5),mat='blorb_body',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0,0,0)),
+ dict(g='mech',id='pilot_eye',what='one of the game\'s own blorb eyes on the pilot\'s skin, about 0.04 m wide, coloured by blorb.gd\'s rule, front standing inside the shell',shape='egg',semi=(0.02,0.022,0.012),eps=(2.5,2.5),mat='blorb_eye',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0.045,0.018,0.1),mirror=True),
+ dict(g='mech',id='pilot_core',what='the pilot\'s glowing core (a city blorb\'s only)',shape='egg',semi=(0.03,0.03,0.03),eps=(2.0,2.0),mat='blorb_core',col='decorative',role='pilot',join='pilot_seat',on='head_centre',off=(0,0.02,-0.04)),
+]
+BT_JOINS=[
+ dict(id='floor_cut',kind='seated',parts=['door_leaf','lift_door_leaf','louvre_leaf'],plane='the floor under the leaf',rule='as world_door.gd: the leaf\'s egg reaches below the floor and is cut flat at it, so its bottom stands square on the threshold and its top keeps its soft shoulders; one leaf on one hinge (the louvre\'s two are a pair)'),
+ dict(id='louvre_set',kind='split',parts=['louvre_leaf'],parent=(1.185,1.31,0.03),centre=0.87,eps=(5.5,4.0),cuts=[(1,0,0,0.0)],hinge='outer',rule='two louvred leaves from one parent the size of the closed opening, cut at the floor too; they are thrown back flat on the wall either side'),
+ dict(id='crown_fold',kind='meet',parts=['crown_n1','crown_n2','crown_s1','crown_s2','crown_w','crown_e','crown_ridge'],plane='the mitre plane of each shared edge; the springing plane y = 150 under the facets',rule='the plaza and back faces are warped quadrilaterals, so each is two plates on one named diagonal (plaza NE-Wf, back SE-Wb); every plate is cut at the plane it shares with its neighbour, so the edges meet on straight lines with no gap, no overlap and no ledge; the eye lies wholly inside crown_n1'),
+ dict(id='col_ends',kind='chain',parts=['base_post','corner_post','fire_post','gallery_post','stair_post','rail_bar'],plane='what it stands on, and what it carries',rule='cut flat at both ends and capped: a base post from the forecourt to the soffit, a corner post from the soffit to the springing, a rail post from its floor to under its rail'),
+ dict(id='rail_bays',kind='chain',parts=['fire_rail','gallery_rail','stair_rail'],plane='the faces of the posts at each end of a bay',rule='each bay\'s rail is cut at the faces of what carries it, with no gap and no overlap'),
+ dict(id='ramp_ends',kind='chain',parts=['fire_ramp'],plane='the landing\'s edge at each end of a flight',rule='a flight is cut at the planes of the two landings it joins, from the same datum (7.5 m a flight): flush at both ends, no ledge'),
+ dict(id='stair_run',kind='chain',parts=['stair_tread'],plane='each tread\'s front and back planes',rule='a step every 0.29 m along and 0.2 m up; the first tread\'s top is 0.2 above the arena floor, the last of flight B is flush with the gallery floor, the last of A flush with the landing'),
+ dict(id='glass_bays',kind='chain',parts=['gallery_glass'],plane='the post faces',rule='each pane spans post to post and is cut at both'),
+ dict(id='rib_ends',kind='chain',parts=['crown_rib'],plane='the arena floor\'s plane and the ridge facet\'s plane',rule='each rib runs on its facet from the springing to the ridge, cut at both and capped'),
+ dict(id='pipe_ends',kind='chain',parts=['plant_pipe'],plane='the walls\' inner faces',rule='cut at the west and east inner faces and capped'),
+ dict(id='car_ends',kind='chain',parts=['car_wall'],plane='the car\'s floor top and roof underside',rule='cut flat at both and capped; the three walls stand on the floor and stop under the roof'),
+ dict(id='seated',kind='seated',parts=['plant_duct'],plane='the top of what it stands on',rule='cut flat at that plane and capped; no gap, no buried half'),
+ dict(id='against_wall',kind='seated',parts=['vent_hood','louvre_sill','fire_landing','rail_bracket','door_bar','car_panel','plant_fan'],plane='the wall\'s outer (or inner) face',rule='cut at the wall face and capped; it stands proud of the wall by its depth, nothing sunk into the wall'),
+ dict(id='on_surface',kind='placed',parts=['door_opening','louvre_opening','eye_slit','lift_landing','vent_hood','rail_bracket'],plane='the face as it is',rule='only on a flat run of a face; the corner posts and the facets\' edges carry nothing'),
+ dict(id='punched',kind='punched',parts=['door_opening','door_surround','louvre_opening','louvre_surround','eye_slit','eye_surround','lift_cavity','lift_landing','lift_surround'],plane='through the wall',rule='one closed cutter per opening; a doorway is its leaves\' own silhouette (outline) grown by its clearance, so frame and leaf are one shape; an opening that reaches the floor (floor) is flat there; the glass is the cutter intersected with the wall, the ring the cutter grown by its ring less the cutter'),
+ # the mech
+ dict(id='socket_cut',kind='chain',parts=['thigh','shin','upper_arm','forearm'],plane='the plane through each joint\'s centre, square to the limb',rule='a limb tube is cut flat at both joint centres and capped; the actuator ball at the joint (at least 1.05 x the tube\'s radius) covers the cut, so no cap and no gap shows'),
+ dict(id='torso_stack',kind='chain',parts=['pelvis','abdomen_lower','abdomen_upper','chest'],plane='the pelvis top (hips + 0.08), the seam\'s two planes (0.014 apart, about the stack\'s middle), the chest\'s foot (chest - 0.15)',rule='each plate is cut flat at the planes it shares with its neighbour; the band of light fills the seam; the stack is flush from the pelvis to the chest'),
+ dict(id='shoulder_seat',kind='seated',parts=['shoulder_shell'],plane='the plane under the pad, tilted with it',rule='the shell is cut flat where it lies on the shoulder and capped; it stays wholly inside the blorb chest (the chest blorb\'s ellipsoid at 0.93), so with the suit on only the blorb shows'),
+ dict(id='head_split',kind='split',parts=['head_shell','head_visor'],parent=(0.1323,0.1575,0.126),centre=1.8333,eps=(2.5,2.5),cuts=[],curve='one smooth curve, no chin line',hinge='the visor at the crown',rule='both are the one head egg; the visor keeps the front of the curve, the shell the rest; the curve is BLOCK_TOWER.mech.head_cut: it runs over the crown\'s front half as a plane, sweeps down and forward below the temples and closes at the chin, a single line all the way round; the shell is closed behind the glass and the visor is cut and capped along the same line'),
+ dict(id='pilot_seat',kind='placed',parts=['pilot_body','pilot_eye','pilot_core'],plane='the head\'s centre',rule='the pilot is the head shape inset to 0.87 so that it and its eyes stay inside the shell; the eyes are the game\'s blorb eye meshes, moved onto the pilot\'s skin, each with a millimetre to spare'),
+]
+BLOCK_TOWER['mech']=BT_MECH
+BLOCK_TOWER['parts']=BT_PARTS; BLOCK_TOWER['joins']=BT_JOINS
+def _bt_parts_checks():
+    parts_checks('block',BT_PARTS,BT_JOINS)
+    P_={p['id']:p for p in BT_PARTS}; J_={j['id']:j for j in BT_JOINS}; BT=BLOCK_TOWER; S=BT['sched']; SI=S['inside']; I=BT['inside']; M=BT['mech']
+    def off(nm,a,b,tol=0.011):
+        if abs(a-b)>tol: problems.append(('block parts: %s out of step'%nm,a,b))
+    ST=_TOP/I['floors']; sub=lambda a,b: tuple(x-y for x,y in zip(a,b))
+    # the parts are placed on something
+    for g in ('body','openings','crown','climb','lobby','lift','plant','arena','mech'):
+        if not [p for p in BT_PARTS if p['g']==g]: problems.append(('block parts: no part in',g))
+    # ---- the body
+    base=BT['base']; bw=P_['base_wall']
+    off('the base\'s setback',_BW/2-bw['semi'][0],base[0]); off('the base\'s setback (depth)',_BD/2-bw['semi'][2],base[0]); off('the base\'s height',2*bw['semi'][1],base[1])
+    sw=P_['shaft_wall']
+    off('the shaft\'s width',2*sw['semi'][0],_BW); off('the shaft\'s depth',2*sw['semi'][2],_BD); off('the shaft\'s height',2*sw['semi'][1],_TOP-base[1])
+    if bw['t']<S['wall'] or sw['t']!=S['wall']: problems.append(('block parts: the walls out of step with the schedule\'s thickness',))
+    # ---- the door: in the base wall, 4 m behind the plan's door line, in the base's span, one leaf
+    d=P_['door_opening']; D_=S['door']
+    off('the door\'s width',2*d['semi'][0],D_['w']); off('the door\'s height',2*d['semi'][1],D_['h'])
+    off('the door\'s x',d['at'][0],BT['door'][0]-_OX); off('the door\'s depth',d['at'][2],-(_BD/2-base[0])); off('the plan\'s door line',BT['door'][1],_SH[1])
+    if abs(d['at'][0])+D_['w']/2+0.6>bw['semi'][0]: problems.append(('block parts: the door too near the base\'s corner',))
+    # ---- the hoods: on the ring heights, in the face, clear of the corner posts and of each other, the east pair either side of the rail
+    h=S['hood']; hd=P_['vent_hood']
+    off('the hood\'s width',2*hd['semi'][0],h['w']); off('the hood\'s height',2*hd['semi'][1],h['h']); off('the hood\'s projection',hd['semi'][2],h['out'])
+    off('the hood against BLOCK_TOWER.vent (projection)',h['out'],BT['vent'][0]); off('the hood against BLOCK_TOWER.vent (width)',h['w'],BT['vent'][1])
+    for lst,half,nm in ((h['ns'],_BW/2,'plaza and back'),(h['ew'],_BD/2,'side')):
+        if max(abs(c) for c in lst)+h['w']/2>half-1.0: problems.append(('block parts: a hood too near a corner post on the',nm))
+        if any(b-a<h['w']+1.0 for a,b in zip(lst,lst[1:])): problems.append(('block parts: hoods too close on the',nm))
+    lz=I['louvre']['at']-_OZ
+    if lz not in h['ew']: problems.append(('block parts: the open louvre is not under an east hood',lz))
+    # ---- the open louvre
+    L=S['louvre']; lo=P_['louvre_opening']
+    off('the louvre\'s width',2*lo['semi'][0],L['w']); off('the louvre\'s height',2*lo['semi'][1],L['h'])
+    ring=I['louvre']['ring']*_TOP
+    off('the louvre\'s hood bottom on its head',ring-h['h'],L['sill']+L['h']); off('the louvre\'s sill on the plant floor',L['sill'],SI['floors']['way_in'])
+    off('the sill\'s top',P_['louvre_sill']['top'],L['sill']); off('the sill\'s width',2*P_['louvre_sill']['semi'][0],L['sill_w']); off('the sill\'s projection',P_['louvre_sill']['semi'][2],L['sill_out'])
+    if L['sill_w']<L['w']: problems.append(('block parts: the sill narrower than the opening',))
+    # ---- the crown: facets on the plan's corners, the planes true, the eye in one plate
+    import math as _m
+    def sub3(a,b): return (a[0]-b[0],a[1]-b[1],a[2]-b[2])
+    def cross(a,b): return (a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0])
+    def dot(a,b): return sum(x*y for x,y in zip(a,b))
+    for p in BT_PARTS:
+        if p['shape']!='facet': continue
+        pts=[BT_PT[k] for k in p['pts']]
+        if len(pts)==4:
+            n=cross(sub3(pts[1],pts[0]),sub3(pts[2],pts[0])); ln=_m.sqrt(dot(n,n)); dist=abs(dot(n,sub3(pts[3],pts[0])))/ln
+            if dist>0.01: problems.append(('block parts: a crown plate not flat',p['id'],round(dist,3)))
+        if p['t']!=S['crown_t']: problems.append(('block parts: a crown plate not the schedule\'s thickness',p['id']))
+    for nm,quad in (('plaza',('NW','NE','Ef','Wf')),('back',('SE','SW','Wb','Eb'))):
+        pts=[BT_PT[k] for k in quad]; n=cross(sub3(pts[1],pts[0]),sub3(pts[2],pts[0]))
+        if abs(dot(n,sub3(pts[3],pts[0])))/_m.sqrt(dot(n,n))<0.05: problems.append(('block parts: the %s face is flat and needs no split'%nm,))
+    # every crown plate's edge is shared by exactly one other plate or lies on the springing / the ridge's ends
+    edges={}
+    for p in BT_PARTS:
+        if p['shape']!='facet': continue
+        ks=p['pts']
+        for a,b in zip(ks,ks[1:]+ks[:1]): edges.setdefault(frozenset((a,b)),[]).append(p['id'])
+    for e,ids in edges.items():
+        if len(ids)==2: continue
+        a,b=sorted(e)
+        on_spring=BT_PT[a][1]==_TOP and BT_PT[b][1]==_TOP; on_end=a[0]=='W' and b[0]=='W' or a[0]=='E' and b[0]=='E'
+        if not (len(ids)==1 and (on_spring or on_end or {a,b}<={'Wf','Ef','Eb','Wb'})): problems.append(('block parts: a crown edge with no neighbour',sorted(e),ids))
+    # the eye: wholly inside crown_n1, as a cutter of the BLOCK_TOWER.eye numbers
+    E_=BT['eye']; ey=P_['eye_slit']; ex=(_XW+_XE)/2
+    off('the eye\'s height',2*ey['semi'][1],E_['y'][1]-E_['y'][0]); off('the eye\'s width',2*ey['semi'][0],E_['w']); off('the eye\'s centre',ey['at'][1],(E_['y'][0]+E_['y'][1])/2); off('the eye\'s x',ey['at'][0],ex)
+    tri=[BT_PT[k] for k in P_['crown_n1']['pts']]
+    def inside_tri(x,y):
+        (x0,y0,_),(x1,y1,_),(x2,y2,_)=tri; d=(y1-y2)*(x0-x2)+(x2-x1)*(y0-y2)
+        a=((y1-y2)*(x-x2)+(x2-x1)*(y-y2))/d; b=((y2-y0)*(x-x2)+(x0-x2)*(y-y2))/d
+        return a>=0 and b>=0 and 1-a-b>=0
+    for x_ in (ex-E_['w']/2,ex+E_['w']/2):
+        for y_ in E_['y']:
+            if not inside_tri(x_,y_): problems.append(('block parts: the eye leaves crown_n1',x_,y_))
+    pn=cross(sub3(tri[1],tri[0]),sub3(tri[2],tri[0])); zface=lambda y: tri[0][2]-(pn[1]*(y-tri[0][1]))/pn[2]
+    off('the eye\'s depth on its plate',ey['at'][2],zface(ey['at'][1]),0.02)
+    # ---- the climb: every hop within the hero's jump
+    hop=S['hop']; F_=S['fire']; Br=S['bracket']; ring0=BT['vents'][0]*_TOP
+    if hop['rise']>0.9*hop['apex']: problems.append(('block parts: a hop higher than the hero\'s jump clears',hop['rise'],hop['apex']))
+    if hop['leap']>0.8*hop['reach']: problems.append(('block parts: a leap longer than the hero\'s jump reaches',hop['leap'],hop['reach']))
+    if F_['rise']>F_['run']*_m.tan(_m.radians(TOWER_HOUSE['ramp']['max_deg'])): problems.append(('block parts: a fire escape flight steeper than the world\'s ramps',))
+    off('the fire escape\'s rise to the first ring',F_['flights']*F_['rise'],ring0)
+    A=I['approach']; xface=A['rect'][0]-_OX
+    off('the leap across the gap',(xface-F_['landing_out'])-(_BW/2+h['out']),hop['leap'],0.011)
+    off('the sixth landing level with the ring',F_['flights']*F_['rise'],BT['vents'][0]*_TOP)
+    zs=F_['z_south']; south_end=zs+F_['landing_z']/2; north_end=zs-F_['landing_z']/2-F_['run']-F_['landing_z']
+    if south_end>A['rect'][3]-_OZ-0.5 or north_end<A['rect'][1]-_OZ+0.5: problems.append(('block parts: the fire escape runs off the neighbour\'s face',north_end,south_end))
+    if abs(zs-lz)>0.01: problems.append(('block parts: the sixth landing not in front of the east hood',zs,lz))
+    if not (h['ew'][0]-h['w']/2<=zs-F_['landing_z']/2 and zs+F_['landing_z']/2<=h['ew'][0]+h['w']/2): problems.append(('block parts: the sixth landing not within the hood\'s width',))
+    off('the fire landing\'s depth',P_['fire_landing']['semi'][2],F_['landing_out']); off('the fire landing\'s length',2*P_['fire_landing']['semi'][0],F_['landing_z'])
+    off('the fire ramp\'s width',2*P_['fire_ramp']['semi'][0],F_['ramp_w'])
+    if F_['landing_out']+0.5>xface-(_BW/2+h['out']): pass
+    off('the first bracket one hop above the ring',Br['first'],ring0+hop['rise']); off('the brackets\' step',Br['step'],hop['rise'])
+    last=Br['first']+(Br['count']-1)*Br['step']
+    if not (L['sill']+0.5<=last<=ring-h['h']-0.2): problems.append(('block parts: the last bracket not a short step from the sill',last))
+    if Br['out']>h['out']: problems.append(('block parts: a bracket proud of the hoods',))
+    if abs(h['ew'][0]+h['w']/2-(-Br['z']-Br['w']/2))<0.3 or (h['ew'][1]-h['w']/2)-(Br['z']+Br['w']/2)<0.3: problems.append(('block parts: a bracket too close to a hood',))
+    off('the bracket\'s width',2*P_['rail_bracket']['semi'][0],Br['w']); off('the bracket\'s projection',P_['rail_bracket']['semi'][2],Br['out'])
+    # ---- the slits sit across every face at the plan's spacing
+    sl=S['slit']['at']
+    if any(abs(b-a-BT['slit'][1])>1e-6 for a,b in zip(sl,sl[1:])): problems.append(('block parts: the slits not at BLOCK_TOWER.slit\'s spacing',))
+    off('the slit\'s width',2*P_['shaft_slit']['semi'][0],BT['slit'][0])
+    # ---- inside
+    fl=SI['floors']; zn={z[0]:z for z in I['zones']}
+    off('the crown floor',fl['crown'],I['floors']*ST)
+    wz=zn['way in']
+    if not ((wz[1]*ST-0.1)<=fl['way_in']<=((wz[2]+1)*ST)): problems.append(('block parts: the way-in floor outside its storey',fl['way_in']))
+    pl=SI['plant']; off('the plant ceiling',P_['plant_ceiling']['top']-2*P_['plant_ceiling']['semi'][1]-fl['way_in'],pl['clear'],0.0111)
+    if P_['plant_ceiling']['top']>(wz[2]+1)*ST+0.02: problems.append(('block parts: the plant\'s ceiling through the storey above',))
+    off('the plant floor',P_['plant_floor']['top'],fl['way_in']); off('the plant\'s width',2*P_['plant_floor']['semi'][0],_BW-2*S['wall']); off('the plant\'s depth',2*P_['plant_floor']['semi'][2],_BD-2*S['wall'])
+    lb=SI['lobby']; off('the lobby\'s width',2*P_['lobby_floor']['semi'][0],2*bw['semi'][0]-2*bw['t']); off('the lobby\'s depth',2*P_['lobby_floor']['semi'][2],2*bw['semi'][2]-2*bw['t'])
+    off('the lobby\'s clear height',P_['lobby_ceiling']['top']-2*P_['lobby_ceiling']['semi'][1],lb['clear'])
+    if P_['lobby_ceiling']['top']>base[1]: problems.append(('block parts: the lobby\'s ceiling through the base\'s roof',))
+    off('the arena floor',P_['arena_floor']['top'],fl['crown']); off('the arena\'s width',2*P_['arena_floor']['semi'][0],_BW-2*S['wall']); off('the arena\'s depth',2*P_['arena_floor']['semi'][2],_BD-2*S['wall'])
+    c=SI['core']['rect']; wc=(I['core'][0]-_OX,I['core'][1]-_OZ,I['core'][2]-_OX,I['core'][3]-_OZ)
+    if any(abs(a-b)>0.011 for a,b in zip(c,wc)): problems.append(('block parts: the core out of step with BLOCK_TOWER.inside.core',c,wc))
+    lf=I['lifts']['lift']; lat=(lf['at'][0]-_OX,lf['at'][1]-_OZ); LF=SI['lift']
+    if any(abs(a-b)>0.011 for a,b in zip(lat,LF['at'])): problems.append(('block parts: the lift out of step with BLOCK_TOWER.inside',lat,LF['at']))
+    if any(abs(a-n*ST)>0.1 for a,n in zip(LF['stops'],lf['stops'])): problems.append(('block parts: the lift\'s stops off the storeys',))
+    if abs(LF['stops'][1]-fl['way_in'])>0.011 or LF['stops'][2]!=fl['crown'] or LF['stops'][0]!=fl['lobby']: problems.append(('block parts: the lift\'s stops off the floors',))
+    if (c[2]-c[0]-LF['cavity'])/2<1.0 or (c[3]-c[1]-LF['cavity'])/2<1.0: problems.append(('block parts: the core\'s wall round the lift under 1 m',))
+    if abs((c[0]+c[2])/2-LF['at'][0])>0.01 or abs((c[1]+c[3])/2-LF['at'][1])>0.01: problems.append(('block parts: the lift not centred in the core',))
+    off('the cavity\'s width',2*P_['lift_cavity']['semi'][0],LF['cavity']); off('the cavity\'s depth',2*P_['lift_cavity']['semi'][2],LF['cavity'])
+    car=LF['car']
+    if car['outer']>LF['cavity']-0.2: problems.append(('block parts: the car without 0.1 m each side',))
+    off('the car\'s floor',2*P_['car_floor']['semi'][0],car['outer']); off('the car\'s roof',P_['car_roof']['top'],car['clear']+car['roof']+0.0)
+    if car['clear']<LF['door']['h']: problems.append(('block parts: the car lower than its doors',))
+    ll=P_['lift_landing']; off('the landing door\'s width',2*ll['semi'][0],LF['door']['w']); off('the landing door\'s height',2*ll['semi'][1],LF['door']['h'])
+    if c[0]>lb['inner'][0]/2 or c[2]>lb['inner'][0]/2 or abs(c[1])>lb['inner'][1]/2 or abs(c[3])>lb['inner'][1]/2: problems.append(('block parts: the core outside the lobby',))
+    # the gallery on the back slope: the plan's place, a stair of true steps, and headroom under the shell
+    G=I['arena']['gallery']; GG=SI['gallery']
+    off('the gallery\'s near edge',GG['z'][0],G['z'][0]-_OZ); off('the gallery\'s far edge',GG['z'][1],G['z'][1]-_OZ); off('the gallery\'s height',GG['y'],G['y']); off('the gallery floor',P_['gallery_floor']['top'],GG['y'])
+    off('the gallery\'s depth',2*P_['gallery_floor']['semi'][2],GG['z'][1]-GG['z'][0]); off('the gallery\'s width',2*P_['gallery_floor']['semi'][0],GG['x'][1]-GG['x'][0])
+    off('the glass\'s height',2*P_['gallery_glass']['semi'][1],GG['glass_h']); off('the glass bays',GG['glass_bays']*2*P_['gallery_glass']['semi'][0],GG['x'][1]-GG['x'][0])
+    sp=[BT_PT[k] for k in ('SE','SW','Wb')]; nn=cross(sub3(sp[1],sp[0]),sub3(sp[2],sp[0]))
+    if nn[2]<0: nn=tuple(-v for v in nn)
+    ln=_m.sqrt(dot(nn,nn)); cn=dot(nn,sp[0])-S['crown_t']*ln
+    roof=lambda z: (cn-nn[2]*z)/nn[1]
+    if roof(GG['z'][0]+4.0)-GG['y']<2.2: problems.append(('block parts: no headroom on the gallery\'s standing ground',roof(GG['z'][0]+4.0)-GG['y']))
+    if roof(GG['z'][0])-GG['y']<GG['glass_h']+1.0: problems.append(('block parts: no room for the glass under the shell',))
+    st=SI['stair']
+    off('flight A reaches the landing',fl['crown']+st['treads']*st['rise'],st['landing']['y']); off('flight B reaches the gallery',st['landing']['y']+st['treads']*st['rise'],GG['y'])
+    off('flight A\'s run',st['a']['z0']-st['treads']*st['run'],st['landing']['z'][1]); off('flight B\'s run',st['b']['z0']+st['treads']*st['run'],GG['z'][0])
+    off('flight B starts where the landing ends',st['b']['z0'],st['landing']['z'][1])
+    if _m.degrees(_m.atan2(st['rise'],st['run']))>42: problems.append(('block parts: the stair steeper than 42 degrees',))
+    if not (st['landing']['x'][0]<=st['a']['x']-st['w']/2 and st['b']['x']+st['w']/2<=st['landing']['x'][1]): problems.append(('block parts: the landing does not carry both flights',))
+    if st['landing']['x'][0]<-(_BW/2-S['wall'])+0.3: problems.append(('block parts: the stair in the wall',))
+    if not (-(_BD/2-S['wall'])<=st['landing']['z'][0]): problems.append(('block parts: the landing through the north wall',))
+    if st['b']['x']-st['w']/2<=st['a']['x']+st['w']/2: problems.append(('block parts: the two flights overlap',))
+    off('the tread\'s depth',2*P_['stair_tread']['semi'][2],st['run'],0.011); off('the tread\'s width',2*P_['stair_tread']['semi'][0],st['w'])
+    off('the landing\'s width',2*P_['stair_landing']['semi'][0],st['landing']['x'][1]-st['landing']['x'][0]); off('the landing\'s depth',2*P_['stair_landing']['semi'][2],st['landing']['z'][1]-st['landing']['z'][0]); off('the landing\'s top',P_['stair_landing']['top'],st['landing']['y'])
+    stn=SI['stations']
+    if not (stn['hero'][2]<c[1]-1.0 and stn['boss'][2]<c[1]-1.0): problems.append(('block parts: a station not in front of the lift',))
+    if stn['kask'][1]!=GG['y'] or stn['pinestein'][1]!=GG['y'] or not (GG['z'][0]<stn['kask'][2]<GG['z'][1]): problems.append(('block parts: Kask or Pinestein off the gallery',))
+    # ---- the mech: the hero's joints x 1.05, thin metal limbs, balls that cover the cuts, a head under the doors
+    MS=M['scale']; Jn={k:tuple(v*MS for v in vv) for k,vv in M['joints'].items()}
+    hc=Jn['head_centre']; top=hc[1]+M['hero']['head'][1]*MS
+    if top>2.0 or top>2.2-0.1: problems.append(('block parts: the mech too tall for the hero\'s doors',top))
+    if M['capsule']['h']<top-0.005: problems.append(('block parts: the mech\'s capsule shorter than the mech',))
+    for k in ('head_shell','head_visor'):
+        for a,b in zip(P_[k]['semi'],M['hero']['head']):
+            if abs(a-b*MS)>0.0005: problems.append(('block parts: the head out of step with the hero\'s',k))
+    for a,b in zip(P_['pilot_body']['semi'],P_['head_shell']['semi']):
+        if abs(a-b*M['pilot_inset'])>0.0006: problems.append(('block parts: the pilot is not the head inset',))
+    for a,b in zip(P_['hand']['semi'],M['hero']['hand']):
+        if abs(a-b*MS)>0.0006: problems.append(('block parts: the hand out of step with the hero\'s',))
+    for a,b in zip(P_['foot']['semi'],M['hero']['foot']):
+        if abs(a-b*MS)>0.0006: problems.append(('block parts: the foot out of step with the hero\'s',))
+    balls={'leg':'hip_ball','knee':'knee_ball','ankle':'ankle_ball','arm':'shoulder_ball','elbow':'elbow_ball','wrist':'wrist_ball'}
+    for p in BT_PARTS:
+        if p['g']!='mech': continue
+        if not ('on' in p or 'tube' in p): problems.append(('block parts: a mech part with no place',p['id']))
+        for key in [p['on']] if 'on' in p else [t[0] for t in p['tube']]:
+            if key not in Jn: problems.append(('block parts: a mech part on a joint the hero does not have',p['id'],key))
+        if p['join']=='socket_cut' if 'join' in p else False:
+            r=p['semi'][0]
+            for end in p['tube']:
+                bl=P_[balls[end[0]]]['semi'][0]
+                if bl<1.05*r: problems.append(('block parts: a ball does not cover its limb\'s cut',p['id'],end[0]))
+            a,b=p['tube']; length=_m.dist(tuple(x+o for x,o in zip(Jn[a[0]],a[1])),tuple(x+o for x,o in zip(Jn[b[0]],b[1])))
+            if length<0.1: problems.append(('block parts: a limb tube too short',p['id']))
+    hipY=Jn['hips'][1]; chestY=Jn['chest'][1]; s0=hipY+M['plates_pad']; s1=chestY-M['chest_h']; ay=(s1-s0-M['seam'])/4+0.004
+    off('the abdomen plates',P_['abdomen_lower']['semi'][1],ay,0.0011); off('the upper plate',P_['abdomen_upper']['semi'][1],ay,0.0011)
+    off('the pelvis meets the stack',hipY+P_['pelvis']['off'][1]+P_['pelvis']['semi'][1],s0,0.0011)
+    off('the chest meets the stack',chestY-P_['chest']['semi'][1],s1,0.0011)
+    off('the lower plate\'s place',hipY+P_['abdomen_lower']['off'][1],s0+ay-0.004,0.0011); off('the upper plate\'s place',hipY+P_['abdomen_upper']['off'][1],s1-ay+0.004,0.0011)
+    off('the band of light in the seam',hipY+P_['abdomen_light']['off'][1],(s0+s1)/2,0.0011)
+    off('the chest',P_['chest']['semi'][1],M['chest_h'])
+    # the shoulder shell lies close and wholly inside the blorb chest
+    cb=M['chest_blorb']; bc=tuple(v*MS for v in cb['c']); bs=tuple(v*MS for v in cb['semi']); sh_=P_['shoulder_shell']
+    ar=Jn['arm']; ctr=(ar[0]+sh_['off'][0],ar[1]+sh_['off'][1],ar[2]+sh_['off'][2]); tl=_m.radians(sh_['tilt']); worst=0.0
+    pw=lambda v,e: (_m.copysign(abs(v)**(2/e),v) if v else 0.0)
+    for i in range(-20,21):
+        for j in range(40):
+            eta=_m.pi/2*i/20; om=2*_m.pi*j/40; e=sh_['eps'][0]; a_,b_,c_=sh_['semi']
+            x=a_*pw(_m.cos(eta),e)*pw(_m.sin(om),e); y=b_*pw(_m.sin(eta),e); z=c_*pw(_m.cos(eta),e)*pw(_m.cos(om),e)
+            xr=x*_m.cos(tl)+y*_m.sin(tl); yr=-x*_m.sin(tl)+y*_m.cos(tl)
+            q=((ctr[0]+xr-bc[0])/bs[0],(ctr[1]+yr-bc[1])/bs[1],(ctr[2]+z-bc[2])/bs[2]); worst=max(worst,_m.sqrt(dot(q,q)))
+    if worst>0.93: problems.append(('block parts: the shoulder shell leaves the blorb chest',round(worst,3)))
+    if sh_['semi'][1]*2>0.08 or sh_['semi'][0]*2>0.14: problems.append(('block parts: the shoulder shell not low and close',))
+_bt_parts_checks()
 def _p3():
     from shapely.geometry import LineString, Point, Polygon, box as sbox
     from shapely.ops import unary_union

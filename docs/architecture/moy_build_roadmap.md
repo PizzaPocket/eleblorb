@@ -129,7 +129,7 @@ diagnostic replaces this column.
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
 | P15 | Outside the wall: turbines, the battery, water and recycling works, the launch site, city blorbs | desert | L1 to L2 | L3 | planned | |
 | P16 | Final polish and performance | city | n/a | L4 | planned | |
-| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **fix** (reviewed 2026-10-18: the mech is boxes, a second mech appears, the fight does not reset; not yet played; section 11) | `moy_pkg_P17.md` |
+| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **ready** (revised 2026-10-18: binding parts and joins schedule, 91 parts, 20 joins, in section 12; the first review's fix list folded into the one build list, section 13; model republished) | `moy_pkg_P17.md` |
 | P18 | **The Arches**: the old goods store in the wall's arches; the fight club (Tuesday, Friday) and the rave (Saturday night) | the wall by the South Gate | L0 | L3 | planned | |
 
 **Order.**
