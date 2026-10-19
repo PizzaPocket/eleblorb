@@ -1,7 +1,7 @@
 # Package P2: bake, rendered performance and streaming
 
 2026-10-19. Build-session brief. Read `moy_build_roadmap.md` first.
-Status: **fix** (first review, section 10). Performance acceptance remains open.
+Status: **fix** (second review, section 11). Performance acceptance remains open.
 
 ## 1. Area, target and dependencies
 
@@ -304,3 +304,91 @@ completion from a runner's rendering-evidence flag.
 
 **Handoff to Luna:** Build the P2 fixes in section 10 of
 `docs/architecture/moy_pkg_P2.md`, keeping the original acceptance contract.
+
+## 11. Second review — 2026-10-19: fix
+
+Reviewed `b4de2b2`, `../diagnostics/2026-10-19-moy-P2-fixes.md`,
+the three final-clean raw runs, streaming/probe/screenshot changes, and
+Estate Court/East Gate noon screenshots. **Result: fix.**
+This pass closes useful instrumentation work; it does not close P2.
+
+### Keep / closed for this review
+
+- All three final-clean runs match the submitted source hashes. Each contains
+  seven stationary samples and two settled cycles; all correctly record
+  `acceptance_passed=false`.
+- Telemetry is opt-in and its arrays capped. Hotel requests have separate
+  release hysteresis and loaded requests are consumed before discard.
+- The +55-node observation is explained by the distant skeleton encounter.
+  In the final runs, both unloads return to 18,639 nodes and both reloads to
+  42,606; city actor counts are stable. Do not keep calling this a proven
+  city actor leak. Rapid re-entry/support retention still need route proof.
+- Named benchmark screenshots and their manifest now exist, including the
+  separate East Gate view. Rendering validity and static benchmark acceptance
+  are distinct, with negative contract fixtures.
+- Reviewer quick checks and 205-pack bake freshness pass. The contract success
+  and frame-budget failure processes returned 0 and 1 respectively locally.
+  Apple M5 performance is assessed from submitted evidence, not rerun on Linux.
+
+### Remaining work for Luna
+
+1. **Do the performance work before another full acceptance review.**
+   The diagnostic explicitly says no asset/material/tessellation optimization
+   or bounded activation queue was completed. Estate p95 is
+   63.762 / 60.483 / 59.629 ms (median 60.483), around 7,430 peak draws and
+   12.84 million primitives; synchronous activation p95 is 4.747 ms and
+   maximum 25.413 ms. Each process still has 2–3 transition stalls over 100 ms.
+   Profile the expensive packs, apply the allowed local batching/sharing/
+   tessellation and activation scheduling changes, then provide before/after
+   evidence on identical hardware/settings. Preserve dimensions, collision,
+   routes, source signatures and spatial culling. No budget relaxation.
+
+2. **Implement and measure the missing controlled route suite.**
+   Moving train through station/turn/vertical crossing; four-gate fast entry;
+   cross-pack vine handover; occupied roof/platform/train threshold support;
+   Xiao Hou Zi and alternate-body entry; hotel annulus hold and rapid re-entry
+   while requests are pending. Prove bounds/multiple-body eligibility rather
+   than leaving it tied only to Player XZ distance to CITY_CENTER. Repeat
+   three warm controlled traversals, then three final-source fresh processes.
+   Capture support readiness and state with the actual controllers.
+
+3. **Prevent static-only success from implying full P2 acceptance.**
+   `_finalize_acceptance` currently calls seven camera samples plus two cycles
+   the full suite. Add explicit required traversal/support coverage and results
+   to the gate table and machine-readable acceptance before it can pass P2.
+   Until implemented, label this stationary benchmark scope and keep the
+   missing route gates unrun/failing. Test the incomplete-route result.
+
+4. **Correct the remaining measurement/report details.**
+   - `_summarize` divides total frame-buffer bytes by frame count, subtracting
+     just 104 bytes from every memory sample. It does not remove accumulated
+     buffer storage. Track actual allocated capacity at capture time, or report
+     unadjusted memory with a quantified observer-error bound. Also account for
+     retained telemetry, summaries and lifetime inventories where relevant.
+     This is a small correction here, not an explanation for Estate's FPS miss.
+   - Correct the summary sentence saying median East Gate p95 remains over
+     budget: its median is 33.089 ms, below 33.3; one run is 33.727, so the
+     all-runs gate still misses. Crossroads median is 18.450 with actual range
+     17.499–18.876, not 18.181–18.876. Keep raw runs unchanged.
+   - Screenshot camera far is left at the engine default while the probe uses
+     1,800 m. Set and record matching clipping planes and ensure each view's
+     actual current camera/readiness matches the benchmark. Existing images
+     establish that the named views render; they do not establish a train ride.
+   - Distinguish observed completion-poll time from exact loader completion,
+     and tree exit from complete resource/GPU destruction as already requested.
+
+5. **Finish the owed correctness checks on the optimized final build.**
+   Re-run isolated QA after final edits, P0 fixtures and the location/path
+   comparison against the preserved committed baseline, full runtime/plan
+   checks and bake freshness. Document exact commands/exits. Keep existing
+   geometry debt distinct from any P2 regression; no new blocking regression.
+   Preserve native-crash evidence if one returns; current non-reproduction
+   remains an acknowledged limitation.
+
+Deliver `docs/diagnostics/<date>-moy-P2-fixes-2.md` with each remaining item,
+measured optimization results, complete route gates, final-source repeated runs,
+and checks. Preserve the completed instrumentation rather than replacing it.
+
+**Handoff to Luna:** Continue P2 from section 11 of
+`docs/architecture/moy_pkg_P2.md`. Prioritize actual performance remediation
+and controlled-route proof; the original budgets remain binding.
