@@ -34,34 +34,34 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_tacvq"]
 size = Vector3(10, 0.15, 10)
 
-[node name="MoyCell_01_00" type="Node3D" unique_id=1477661382]
+[node name="MoyCell_01_00" type="Node3D" unique_id=1083099027]
 
-[node name="Building_42_Water_works" type="StaticBody3D" parent="." unique_id=1657242649]
+[node name="Building_42_Water_works" type="StaticBody3D" parent="." unique_id=1294326071]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -690, -57, -219)
 
-[node name="@CollisionShape3D@2624" type="CollisionShape3D" parent="Building_42_Water_works" unique_id=2070359669]
+[node name="@CollisionShape3D@2624" type="CollisionShape3D" parent="Building_42_Water_works" unique_id=867761319]
 shape = SubResource("BoxShape3D_3nccd")
 
-[node name="@MeshInstance3D@2625" type="MeshInstance3D" parent="Building_42_Water_works" unique_id=2136626948]
+[node name="@MeshInstance3D@2625" type="MeshInstance3D" parent="Building_42_Water_works" unique_id=828730091]
 material_override = SubResource("StandardMaterial3D_0dhtn")
 mesh = SubResource("BoxMesh_tfndq")
 
-[node name="@MeshInstance3D@2626" type="MeshInstance3D" parent="Building_42_Water_works" unique_id=1921828413]
+[node name="@MeshInstance3D@2626" type="MeshInstance3D" parent="Building_42_Water_works" unique_id=108186634]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.925, 0)
 material_override = SubResource("StandardMaterial3D_32hl0")
 mesh = SubResource("BoxMesh_aedhb")
 
-[node name="Building_43_Water_tower" type="StaticBody3D" parent="." unique_id=584415369]
+[node name="Building_43_Water_tower" type="StaticBody3D" parent="." unique_id=493380751]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -717, -42.5, -221)
 
-[node name="@CollisionShape3D@2627" type="CollisionShape3D" parent="Building_43_Water_tower" unique_id=538908452]
+[node name="@CollisionShape3D@2627" type="CollisionShape3D" parent="Building_43_Water_tower" unique_id=936508912]
 shape = SubResource("BoxShape3D_wc16r")
 
-[node name="@MeshInstance3D@2628" type="MeshInstance3D" parent="Building_43_Water_tower" unique_id=1723366365]
+[node name="@MeshInstance3D@2628" type="MeshInstance3D" parent="Building_43_Water_tower" unique_id=1285429283]
 material_override = SubResource("StandardMaterial3D_5vclx")
 mesh = SubResource("BoxMesh_y2nvt")
 
-[node name="@MeshInstance3D@2629" type="MeshInstance3D" parent="Building_43_Water_tower" unique_id=1211129606]
+[node name="@MeshInstance3D@2629" type="MeshInstance3D" parent="Building_43_Water_tower" unique_id=341424637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 17.425, 0)
 material_override = SubResource("StandardMaterial3D_hl87v")
 mesh = SubResource("BoxMesh_tacvq")

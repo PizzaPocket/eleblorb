@@ -687,6 +687,114 @@ static func _crossing_rain_garden(data: Dictionary, index: int) -> StaticBody3D:
 	return body
 
 
+static func _add_prism_faces(tool: SurfaceTool, bottom: Array, top: Array) -> void:
+	# A convex prism from four bottom corners and the four above them, in one order round.
+	var center := Vector3.ZERO
+	for corner in bottom + top: center += corner
+	center /= 8.0
+	_add_facing_triangle(tool, top[0], top[1], top[2], Vector3.UP)
+	_add_facing_triangle(tool, top[0], top[2], top[3], Vector3.UP)
+	for i in 4:
+		var j := (i + 1) % 4
+		var mid: Vector3 = (bottom[i] + bottom[j]) * 0.5
+		var outward := Vector3(mid.x - center.x, 0.0, mid.z - center.z).normalized()
+		_add_facing_triangle(tool, bottom[i], bottom[j], top[j], outward)
+		_add_facing_triangle(tool, bottom[i], top[j], top[i], outward)
+
+
+static func _prism_collision(body: StaticBody3D, name: String, bottom: Array, top: Array) -> void:
+	var points := PackedVector3Array()
+	for corner in bottom + top: points.append(corner)
+	var shape := ConvexPolygonShape3D.new()
+	shape.points = points
+	var collision := CollisionShape3D.new()
+	collision.name = name
+	collision.shape = shape
+	body.add_child(collision)
+
+
+static func _flight_underfill(label: String, a: Vector3, b: Vector3, half_width: float, floor_y: float, soffit_drop: float = 0.0) -> StaticBody3D:
+	# A solid skirt under a flight's low end, from the floor up to the belt's underside, for as far as the
+	# clearance is under 2.5 m: nobody walks into the wedge under a stair. World coordinates, body at the origin.
+	var low := a if a.y <= b.y else b
+	var high := b if a.y <= b.y else a
+	var delta := Vector2(high.x - low.x, high.z - low.z)
+	var run := delta.length()
+	if run < 0.5 or high.y - low.y < 0.1: return null
+	var dir := delta / run
+	var lateral := Vector2(-dir.y, dir.x)
+	var slope := (high.y - low.y) / run
+	var under_y0 := low.y - 0.45 / cos(atan2(high.y - low.y, run))
+	# soffit_drop: how far under the line the lowest soffit hangs (a stair's sawtooth hangs lower than the belts).
+	var lowest := low.y - maxf(soffit_drop, 0.45 / cos(atan2(high.y - low.y, run)))
+	var s_max := minf(run, (2.5 + floor_y - lowest) / slope)
+	if s_max < 0.3: return null
+	var bottom: Array = []
+	var top: Array = []
+	for s in [0.0, s_max]:
+		for side in ([-1.0, 1.0] if s == 0.0 else [1.0, -1.0]):
+			var plan: Vector2 = Vector2(low.x, low.z) + dir * float(s) + lateral * float(side) * half_width
+			bottom.append(Vector3(plan.x, floor_y - 0.1, plan.y))
+			top.append(Vector3(plan.x, maxf(floor_y + 0.02, under_y0 + slope * s), plan.y))
+	var body := StaticBody3D.new()
+	body.name = label
+	body.set_meta("solid_fill", true)
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_add_prism_faces(tool, bottom, top)
+	_prism_collision(body, label + "Collision", bottom, top)
+	var visual := MeshInstance3D.new()
+	visual.name = label + "Visual"
+	visual.mesh = tool.commit()
+	visual.material_override = _material(Color("#b3a27e"))
+	body.add_child(visual)
+	return body
+
+
+static func _helix_underfill(label: String, hand: Dictionary, depth: float, r_in: float, r_out: float) -> StaticBody3D:
+	# The first rising turn of a hand lifts off the ground: under it the soffit is under 2.3 m until the tread is
+	# 2.3 + depth up. That wedge is filled, sector by sector (6 degrees), up to the soffit's far edge. Local to the tower.
+	var body := StaticBody3D.new()
+	body.name = label
+	body.set_meta("solid_fill", true)
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var count := 0
+	for seg in hand.profile:
+		var y0 := float(seg[2])
+		var y1 := float(seg[3])
+		if not is_zero_approx(y0) or y1 <= y0: continue
+		var a0 := float(seg[0])
+		var a1 := float(seg[1])
+		var rate := (y1 - y0) / (a1 - a0)
+		var span := minf(a1 - a0, (2.3 + depth) / rate)   # 2.3 m clears the 2.2 m rule and stops short of the other hand's ground landing
+		var steps := maxi(1, ceili(span / 6.0))
+		for i in steps:
+			var d0 := deg_to_rad(a0 + span * float(i) / steps)
+			var d1 := deg_to_rad(a0 + span * float(i + 1) / steps)
+			var top_y := rate * (a0 + span * float(i + 1) / steps - a0) - depth
+			if top_y < 0.1: continue
+			var bottom: Array = [Vector3(cos(d0) * r_in, -0.1, sin(d0) * r_in), Vector3(cos(d1) * r_in, -0.1, sin(d1) * r_in), Vector3(cos(d1) * r_out, -0.1, sin(d1) * r_out), Vector3(cos(d0) * r_out, -0.1, sin(d0) * r_out)]
+			var top: Array = []
+			for corner in bottom: top.append(Vector3(corner.x, top_y, corner.z))
+			_add_prism_faces(tool, bottom, top)
+			_prism_collision(body, "%sCollision_%02d" % [label, count], bottom, top)
+			count += 1
+	if count == 0:
+		body.free()
+		return null
+	var visual := MeshInstance3D.new()
+	visual.name = label + "Visual"
+	visual.mesh = tool.commit()
+	visual.material_override = _material(Color("#aaa58f"))
+	body.add_child(visual)
+	return body
+
+
 static func _polygon_deck_body(label: String, outline: PackedVector2Array, top_y: float, thickness: float, color: Color) -> StaticBody3D:
 	# A deck of any outline (world x, z): a top, a soffit and sides, with convex pieces for collision.
 	var polygon := _rain_garden_orient(outline)
@@ -1464,6 +1572,9 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 						for rail_i in 2:
 							var rail_belt:=MeshInstance3D.new(); rail_belt.name="HelixMovingRubberHandrail"; var rbm:=BoxMesh.new(); rbm.size=Vector3(0.72,0.09,0.13); rail_belt.mesh=rbm; rail_belt.material_override=_material(Color("#242827")); var fraction:=float(rail_i)*0.5; if not is_up: fraction=1.0-fraction; rail_belt.set_meta("helix_fraction",fraction); rail_belt.set_meta("helix_radius",rail_radius); rail_belt.set_meta("helix_offset_y",float(PLAN.ESCALATORS.handrail.height)); var ra:=lerpf(a0,a1,fraction); var ry:=lerpf(y0,y1,fraction)+float(PLAN.ESCALATORS.handrail.height); rail_belt.position=Vector3(cos(ra)*rail_radius,ry,sin(ra)*rail_radius); rail_belt.rotation.y=-ra-PI*0.5; body.add_child(rail_belt)
 				root.add_child(body)
+		for hand in data.hands:
+			var hand_fill:=_helix_underfill("CrossingHandFill_%02d_%s"%[ti,String(hand.hand)],hand,float(PLAN.ESCALATORS.section.depth),float(tcfg.band[0]),float(tcfg.band[1]))
+			if hand_fill!=null: root.add_child(hand_fill)
 		for level in [6.5,14.2,37.0]:
 			var inner_radius:=maxf(float(tcfg.gallery_r[0]),float(tcfg.gallery_clear))/cos(PI/48.0)
 			var ann:=_annulus_body("CrossingGallery_%.1f"%level,inner_radius,float(tcfg.gallery_r[1]),48,1.0,level); root.add_child(ann)
@@ -2043,6 +2154,9 @@ static func _add_arch_front(packs: Dictionary) -> void:
 			var band: Array=front.bands[String(flight.band)]; var ys: Array=flight.y; var zs: Array=flight.z
 			var foot:=Vector3((float(band[0])+float(band[1]))*0.5,DATUM+float(ys[0]),float(zs[0])); var head:=Vector3(foot.x,DATUM+float(ys[1]),float(zs[1]))
 			_add_escalator_pair(packs,"CityHall_%s_%s"%[side,String(flight.name)],foot,head,2.8,0.04,true)
+			if is_equal_approx(float(ys[0]),y):
+				var flight_fill:=_flight_underfill("CityHallSkirtF1_%s_%s"%[side,String(flight.name)],foot,head,1.25,DATUM+float(ys[0]))
+				if flight_fill!=null: _add(packs,_cell(Vector2(foot.x,foot.z)),flight_fill)
 		for gallery in leg.galleries:
 			var band_name:=String(gallery.band); var xr: Array
 			if band_name=="AB": xr=[minf(float(front.bands.A[0]),float(front.bands.B[0])),maxf(float(front.bands.A[1]),float(front.bands.B[1]))]
@@ -2054,6 +2168,8 @@ static func _add_arch_front(packs: Dictionary) -> void:
 		var outer: Dictionary=leg.outer; var oys: Array=outer.y; var ozs: Array=outer.z
 		# The pair's head is drawn on the landing's east edge (x outer.x[1]); its belts are 2.2 m wide about that line, so the head sits one belt half-width inside the landing.
 		_add_escalator_pair(packs,"CityHallOuter_%s"%side,Vector3(float(outer.x[0]),DATUM+float(oys[0]),float(ozs[0])),Vector3(float(outer.x[1])-1.1,DATUM+float(oys[1]),float(ozs[1])),2.8,0.04,true)
+		var outer_fill:=_flight_underfill("CityHallSkirtOuter_%s"%side,Vector3(float(outer.x[0]),DATUM+float(oys[0]),float(ozs[0])),Vector3(float(outer.x[1])-1.1,DATUM+float(oys[1]),float(ozs[1])),1.25,DATUM+float((leg.outer_landing as Dictionary).y))
+		if outer_fill!=null: _add(packs,_cell(Vector2(float(outer.x[1]),float(ozs[1]))),outer_fill)
 		var ol: Dictionary=leg.outer_landing; var olx: Array=ol.x; var olz: Array=ol.z
 		var landing:=_box_body("CityHallOuterLanding_%s"%side,Vector3(float(olx[1])-float(olx[0]),0.4,absf(float(olz[1])-float(olz[0]))),Vector3((float(olx[0])+float(olx[1]))*0.5,DATUM+float(ol.y)-0.2,(float(olz[0])+float(olz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(landing.position.x,landing.position.z)),landing)
 		var steps: Dictionary=leg.steps; var footx:=float(steps.foot); var headx:=float(steps.head); var half: Array=steps.half; var half_y:=float(steps.half_y)
@@ -2069,6 +2185,11 @@ static func _add_arch_front(packs: Dictionary) -> void:
 					_add_escalator_pair(packs,"CityHallSteps_%s_%s_%d"%[side,String(lane.kind).to_snake_case(),flight_i],a,b,2.4,0.04,true)
 				else:
 					_add(packs,_cell(Vector2((a.x+b.x)*0.5,z)),_stair_body("CityHallStair_%s_%d"%[side,flight_i],a,b,float(lane.w)))
+		var steps_reach:=0.0
+		for lane in steps.lanes: steps_reach=maxf(steps_reach,absf(float(lane.z)-float(steps.z)))
+		steps_reach+=1.25   # the outer lanes are 2.4 m wide pairs about their centre lines
+		var steps_fill:=_flight_underfill("CityHallSkirtSteps_%s"%side,Vector3(footx,DATUM+0.13,float(steps.z)),Vector3(float(half[0]),DATUM+half_y,float(steps.z)),steps_reach,DATUM+0.13,float(PLAN.ESCALATORS.section.depth))
+		if steps_fill!=null: _add(packs,_cell(Vector2(footx,float(steps.z))),steps_fill)
 		var half_land:=_box_body("CityHallStepsHalfLanding_%s"%side,Vector3(absf(float(half[1])-float(half[0])),0.4,float(steps.width)),Vector3((float(half[0])+float(half[1]))*0.5,DATUM+half_y-0.2,float(steps.z)),Color("#c9b999")); _add(packs,_cell(Vector2(half_land.position.x,half_land.position.z)),half_land)
 		for li in leg.lifts.size():
 			var ld: Dictionary=leg.lifts[li]; var c: Vector2=Vector2(ld.c[0],float(ld.c[1])); var stops: Array=ld.stops

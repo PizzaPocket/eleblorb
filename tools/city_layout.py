@@ -1929,6 +1929,10 @@ def _arch_front():
         for f_ in L['flights']+[dict(band=None,x=L['outer']['x'],y=L['outer']['y'],z=L['outer']['z'])]:
             xb=bx[f_['band']] if f_.get('band') else f_['x']
             for zq,yq in ((f_['z'][0],f_['y'][0]),(f_['z'][1],f_['y'][1])): ways.append((yq,LineString([(xb[0],zq),(xb[1],zq)]).buffer(0.05)))
+        # the outer pair leaves the walk over the tracks across the walk's near edge: its guard opens there (2026-10-19:
+        # the run along that edge was unbroken, so the glass stood in the belt's path and cut the walk off from the pair)
+        zo0,zo1=L['outer']['z']; xo0,xo1=L['outer']['x']; ze=min(T_['z'],key=lambda v:abs(v-zo1)); xe=xo0+(xo1-xo0)*((ze-zo0)/(zo1-zo0))
+        ways.append((T_['y'],LineString([(xe-1.3,ze),(xe+1.3,ze)]).buffer(0.05)))
         ways.append((st['half_y'],LineString([(st['half'][0],st['z']-st['width']/2),(st['half'][0],st['z']+st['width']/2)]).buffer(0.05)))
         ways.append((st['half_y'],LineString([(st['half'][1],st['z']-st['width']/2),(st['half'][1],st['z']+st['width']/2)]).buffer(0.05)))
         def door_of(lf):

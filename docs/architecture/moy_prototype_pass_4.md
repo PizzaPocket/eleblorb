@@ -522,25 +522,25 @@ Built by the planning session at the user's request (diagnostic
   see a narrow escalator (see section 13 of `moy_pkg_P0.md`).
 - **The section 6 checks still pass** (`failures=0`), plus the new garden count.
 
-**Result: done at L2.** Four items need planning decisions and are not P1's to
-build (plan change requests; the plan is locked):
-1. the wedge under every flight's low end where the soffit is 2.0 to 2.2 m (20
-   blocking `headroom` findings in P1's area): close it or accept it;
-2. the outer pair's foot against the walk over the tracks (4 `trap` findings, 3
-   cells each): move the foot or notch the walk;
-3. the tower lifts' deck-concourse calls (4 `reach`): a +6.5 landing within reach
-   of the lift, or drop the stop;
-4. the Crossing's `overlap` and `solid` findings (136 and 35), which belong to P7.
+**Result: done at L2.** The four plan questions were decided on 2026-10-19 (the
+user):
+1. the wedge under every flight's low end: **closed** with solid skirts (the
+   scissor flight over the Rostrum, the outer pair, the Steps, and under the first
+   turn of each helix hand): `_flight_underfill`, `_helix_underfill`;
+2. the outer pair's foot (4 `trap` findings): a plan data fault, **fixed** (the
+   walk's guard now opens where the pair leaves it);
+3. the tower lifts' deck-concourse calls (4 `reach`): **carried to P7**, the
+   Crossing to shippable;
+4. the Crossing's `overlap` and `solid` findings (136 and 35): **carried to P7**.
+
+P1's boxes in the whole-city baseline: no blocking `headroom`, no `trap`, no
+`underside`, civic `reach` 0 (the Crossing's 4 are item 3).
 
 Found on the way and given to others: the park's paving is wound face-down and
 cannot be seen (P8; one line); the arch legs' east wall band is opened for the
 outer platform (P11 owns the legs).
 
 **Decisions:**
-- 2026-10-19: P1 done at L2. The build chat's earlier *done* (before the review)
-  stood on a validator that did not run the suite; this one stands on the suite's
-  baseline, with the four items above recorded as plan questions.
-- 2026-10-19: P1's gate was "no new blocking suite findings and every finding on
-  its own elements triaged". New blocking findings exist (the `trap` pockets and
-  the `headroom` fringe); each is triaged above. A future pass that closes the
-  four items takes P1 to a clean suite.
+- 2026-10-19: P1 done at L2, on the suite's baseline.
+- 2026-10-19: the user's calls: close the wedge under flights; the planner decides
+  the outer pair (fixed in the plan's guards); items 3 and 4 go to P7.
