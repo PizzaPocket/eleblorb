@@ -35,6 +35,8 @@ var _reachable: Dictionary = {}
 var _reached_buckets:Dictionary = {}
 var _reverse_reachable: Dictionary = {}
 var _clearance_cache: Dictionary = {}
+var _debug_key := Vector2i(999999, 999999)
+var _cli_opts:Dictionary = {}
 var _player_start: Vector3 = Vector3.ZERO
 var _reach_start_position: Vector3 = Vector3.ZERO
 var _reach_start_cell: Dictionary = {}
@@ -53,11 +55,15 @@ func _ready() -> void:
 func _run() -> void:
 	_suite_started_usec = Time.get_ticks_usec()
 	var opts := _parse_options(OS.get_cmdline_user_args())
+	_cli_opts = opts
 	if opts.has("area"):
 		var values := String(opts.area).split(",")
 		if values.size()==4: _area=Vector4(float(values[0]),float(values[1]),float(values[2]),float(values[3]))
 	if opts.has("checks"):
 		for check in String(opts.checks).split(","): _only_checks.append(check)
+	if opts.has("debug-cell"):
+		var dv := String(opts["debug-cell"]).split(",")
+		if dv.size() == 2: _debug_key = Vector2i(roundi(float(dv[0]) / WALK_GRID_STEP), roundi(float(dv[1]) / WALK_GRID_STEP))
 	if opts.has("fixtures"):
 		await _run_fixture_suite()
 		return
@@ -95,6 +101,8 @@ func _run() -> void:
 	var graph_started := Time.get_ticks_usec()
 	_build_reach_graph(main)
 	_timings["reach_graph"] = (Time.get_ticks_usec() - graph_started) / 1000.0
+	if opts.has("reach-map"): _print_reach_map(String(opts["reach-map"]))
+	if opts.has("cell-probe"): _print_cell_probe(String(opts["cell-probe"]))
 	for check in CHECKS:
 		if not _only_checks.is_empty() and check not in _only_checks: continue
 		var started:=Time.get_ticks_usec()
@@ -112,6 +120,48 @@ func _run() -> void:
 	_write_report(String(opts.get("kingdom","moy")),String(opts.get("date","2026-10-18")))
 	print("WORLD_CHECKS findings=",_findings.size()," elapsed_ms=",Time.get_ticks_usec()-_suite_started_usec," timings_ms=",_timings)
 	get_tree().quit(1 if _has_blocking_finding() else 0)
+
+func _print_cell_probe(spec:String)->void:
+	# --cell-probe=x,z[;x,z...]: every walk cell in that grid column, bottom to top.
+	for point in spec.split(";"):
+		var v := point.split(",")
+		if v.size() != 2: continue
+		var key := Vector2i(roundi(float(v[0]) / _grid_step), roundi(float(v[1]) / _grid_step))
+		print("WORLD_CELL_PROBE column ", float(key.x) * _grid_step, ",", float(key.y) * _grid_step)
+		var cells:Array = _walk_grid.get(key, [])
+		cells.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a.y) < float(b.y))
+		for cell in cells:
+			var head_hit := ""
+			var head_query := PhysicsRayQueryParameters3D.create(cell.position + Vector3.UP * 0.05, cell.position + Vector3.UP * (WALKER_HEIGHT - 0.05), _static_mask)
+			head_query.exclude = _dynamic_excludes.duplicate()
+			head_query.exclude.append((cell.body as CollisionObject3D).get_rid())
+			var head_result := get_viewport().world_3d.direct_space_state.intersect_ray(head_query)
+			if not head_result.is_empty(): head_hit = "%s at +%.2f" % [String((head_result.collider as Node).name), float(head_result.position.y) - float(cell.y)]
+			print("  y=%.3f reached=%s clear=%s head=%s body=%s shape=%s support=%.2f" % [float(cell.y), _reachable.has(String(cell.id)), _cell_clearance(cell), head_hit, String(cell.body.name), String(cell.get("shape_name","")), float(cell.get("support_width", INF))])
+
+func _print_reach_map(spec:String)->void:
+	# --reach-map=x0,z0,x1,z1,y0,y1: one character per walk-grid cell whose height
+	# lies in [y0, y1]: R reached from a start, u not reached, . no walk cell.
+	# Rows run along z, columns along x.
+	var v := spec.split(",")
+	if v.size() != 6: return
+	var x0 := float(v[0]); var z0 := float(v[1]); var x1 := float(v[2]); var z1 := float(v[3]); var y0 := float(v[4]); var y1 := float(v[5])
+	print("WORLD_REACH_MAP x ", x0, "..", x1, " z ", z0, "..", z1, " y ", y0, "..", y1, " step ", _grid_step)
+	var z := z0
+	while z <= z1 + 0.001:
+		var row := ""
+		var x := x0
+		while x <= x1 + 0.001:
+			var key := Vector2i(roundi(x / _grid_step), roundi(z / _grid_step))
+			var mark := "."
+			for cell in _walk_grid.get(key, []):
+				if float(cell.y) < y0 or float(cell.y) > y1: continue
+				mark = "R" if _reachable.has(String(cell.id)) else "u"
+				if mark == "R": break
+			row += mark
+			x += _grid_step
+		print("WORLD_REACH_ROW %7.1f %s" % [z, row])
+		z += _grid_step
 
 func _parse_options(args:PackedStringArray)->Dictionary:
 	var result:Dictionary={}
@@ -165,8 +215,9 @@ func _build_walk_grid(step:float, low:float, high:float, candidate_columns:Varia
 			var to := Vector3(x, low, z)
 			var excluded := _dynamic_excludes.duplicate()
 			var seen_heights:Dictionary = {}
+			var ray_from := from
 			for _hit_index in COLUMN_HIT_LIMIT:
-				var query := PhysicsRayQueryParameters3D.create(from, to, _static_mask, excluded)
+				var query := PhysicsRayQueryParameters3D.create(ray_from, to, _static_mask, excluded)
 				query.hit_back_faces = true
 				var hit := space.intersect_ray(query)
 				if hit.is_empty(): break
@@ -174,6 +225,11 @@ func _build_walk_grid(step:float, low:float, high:float, candidate_columns:Varia
 				if body == null: break
 				var rid := body.get_rid()
 				if rid in excluded: break
+				# A glass rail or other box top narrower than the walker is not a surface to stand on: carry on down
+				# through this body to what it stands on (a balustrade must not hide its escalator belt).
+				if _hit_is_thin_box_top(body, hit):
+					ray_from = (hit.position as Vector3) + Vector3.DOWN * 0.03
+					continue
 				excluded.append(rid)
 				var normal:Vector3 = hit.normal
 				if normal.y < _walkable_slope_dot: continue
@@ -182,7 +238,32 @@ func _build_walk_grid(step:float, low:float, high:float, candidate_columns:Varia
 				if seen_heights.has(height_key): continue
 				seen_heights[height_key] = true
 				var key := Vector2i(ix, iz)
-				var cell := {"key": key, "x": x, "z": z, "y": position.y, "position": position, "normal": normal, "body": body, "body_path": str(body.get_path()), "id": _cell_id(key, position.y, body)}
+				var shape_name := ""
+				var support_width := INF
+				var shape_index := int(hit.get("shape", -1))
+				if shape_index >= 0:
+					var shape_owner := body.shape_owner_get_owner(body.shape_find_owner(shape_index))
+					if shape_owner is CollisionShape3D:
+						var collision_shape := shape_owner as CollisionShape3D
+						shape_name = collision_shape.get_class()
+						if collision_shape.shape is BoxShape3D: shape_name = "box %.2f x %.2f x %.2f at local y %.2f" % [(collision_shape.shape as BoxShape3D).size.x, (collision_shape.shape as BoxShape3D).size.y, (collision_shape.shape as BoxShape3D).size.z, collision_shape.position.y]
+						elif collision_shape.shape != null: shape_name = collision_shape.shape.get_class()
+						if collision_shape.shape is BoxShape3D:
+							var box_shape := collision_shape.shape as BoxShape3D
+							var axes:Array[Vector3] = [collision_shape.global_transform.basis.x, collision_shape.global_transform.basis.y, collision_shape.global_transform.basis.z]
+							var dims:Array[float] = [box_shape.size.x, box_shape.size.y, box_shape.size.z]
+							var top_axis := 0
+							var best_alignment := -1.0
+							for axis_index in 3:
+								var alignment := absf(axes[axis_index].normalized().dot(normal))
+								if alignment > best_alignment:
+									best_alignment = alignment
+									top_axis = axis_index
+							var widths:Array[float] = []
+							for axis_index in 3:
+								if axis_index != top_axis: widths.append(dims[axis_index] * axes[axis_index].length())
+							support_width = minf(widths[0], widths[1])
+				var cell := {"key": key, "x": x, "z": z, "y": position.y, "position": position, "normal": normal, "body": body, "body_path": str(body.get_path()), "shape_name": shape_name, "support_width": support_width, "id": _cell_id(key, position.y, body)}
 				if not grid.has(key): grid[key] = []
 				grid[key].append(cell)
 				cells.append(cell)
@@ -195,18 +276,70 @@ func _build_walk_grid(step:float, low:float, high:float, candidate_columns:Varia
 		filtered[key].append(cell)
 	return filtered
 
+func _hit_is_thin_box_top(body:CollisionObject3D, hit:Dictionary)->bool:
+	var shape_index := int(hit.get("shape", -1))
+	if shape_index < 0: return false
+	var shape_owner := body.shape_owner_get_owner(body.shape_find_owner(shape_index))
+	if not (shape_owner is CollisionShape3D) or not ((shape_owner as CollisionShape3D).shape is BoxShape3D): return false
+	var collision_shape := shape_owner as CollisionShape3D
+	var box_shape := collision_shape.shape as BoxShape3D
+	var axes:Array[Vector3] = [collision_shape.global_transform.basis.x, collision_shape.global_transform.basis.y, collision_shape.global_transform.basis.z]
+	var dims:Array[float] = [box_shape.size.x, box_shape.size.y, box_shape.size.z]
+	var top_axis := 0
+	var best_alignment := -1.0
+	for axis_index in 3:
+		var alignment := absf(axes[axis_index].normalized().dot(hit.normal))
+		if alignment > best_alignment:
+			best_alignment = alignment
+			top_axis = axis_index
+	var widths:Array[float] = []
+	for axis_index in 3:
+		if axis_index != top_axis: widths.append(dims[axis_index] * axes[axis_index].length())
+	return minf(widths[0], widths[1]) < WALKER_RADIUS
+
 func _apply_radius_filter(cells:Array[Dictionary], grid:Dictionary, step:float)->Array[Dictionary]:
 	var result:Array[Dictionary] = []
 	var offsets:Array[Vector2i] = [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,-1),Vector2i(0,1)]
 	for cell in cells:
+		if cell.key == _debug_key:
+			var present_report := ""
+			for offset in offsets:
+				var neighbour_key_dbg:Vector2i = cell.key + offset
+				present_report += "%s:%s " % [offset, grid.has(neighbour_key_dbg) and _has_nearby_height(grid[neighbour_key_dbg], float(cell.y), STEP_HEIGHT)]
+			print("WORLD_DEBUG_CELL y=%.3f body=%s neighbours %s ray_support=%s" % [float(cell.y), String(cell.body.name), present_report, _supported_at_walker_radius(cell, grid, step)])
 		var supported := true
 		for offset in offsets:
 			var neighbour_key:Vector2i = cell.key + offset
 			if not grid.has(neighbour_key) or not _has_nearby_height(grid[neighbour_key], float(cell.y), STEP_HEIGHT):
 				supported = false
 				break
-		if supported: result.append(cell)
+		if supported:
+			result.append(cell)
+		elif step > 0.4 and _supported_at_walker_radius(cell, grid, step):
+			result.append(cell)
 	return result
+
+func _supported_at_walker_radius(cell:Dictionary, grid:Dictionary, step:float)->bool:
+	# The grid test asks for a walkable neighbour 0.5 m away on every side, so a
+	# 1.1 m belt (an escalator lane) keeps at most one borderline column. Cells that
+	# fail it narrowly are tested again at the walker's real radius, 0.45 m.
+	var present := 0
+	for offset in [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,-1),Vector2i(0,1)]:
+		var neighbour_key:Vector2i = cell.key + offset
+		if grid.has(neighbour_key) and _has_nearby_height(grid[neighbour_key], float(cell.y), STEP_HEIGHT): present += 1
+	if present < 1: return false
+	var state := get_viewport().world_3d.direct_space_state
+	var base:Vector3 = cell.position
+	for offset in [Vector3(WALKER_RADIUS,0.0,0.0),Vector3(-WALKER_RADIUS,0.0,0.0),Vector3(0.0,0.0,WALKER_RADIUS),Vector3(0.0,0.0,-WALKER_RADIUS)]:
+		var from:Vector3 = base + offset + Vector3.UP * 0.35
+		var query := PhysicsRayQueryParameters3D.create(from, from + Vector3.DOWN * (STEP_HEIGHT + 0.35 + 0.3), _static_mask)
+		query.exclude = _dynamic_excludes
+		query.hit_back_faces = true
+		var hit := state.intersect_ray(query)
+		if hit.is_empty(): return false
+		if (hit.normal as Vector3).y < _walkable_slope_dot: return false
+		if absf(float(hit.position.y) - float(base.y)) > STEP_HEIGHT: return false
+	return true
 
 func _has_nearby_height(cells:Array, target_height:float, tolerance:float)->bool:
 	for cell in cells:
@@ -581,9 +714,19 @@ func _check_reach(root:Node)->void:
 		var cell := _nearest_cell(point, 2.0)
 		if cell.is_empty():
 			_record("reach", target, point, "no walk cell lies within 2 m of the target", true)
-		elif not _reachable.has(String(cell.id)):
+		elif not _reachable.has(String(cell.id)) and not _reached_within(point, 0.8):
 			var nearest := _nearest_reached(point)
 			_record("reach", target, point, "target is disconnected from spawn/stations; nearest reached cell: %s" % (str(nearest.position.round()) if not nearest.is_empty() else "none"), true)
+
+func _reached_within(point:Vector3, radius:float)->bool:
+	# A player standing at a marker can use any reached cell within a stride of it,
+	# so a low-headroom cell under a ramp beside it does not make it unreachable.
+	var base := Vector2i(floori(point.x / 16.0), floori(point.z / 16.0))
+	for dx in range(-1, 2):
+		for dz in range(-1, 2):
+			for cell in _reached_buckets.get(base + Vector2i(dx, dz), []):
+				if point.distance_to(cell.position) <= radius: return true
+	return false
 
 func _nearest_reached(point:Vector3)->Dictionary:
 	var best:Dictionary = {}
@@ -689,31 +832,42 @@ func _check_underside(meshes:Array[MeshInstance3D], shapes:Array[CollisionShape3
 				var hit := get_viewport().world_3d.direct_space_state.intersect_ray(query)
 				var collider_present:bool = not hit.is_empty() and hit.get("collider") == entry.body
 				if not mesh_results.has(mesh_id):
-					mesh_results[mesh_id] = {"mesh": mesh, "position": sample, "visible": true, "collider": true, "cell_count": 0, "bad_position": sample, "has_bad_position": false, "missing_face": false, "missing_collider": false}
+					mesh_results[mesh_id] = {"mesh": mesh, "body": entry.body, "position": sample, "visible": true, "collider": true, "cell_count": 0, "face_bad": 0, "ray_bad": 0, "bad_y_min": INF, "bad_y_max": -INF, "bad_position": sample, "has_bad_position": false}
 				var result:Dictionary = mesh_results[mesh_id]
 				result.cell_count += 1
 				if not has_visible_face:
 					result.visible = false
-					result.missing_face = true
+					result.face_bad += 1
 				if not collider_present:
 					result.collider = false
-					result.missing_collider = true
-				if (not has_visible_face or not collider_present) and not result.has_bad_position:
-					result.bad_position = sample
-					result.has_bad_position = true
-			if not has_matching_visual: entry.missing_visual.append(cell)
+					result.ray_bad += 1
+				if not has_visible_face or not collider_present:
+					result.bad_y_min = minf(float(result.bad_y_min), float(sample.y))
+					result.bad_y_max = maxf(float(result.bad_y_max), float(sample.y))
+					if not result.has_bad_position:
+						result.bad_position = sample
+						result.has_bad_position = true
+			# A rail top or other face narrower than the character's radius is not a
+			# deck: it needs no visual of its own.
+			if not has_matching_visual and float(cell.get("support_width", INF)) >= 0.45: entry.missing_visual.append(cell)
 	for mesh_id in mesh_results:
 		var issue:Dictionary = mesh_results[mesh_id]
 		if issue.visible and issue.collider: continue
 		var reasons:Array[String] = []
-		if not issue.visible: reasons.append("no underside-facing face at one or more of %d sampled cells" % int(issue.cell_count))
-		if not issue.collider: reasons.append("upward ray did not hit this deck's collider at one or more of %d sampled cells" % int(issue.cell_count))
-		_record("underside", issue.mesh, issue.bad_position, "; ".join(reasons), true)
+		var total := maxf(float(issue.cell_count), 1.0)
+		if not issue.visible: reasons.append("no underside-facing face at %d of %d sampled cells (%d%%)" % [int(issue.face_bad), int(issue.cell_count), roundi(100.0 * float(issue.face_bad) / total)])
+		if not issue.collider: reasons.append("upward ray did not hit this deck's collider at %d of %d sampled cells (%d%%)" % [int(issue.ray_bad), int(issue.cell_count), roundi(100.0 * float(issue.ray_bad) / total)])
+		reasons.append("failing cells span y %.2f to %.2f" % [float(issue.bad_y_min), float(issue.bad_y_max)])
+		_record("underside", issue.mesh, issue.bad_position, "; ".join(reasons), true, issue.body)
 	for body_path in body_cells:
 		var entry:Dictionary = body_cells[body_path]
 		if not _is_walk_deck(entry.body) or entry.missing_visual.is_empty(): continue
 		var missing:Array = entry.missing_visual
-		_record("underside", entry.body, missing[0].position, "walkable deck collider has no visual within 0.08 m at %d sampled cells" % missing.size(), true, null, "deck_visual_missing")
+		var shape_counts:Dictionary = {}
+		for missing_cell in missing: shape_counts[str(missing_cell.get("shape_name",""))] = int(shape_counts.get(str(missing_cell.get("shape_name","")),0)) + 1
+		var shape_parts:Array[String] = []
+		for shape_key in shape_counts: shape_parts.append("%s x%d" % [shape_key if not String(shape_key).is_empty() else "?", int(shape_counts[shape_key])])
+		_record("underside", entry.body, missing[0].position, "walkable deck collider has no visual within 0.08 m at %d sampled cells (collision shapes: %s)" % [missing.size(), ", ".join(shape_parts)], true, null, "deck_visual_missing")
 	_check_inward_winding(meshes)
 
 func _is_walk_deck(body:Node)->bool:
@@ -725,7 +879,7 @@ func _build_mesh_buckets(meshes:Array[MeshInstance3D])->void:
 	for mesh in meshes:
 		if mesh.mesh == null or String(mesh.get_meta("collision_policy", "")) == "decorative": continue
 		var bounds := _node_world_aabb(mesh)
-		if bounds.size.x > 128.0 or bounds.size.z > 128.0: continue
+		if bounds.size.x > 256.0 or bounds.size.z > 256.0: continue
 		var min_x := int(floor(bounds.position.x / bucket_size)); var max_x := int(floor(bounds.end.x / bucket_size))
 		var min_z := int(floor(bounds.position.z / bucket_size)); var max_z := int(floor(bounds.end.z / bucket_size))
 		var mesh_id := mesh.get_instance_id()
@@ -782,13 +936,35 @@ func _underside_thickness(mesh:MeshInstance3D, point:Vector2, top_y:float, body_
 		best_top_error = top_error
 		best_thickness = maxf(0.05,thickness)
 	if not is_inf(best_thickness): return best_thickness
-	# Curved concave decks use a conservative cap around their actual visual.
+	# Curved concave decks (the helix hands): measure the deck's own section from
+	# the nearest down face straight under the sample, up to 1.5 m. A deck with no
+	# such face keeps the conservative cap, so a missing soffit still fails.
+	var section_depth := _own_down_face_depth(mesh, point, top_y, 1.5)
+	if not is_nan(section_depth): return section_depth + 0.03
 	var bounds := _node_world_aabb(mesh)
 	return minf(maxf(bounds.size.y, 0.15), 0.75)
+
+func _own_down_face_depth(mesh:MeshInstance3D, point:Vector2, top_y:float, max_depth:float)->float:
+	if mesh.mesh == null: return NAN
+	var nearest := NAN
+	var faces := _mesh_triangles(mesh)
+	for i in range(0,faces.size(),3):
+		var a:Vector3 = mesh.global_transform * faces[i]
+		var b:Vector3 = mesh.global_transform * faces[i+1]
+		var c:Vector3 = mesh.global_transform * faces[i+2]
+		if (c-a).cross(b-a).normalized().y > -0.5: continue
+		var y := _triangle_height_xz(point,a,b,c)
+		if is_nan(y) or y >= top_y-0.005 or top_y-y > max_depth: continue
+		if is_nan(nearest) or y > nearest: nearest = y
+	return NAN if is_nan(nearest) else top_y - nearest
 
 func _has_visible_underside(mesh:MeshInstance3D, sample:Vector3, max_drop:float=0.75)->bool:
 	if mesh.mesh == null: return false
 	if _mesh_is_two_sided(mesh): return true
+	# A soffit straight under the sample, within the deck's thickness. On a
+	# sloped deck the perpendicular foot of a top point near the high end falls
+	# past the end of the soffit, so the 3D test below would miss that cell.
+	if not is_nan(_own_down_face_depth(mesh, Vector2(sample.x,sample.z), sample.y, max_drop + 0.05)): return true
 	var faces := _mesh_triangles(mesh)
 	for i in range(0, faces.size(), 3):
 		var a:Vector3 = mesh.global_transform * faces[i]
@@ -1010,6 +1186,7 @@ func _run_fixture_suite()->void:
 	_fixture_buried(root)
 	_fixture_water(root)
 	_fixture_reach(root)
+	_fixture_narrow_belt(root)
 	_fixture_trap(root)
 	_fixture_headroom(root)
 	_fixture_underside(root)
@@ -1037,9 +1214,10 @@ func _run_fixture_suite()->void:
 		["buried",Vector4(7,-3,13,3),Vector3(10,0,0),"FixtureBuriedSlab","terrain stands above","FixtureBuriedClean"],
 		["water",Vector4(17,-3,23,3),Vector3(20,0,0),"FixtureWaterFourTenthsOverBank","0.40 m above bank","FixtureWaterClean"],
 		["reach",Vector4(27,-3,35,3),Vector3(28,0.2,0),"FixtureDisconnectedPlatform","disconnected from spawn","FixtureReachClean"],
+		["reach",Vector4(150,-8,172,8),Vector3(151,0.2,0),"FixtureNarrowBeltGapTarget","disconnected from spawn","FixtureNarrowBeltTarget"],
 		["trap",Vector4(37,-3,45,3),Vector3(44,0.2,0),"FixtureOneWayPocket","cannot return to spawn","FixtureTrapClean"],
 		["headroom",Vector4(47,-3,53,3),Vector3(50,0.2,0),"FixtureHeadroomBeam","standing height","FixtureHeadroomClean"],
-		["underside",Vector4(57,-3,126,3),Vector3(60,0.2,0),"FixtureUndersideTopOnlyVisual","no underside-facing face","FixtureUndersideClean"],
+		["underside",Vector4(57,-3,150,3),Vector3(60,0.2,0),"FixtureUndersideTopOnlyVisual","no underside-facing face","FixtureUndersideClean"],
 		["solid",Vector4(67,-3,77,3),Vector3(70,0,0),"FixtureUncollidedSolid","no collider within 0.05 m","FixtureSolidClean"],
 		["guard",Vector4(77,-3,86,3),Vector3(80,2.2,0),"FixtureGuardPad","fully guarded and has no tagged way through","FixtureGuardClean"],
 	]
@@ -1049,6 +1227,7 @@ func _run_fixture_suite()->void:
 		var bounds := _scene_y_bounds(shapes)
 		_walk_grid = _build_walk_grid(WALK_GRID_STEP,bounds.x,bounds.y); _grid_step = WALK_GRID_STEP
 		_build_reach_graph(root)
+		if _cli_opts.has("reach-map") and check == "reach": _print_reach_map(String(_cli_opts["reach-map"]))
 		match check:
 			"overlap": _check_overlap(bounds.x,bounds.y)
 			"buried": _check_buried()
@@ -1068,11 +1247,15 @@ func _run_fixture_suite()->void:
 			if check == "trap" and "FixtureShellGap" in path and "inside an untagged shell" in String(finding.detail): clean_caught = false
 			if String(test[5]) in path: clean_caught = true
 		var second_trap_caught := check != "trap"
-		var broken_link_caught := check != "reach"
+		var broken_link_caught := check != "reach" or String(test[3]) != "FixtureDisconnectedPlatform"
 		var partial_underside_caught := check != "underside"
 		var partial_twin_clean := true
 		var stepped_underside_caught := check != "underside"
 		var stepped_twin_clean := true
+		var concave_underside_caught := check != "underside"
+		var concave_twin_clean := true
+		var no_visual_caught := check != "underside"
+		var no_visual_twin_clean := true
 		if check == "reach":
 			for finding in _findings:
 				if finding.check_id == "reach" and "FixtureBrokenReachLinkEndpoint" in String(finding.node_path) and "no walk cell within 3 m" in String(finding.detail): broken_link_caught = true
@@ -1088,11 +1271,17 @@ func _run_fixture_suite()->void:
 				if "FixtureUndersidePartialCleanTwin" in path: partial_twin_clean = false
 				if "FixtureSteppedFlightNoBottom" in path and "no underside-facing face" in detail: stepped_underside_caught = true
 				if "FixtureSteppedFlightCleanTwin" in path: stepped_twin_clean = false
-		var underside_fixtures_ok := partial_underside_caught and partial_twin_clean and stepped_underside_caught and stepped_twin_clean
+				if "FixtureConcaveNoSoffit" in path and "no underside-facing face" in detail: concave_underside_caught = true
+				if "FixtureConcaveClosedTwin" in path: concave_twin_clean = false
+				if "FixtureDeckNoVisual" in path and String(finding.kind) == "deck_visual_missing": no_visual_caught = true
+				if "FixtureDeckWithVisualTwin" in path: no_visual_twin_clean = false
+		var underside_fixtures_ok := partial_underside_caught and partial_twin_clean and stepped_underside_caught and stepped_twin_clean and concave_underside_caught and concave_twin_clean and no_visual_caught and no_visual_twin_clean
 		if caught and second_trap_caught and broken_link_caught and not clean_caught and underside_fixtures_ok:
-			print("WORLD_CHECK_FIXTURE PASS ",check," fault=",test[3]," clean=",test[5]," partial_deck=",partial_underside_caught," partial_twin_clean=",partial_twin_clean," stepped_flight=",stepped_underside_caught," stepped_twin_clean=",stepped_twin_clean)
+			var extra := ""
+			if check == "underside": extra = " partial_deck=%s partial_twin_clean=%s stepped_flight=%s stepped_twin_clean=%s concave_no_soffit=%s concave_twin_clean=%s deck_no_visual=%s deck_visual_twin_clean=%s" % [partial_underside_caught,partial_twin_clean,stepped_underside_caught,stepped_twin_clean,concave_underside_caught,concave_twin_clean,no_visual_caught,no_visual_twin_clean]
+			print("WORLD_CHECK_FIXTURE PASS ",check," fault=",test[3]," clean=",test[5],extra)
 		else:
-			print("WORLD_CHECK_FIXTURE FAIL ",check," expected_fault=",caught," clean_twin_clear=",not clean_caught," partial_deck=",partial_underside_caught," partial_twin_clean=",partial_twin_clean," stepped_flight=",stepped_underside_caught," stepped_twin_clean=",stepped_twin_clean)
+			print("WORLD_CHECK_FIXTURE FAIL ",check," expected_fault=",caught," clean_twin_clear=",not clean_caught," partial_deck=",partial_underside_caught," partial_twin_clean=",partial_twin_clean," stepped_flight=",stepped_underside_caught," stepped_twin_clean=",stepped_twin_clean," concave_no_soffit=",concave_underside_caught," concave_twin_clean=",concave_twin_clean)
 			for finding in _findings:
 				if finding.check_id == check: print("  finding ",finding.node_path," :: ",finding.detail)
 			failed.append(check)
@@ -1100,7 +1289,7 @@ func _run_fixture_suite()->void:
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(fixture_path))
 	var uid_path := ProjectSettings.globalize_path(fixture_path+".uid")
 	if FileAccess.file_exists(fixture_path+".uid"): DirAccess.remove_absolute(uid_path)
-	print("WORLD_CHECK_FIXTURES passed=",9-failed.size(),"/9 failed=",failed)
+	print("WORLD_CHECK_FIXTURES passed=",cases.size()-failed.size(),"/",cases.size()," failed=",failed)
 	get_tree().quit(1 if not failed.is_empty() else 0)
 
 func _set_fixture_owners(node:Node,owner:Node)->void:
@@ -1135,6 +1324,59 @@ func _fixture_reach(root:Node3D)->void:
 	platform.set_meta("reach_target",true)
 	var clean := _fixture_box(root,"FixtureReachCleanTarget",Vector3(1,0.2,1),Vector3(28,0.1,0),true); clean.set_meta("reach_target",true)
 	var broken := Node3D.new(); broken.name="FixtureBrokenReachLinkEndpoint"; broken.position=Vector3(34,20,0); broken.set_meta("reach_link_id","FixtureBrokenPair"); root.add_child(broken)
+
+func _fixture_belt(root:Node3D, label:String, z:float, x0:float, x1:float, rise:float)->StaticBody3D:
+	# An escalator-like belt: a 0.9 m deep, 1.1 m wide ramp whose body also carries a
+	# glass rail box along each edge, 1.4 m tall and 0.11 m thick. The rails are part
+	# of the same body, so a walk grid that stops at the first thing it hits sees only
+	# their tops and never the belt.
+	var run := x1 - x0
+	var length := sqrt(run * run + rise * rise)
+	var angle := atan2(rise, run)
+	var normal := Vector2(-sin(angle), cos(angle))
+	var top_mid := Vector2((x0 + x1) * 0.5, rise * 0.5)
+	var center := top_mid - normal * 0.45
+	var body := StaticBody3D.new()
+	body.name = label
+	body.collision_layer = 1
+	body.collision_mask = 1
+	body.position = Vector3(center.x, center.y, z)
+	body.rotation.z = angle
+	var belt_shape := BoxShape3D.new()
+	belt_shape.size = Vector3(length, 0.9, 1.1)
+	var belt_collision := CollisionShape3D.new()
+	belt_collision.shape = belt_shape
+	body.add_child(belt_collision)
+	for side in [-1.0, 1.0]:
+		var rail_shape := BoxShape3D.new()
+		rail_shape.size = Vector3(length, 1.4, 0.11)
+		var rail_collision := CollisionShape3D.new()
+		rail_collision.shape = rail_shape
+		rail_collision.position = Vector3(0.0, 0.45 + 0.7, side * 0.495)
+		body.add_child(rail_collision)
+	var belt_mesh := BoxMesh.new()
+	belt_mesh.size = belt_shape.size
+	var visual := MeshInstance3D.new()
+	visual.mesh = belt_mesh
+	visual.material_override = StandardMaterial3D.new()
+	body.add_child(visual)
+	body.set_meta("walk_deck", true)
+	body.set_meta("flight", true)
+	root.add_child(body)
+	return body
+
+func _fixture_narrow_belt(root:Node3D)->void:
+	var ground := _fixture_box(root,"FixtureBeltGround",Vector3(26,1,20),Vector3(161,-0.5,0),true)
+	ground.set_meta("collision_policy","decorative")
+	# Clean: ground, a 1.1 m belt with glass rails, a landing at its head (its top 0.4 m under the belt's end, as the
+	# city's flights meet their decks). Its target must read as reached.
+	_fixture_belt(root,"FixtureNarrowBeltRamp",-4.0,154.0,162.0,4.0)
+	var landing := _fixture_box(root,"FixtureNarrowBeltTarget",Vector3(3.4,0.2,2.4),Vector3(163.3,3.5,-4.0),true)
+	landing.set_meta("reach_target",true)
+	# Fault: the same, with the belt stopping 4 m short of its landing.
+	_fixture_belt(root,"FixtureNarrowBeltShort",4.0,154.0,158.0,2.0)
+	var unreached := _fixture_box(root,"FixtureNarrowBeltGapTarget",Vector3(3.4,0.2,2.4),Vector3(163.3,3.5,4.0),true)
+	unreached.set_meta("reach_target",true)
 
 func _fixture_trap(root:Node3D)->void:
 	var pocket := Node3D.new(); pocket.name="FixtureOneWayPocket"; pocket.position=Vector3(40,0,0); root.add_child(pocket)
@@ -1174,8 +1416,48 @@ func _fixture_underside(root:Node3D)->void:
 	var stepped := _fixture_stepped_flight(root,"FixtureSteppedFlightNoBottom",120.0,false)
 	var stepped_clean := _fixture_stepped_flight(root,"FixtureSteppedFlightCleanTwin",124.0,true)
 	stepped.set_meta("flight",true); stepped_clean.set_meta("flight",true)
+	# A curved-deck pair: a closed 0.9 m section, as the helix hands are, and the
+	# same top with no soffit. Both carry a concave collider of their own faces.
+	_fixture_concave_deck(root,"FixtureConcaveNoSoffit",130.0,false)
+	_fixture_concave_deck(root,"FixtureConcaveClosedTwin",134.0,true)
+	# A walk deck whose collider has no visual, and its clean twin with one.
+	var no_visual := _fixture_box(root,"FixtureDeckNoVisual",Vector3(2,0.1,2),Vector3(140,1.05,0),false)
+	no_visual.set_meta("walk_deck",true)
+	var with_visual := _fixture_box(root,"FixtureDeckWithVisualTwin",Vector3(2,0.1,2),Vector3(144,1.05,0),true)
+	with_visual.set_meta("walk_deck",true)
 	# A tagged moving detail is ignored while the supporting flight remains checked.
 	var decorative_tread := MeshInstance3D.new(); decorative_tread.name="FixtureTaggedMovingTread"; decorative_tread.mesh=BoxMesh.new(); decorative_tread.set_meta("underside_visual_only",true); decorative_tread.position=Vector3(0,0.08,0); stepped.add_child(decorative_tread)
+
+func _fixture_concave_deck(parent:Node3D,label:String,x:float,closed:bool)->StaticBody3D:
+	var half_x := 1.0
+	var half_z := 1.0
+	var section := 0.9
+	var vertices := PackedVector3Array([Vector3(-half_x,0,-half_z),Vector3(-half_x,0,half_z),Vector3(half_x,0,-half_z),Vector3(half_x,0,half_z),Vector3(-half_x,-section,-half_z),Vector3(-half_x,-section,half_z),Vector3(half_x,-section,-half_z),Vector3(half_x,-section,half_z)])
+	var indices := [0,2,1,1,2,3]
+	if closed: indices.append_array([4,5,6,5,7,6])
+	var arrays:Array=[]
+	arrays.resize(Mesh.ARRAY_MAX)
+	arrays[Mesh.ARRAY_VERTEX]=vertices
+	arrays[Mesh.ARRAY_INDEX]=PackedInt32Array(indices)
+	var mesh:=ArrayMesh.new()
+	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+	var body:=StaticBody3D.new()
+	body.name=label
+	body.position=Vector3(x,1.1,0)
+	body.collision_layer=1
+	body.collision_mask=1
+	body.set_meta("walk_deck",true)
+	parent.add_child(body)
+	var visual:=MeshInstance3D.new()
+	visual.name=label+"Visual"
+	visual.mesh=mesh
+	body.add_child(visual)
+	var shape:=ConcavePolygonShape3D.new()
+	shape.set_faces(mesh.get_faces())
+	var collision:=CollisionShape3D.new()
+	collision.shape=shape
+	body.add_child(collision)
+	return body
 
 func _fixture_top_only_mesh(width:float,depth:float)->ArrayMesh:
 	var x:=width*0.5; var z:=depth*0.5

@@ -455,3 +455,38 @@ unless the method changed (then, the new counts).
 - 2026-10-19: `checks/moy-2026-10-19.*` is the measured "now": the geometry of
   07:42, before P1's fix 4 (the rain garden rebuild). It replaces
   `moy-2026-10-18.*`.
+
+## 13. Section 12 built, and closed (2026-10-19)
+
+Built by the planning session at the user's request (diagnostic
+`docs/diagnostics/2026-10-19-moy-P0-fixes-4.md`), in the same pass as P1's fourth
+build.
+
+- **Follow-up 1, reproducible:** P1's builder, validator, plan constants and bake
+  are committed with the suite; the probe files are gone; `checks/moy-2026-10-18.*`
+  restored.
+- **Follow-up 2, the helix `underside`:** 56 findings were a method fault (a 0.75 m
+  cap against a 0.9 m section, and a perpendicular test at a slope's high end),
+  not missing faces. Now 0. Findings carry the failing share and heights and the
+  owning body; the helix deck's mesh is named.
+- **Follow-up 3, `deck_visual_missing`:** ten were 0.11 m balustrade tops (cells on
+  a face under 0.45 m need no visual), two were 136 m decks past the 128 m mesh
+  limit (now 256 m).
+- **Follow-up 4:** each fixture prints its own flags.
+- **Added by the City Hall work:** the walk grid goes down through thin box tops;
+  cells that narrowly fail the 0.5 m support test get rays at 0.45 m; a target is
+  reached when a reached cell is within 0.8 m; `--reach-map`, `--cell-probe`,
+  `--debug-cell`.
+- **Fixtures:** 10/10, with new pairs for a concave closed-section deck, a deck
+  with no visual, and a narrow railed belt.
+- **Baseline:** `checks/moy-2026-10-19.*`, 274 s, the measured "now" for the
+  geometry after P1's fourth build: overlap 403, buried 4, water 0, reach 52, trap
+  4, headroom 65, underside 0, solid 219, guard 2,733.
+
+**Result: done.** `underside` gates a package from here.
+
+**Decisions:**
+- 2026-10-19: P0 done. `underside` is a blocking check on the baseline's terms.
+- 2026-10-19: a target reads as reached within 0.8 m of a reached cell; a cell on a
+  face narrower than the walker's radius (0.45 m) is not a walk cell for the
+  deck-visual check, and the grid does not stop at it.
