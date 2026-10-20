@@ -607,6 +607,50 @@ regeneration environment/order and reconcile against canonical plan output;
 do not hand-edit the generated file, quietly accept footprint drift or undo
 unrelated owner changes. Record semantic equivalence and remaining differences.
 
+## Seventh build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-sixth-review-milestone.md`, current
+split-leaf code, focused saved-pack check, inside-window capture, rendered
+route/hold JSON and source hashes. Builder
+`4bfc40a7f2385f1d2f8f1900db0d4e097bbec7f4a46c87c032c78669e78bcf3c`
+and manifest `5f4add48b4ddd47b8410b87004e18ec082febc8d9f3958202b9a94f176fb3c6c`
+match the evidence; bake freshness passes (248 packs). **P3 remains fix.**
+
+**Accepted progress:** the shared parent is now actually split and floor-cut
+for leaf/shutter pairs with fitted convex collision. The close image shows
+one common rounded outline; the earlier two-head and wrong clip-side faults
+are corrected for these representative parts. The 53 assertions are focused
+supporting evidence, not approval of all house parts. Twelve rendered routes
+and both stocked service records remain valid; their new 30-frame endpoint
+holds have walkable rays, real grounding resolution and zero drift. Close
+the previously missing stationary-support proof for these tested endpoints.
+Do not repeat these checks without a change that could affect them.
+
+**Next implementation milestone:** finish the SAME common-outline chain
+through its opening and ring, plus door leaf/opening/surround, using actual
+scheduled silhouettes. The current rectangle frame visibly leaves space
+outside the rounded shoulders; reducing its bar width does not make its
+shape match. Replace the remaining representative box proxies with scheduled
+forms, make the builder owner/schedule-driven, and supply evidence for the
+complete boom representative. Then replicate and finish tile/lock-up grammar.
+The existing representative ledger identifies the remaining work; do not
+return another broad partial report after only a leaf tweak or harness rerun.
+
+The full kit, parkour/anchors, owned audit, remaining joins and failed shop
+street composition remain open under earlier reviews. Preserve the now
+useful interior and split-leaf evidence. P4 cannot substitute for finishing
+P3's shared grammar.
+
+**Plan reconciliation remains actionable:** reproducibility of current source
+is now established, but equivalence to the locked saved plan is not. Owner 43
+changes from five to four storeys; owner 16 changes shop true to false and
+front-edge index as well as a small polygon difference. Trace source/history
+and any environment-dependent geometry ordering to explain those exact
+changes and propose the smallest reconciliation through `city_layout.py`.
+Do not silently choose a new design or hand-edit `city_plan.gd`; bring the
+concrete reconciliation back for planning review while independent kit work
+continues. Both the source-data precedence and locked-plan rules still apply.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

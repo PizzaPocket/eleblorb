@@ -598,6 +598,33 @@ Both remain fix. Continue with construction rather than another broad report
 round, preserve credited passage/service progress and stop at a substantial
 verifiable milestone for the next automated review.
 
+## Seventh build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P4-sixth-review-milestone.md` and its
+rendered route/hold report against the same current builder/manifest hashes
+recorded in P3's seventh review. **P4 remains fix.**
+
+Credit sixteen movement records and their new 30-frame stationary holds for
+both controllers through passages 0/10/44 and ramp 00 both ways. The ray,
+nearby capsule and real grounding resolver supply stable support with zero
+drift even where CharacterBody's floor flag is false. This closes endpoint
+hold evidence for those tested routes, not all roofs or parkour. Preserve it;
+rerun only when geometry or relevant controller/harness changes justify it.
+
+The 51-part/10-join house kit, fourteen other roof-link route proofs and full
+roof-end geometry, stone/earth/vine/jump routes, courts/yards/pockets, well
+forms and current owner audit remain unfinished. The oldhigh and passage
+retakes still fail visibility; do not keep rerunning identical bad poses.
+Once P3 grammar is complete, build a true scheduled tower representative and
+finish roof links in one coherent implementation round, with focused evidence.
+The plan reproducibility report confirms current generation but does not
+resolve owner 43's height or owner 16's front/shop drift; follow P3's seventh
+review reconciliation requirement before claiming unchanged locked data.
+
+Neither package passes L2. All earlier full-kit, physical collision and
+readable both-side join/route requirements remain binding; new performance
+sampling and city-wide optimization stay deferred.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
