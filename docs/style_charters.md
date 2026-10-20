@@ -360,3 +360,36 @@ capsule tower and dune tower retain their accepted landmark palettes.
 Windspire and south tower trim refinement: use aluminium Windspire fins,
 observation guard and connected crown; neutral metal south screens and pergola.
 No red trim on those buildings. The capsule tower retains its coloured shells.
+
+## Moy: the Crossing (P7)
+
+2026-10-20. Develops the existing approved Crossing/Clock Room program and
+the user's Great Court, Cloud Forest and Flower Dome reference direction.
+
+- **Primary, about 75 percent:** tropical modern civic interchange: steel
+  garden towers, open galleries, planted concourse, pale timber/glass shelter.
+  Locked tower centres, two rail datums and public circulation provide its form.
+- **Secondary, about 20 percent:** the Great Court's continuous triangulated
+  white-steel/glass language, limited to the existing dome. The Singapore
+  conservatories inform smooth profiles and glazing connections; no extra
+  large arch cage is added over this dome.
+- **Accent, about 5 percent:** muted bronze mechanical clocks, bell, handrail
+  shoes and the floor's compass pictogram. No printed letters or numerals.
+- **Kit:** constant-section exponent5.5 structural sweeps with shared cuts,
+  welded flush node patches, one pane/node graph for glass and steel. Visible
+  dome frame width0.07, radial depth0.18,6 mm weld fillet. Natural circular
+  outlines remain circles; the profile exponent describes the member section.
+  P7 binds 70 part templates and 18 joins, including props and landscaping.
+- **Hierarchy:** four garden towers carry the station; the clear dome crowns
+  it; ring clocks and the bell give the Clock Room its identity. Furniture
+  stays secondary and outside the public route/arrival clearances.
+- **Palette:** white-painted steel, clear cool glass, pale timber, light
+  terrazzo, muted bronze and the existing desert greenery/flowers.
+- **Exclusions:** separate capsule/SuperEgg bars with rounded ends; bead-like
+  joints; six-sided faceted cylinders; oversized spherical hubs; disconnected
+  panes/frame; bars across clock eyes; pole-collapsing lattice; a new drum
+  cage/ring beam; decorative geometry pretending to be a traversable opening.
+
+The welded-node detail is a Boolean/union exception to separate rounded
+solids: the incident profiles become one continuous surface with small
+fillets and flush boundaries. Batching disconnected meshes does not satisfy it.

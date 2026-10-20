@@ -119,7 +119,7 @@ diagnostic replaces this column.
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **fix** (reviewed 2026-10-19: finish 51-part/10-join kit, passages/roofs, trap/reach and unload correctness; first-review section) | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | **ready** (2026-10-19: colour model and data updated; nine identities, no printed text/numbers, 39 parts/12 joins and SuperEgg safeguards; build after P3/P4 fixes, section 13) | `moy_pkg_P5.md` |
 | P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **ready** (revision 2: ten consolidated sites, separated shafts and substantial bases; 50 parts/17 joins; muted glass/metal mid-rise palette; old 23-tower handoff withdrawn) | `moy_pkg_P6.md` |
-| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | planned (after P1; carried from P1, 2026-10-19: the four tower lifts' deck-concourse calls have no walk cell within 2 m, so a +6.5 landing outside each tower gallery or the stop dropped; the Crossing's 136 `overlap` (the roof's 41, the lift landings against the platform bridges), 35 `solid` and the roof's `headroom` warnings) | |
+| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 70-part/18-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
 | P8 | **The park**: the four quarters, the dry garden, the reed pond, the tea house and chess terrace, the lawn, the wind trees, walks, benches | park | L2 | L4 | planned (note: the park paving is wound face-down and cannot be seen; one line in `_park_ground_body`, P1 fixes 4) | |
 | P9 | **The giant playground**: climbing towers, nets, slides, perches, hoops, the pump track | park, south-east | L1 | L4 | planned | |
 | P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L4 | planned | |
@@ -204,6 +204,7 @@ Each interior gets an architecture and interior brief (the `architecture` and
 
 | What | Where |
 |---|---|
+| P7 Crossing model | `docs/drawings/moy_crossing_3d.html` (local; publication pending) |
 | P6 Downtown model | `docs/drawings/moy_downtown_3d.html` (local; publication pending) |
 | P5 North Estate model | `docs/drawings/moy_north_estate_3d.html` (local; publication pending) |
 | P2 performance atlas | `docs/drawings/moy_performance_3d.html` (local; reuses the city model, publication pending) |

@@ -53,3 +53,15 @@ the three landmark palettes retain their accepted colours.
 Windspire crown refinement: connected closed ties and braces on the shaft
 roof, with a centred vertical-axis rotor. `references/moy_downtown_crown.png`
 shows the new assembly. Red landmark trim has been replaced by neutral metal.
+
+### Moy P7: the Crossing
+
+`moy_crossing_3d.html` — the four garden towers, recorded helices/galleries,
+concourse ring, platforms, roof, Clock Room and glass dome. Drawn from
+`CityPlan.CROSSING` and its binding 70-part/18-join kit. Includes exterior,
+interior, eye, platform, ground and section views plus an actual unioned
+six-way frame-junction sample beside the exported game hero. Dome panes and
+members share one checked node graph; the grid terminates on a nonzero crown
+and the four actual eye boundaries. No rounded-bead framing or printed text.
+Local model; external publication pending. Brief: `../architecture/moy_pkg_P7.md`.
+Reference images use `references/moy_crossing_*.png`.

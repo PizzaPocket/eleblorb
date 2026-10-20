@@ -4143,6 +4143,14 @@ def _p6_site_checks():
     DK['checks'].update(sites=len(DK['sites']),min_shaft_gap=round(min(gaps),3),source_lots=len(src))
 _p6_site_checks()
 
+
+# P7: complete Crossing kit and exact shared dome topology (planning only).
+from moy_crossing_kit import build_crossing_kit
+CROSSING['kit']=build_crossing_kit(CROSSING,ESCALATORS,PLATFORMS)
+parts_checks('Crossing',CROSSING['kit']['parts'],CROSSING['kit']['joins'])
+if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
+    problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))
+
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
