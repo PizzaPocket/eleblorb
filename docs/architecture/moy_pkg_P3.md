@@ -550,6 +550,63 @@ a coherent implementation milestone with narrowly scoped fresh checks and
 stable evidence, then return for review. All prior acceptance requirements
 remain binding.
 
+## Sixth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-PP3-second-third-review-completion.md`,
+current source, saved-pack validators, route JSON and current noon captures.
+Current builder SHA-256 is
+`1c67f1ea3b88588f425ff97637e72a388761a0972ba0e3f0499393e2f0108ec8`;
+manifest is `598ab4688a7503400b304a11a3f41cf38861b3d84ec6d25d4b55079e7f393002`.
+Both route reports match these hashes and name gl_compatibility / Apple M5.
+Reviewer bake freshness passes at 248 packs. **Result: fix, not L2.**
+
+**Credit and preserve:** the corrected harness supplies twelve passing
+movement records: both controllers through LOT34/71 both ways and shop
+entry/exit. Both service records open the stocked city shop through its
+actual dialog action, report four catalogue/stock entries, one vendor and
+clean modal closure. This is useful service integration evidence. The hero's
+custom grounding is now supplemented by a short support ray; a false
+CharacterBody floor flag alone does not invalidate his route. Add a stationary
+landing hold that proves support distance and bounded vertical drift, rather
+than simply requiring a flag his controller does not use. Rapid re-entry,
+occupied-support retention and former-plaza clearance remain separate work.
+
+**Representative 76 is an improvement, not a complete binding house.** Its
+saved-pack check establishes named parts and four sampled collision hits.
+The inside-window image visibly shows two independently rounded leaf heads
+inside a rectangular opening/frame. `_market_rep_french_window` builds two
+whole clipped eggs, not halves split from one parent outline. The same
+problem applies to independently built shutters. The door surround is
+separate box jambs/lintel rather than the leaf outline grown by clearance.
+The hard-coded `_market_boom_house_076` and `_market_rep_box` still choose
+box walls, slabs, rails/coping and dimensions instead of the scheduled
+profiles/joins. The brief only permits a box for its justified roof slab.
+Presence/count/ray assertions do not establish fitted joins or compliance.
+
+**Next build milestone:** finish this representative properly, without
+replicating the hard-coded exception. Introduce a reusable boom builder driven
+by the schedule/owner data. Split leaves/shutters from one parent; derive
+openings and rings from those same outlines. Seat/cut/cap the scheduled
+members; close every visible gap and overlap. Verify silhouette, clearances
+and collision from both sides and produce a part/function/status ledger for
+this representative. Only then apply the grammar to other boom owners and
+complete tile/lock-up representatives, market flats and remaining variants.
+Keep route/service proof and do not repeat P2 captures of unchanged places.
+
+**Other blockers:** actual veranda/balcony/bounce/arcade/swing parkour;
+current owner audit after source changes; full saved-pack orientation/support;
+readable Helmsmith street composition. Interior capture is now useful. The
+front capture still hides the threshold behind foreground geometry.
+
+**Plan reproducibility:** despite the report's unchanged-plan claim,
+`scripts/city_plan.gd` differs from committed generation in WALL, CROSSING,
+OLD_TOWN and OLD_HOUSES while `tools/city_layout.py` is unchanged. Several
+house differences are ring-order only, but house 16's polygon symmetric
+difference is 0.019 m² and some door/front fields also differ. Trace the
+regeneration environment/order and reconcile against canonical plan output;
+do not hand-edit the generated file, quietly accept footprint drift or undo
+unrelated owner changes. Record semantic equivalence and remaining differences.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

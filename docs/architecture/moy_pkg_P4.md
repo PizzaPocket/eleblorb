@@ -549,6 +549,55 @@ Both packages remain fix. The next automated continuation prioritizes actual
 construction and a valid harness; final acceptance still requires every
 scheduled kit part/join, completed route suite and current geometry proof.
 
+## Sixth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-PP4-second-third-review-completion.md`,
+current source, saved-pack validators, route JSON and current noon captures.
+Current builder SHA-256 is
+`1c67f1ea3b88588f425ff97637e72a388761a0972ba0e3f0499393e2f0108ec8`;
+manifest is `598ab4688a7503400b304a11a3f41cf38861b3d84ec6d25d4b55079e7f393002`.
+Both route reports match these hashes and name gl_compatibility / Apple M5.
+Reviewer bake freshness passes at 248 packs. **Result: fix, not L2.**
+
+**Credit and preserve:** sixteen rendered movement records now cover both
+controllers through passages 0/10/44 both directions and roof ramp 00 both
+ways. This closes the earlier uncut-passage source blocker for those three
+owners and supplies limited usable-ramp evidence. It does not prove all
+scheduled arch/lamp/threshold forms or all fifteen roof links. Check stable
+landing holds using the hero's actual grounding/support resolver and a
+measured support ray; do not discard useful route evidence solely because
+his CharacterBody floor flag is false. Current helper samples proximity
+support but does not assert a sustained final landing.
+
+Saved-pack inspection now rejects selected degenerate faces and finds the
+cut owners. It still uses local centre_y>0.5/downward triangles as a heuristic;
+this cannot prove the correct outward direction or all landing planes.
+Add targeted expected-plane/support assertions and preserve valid thin faces.
+
+**Next build milestone, after P3 grammar:** complete a scheduled tower-house
+representative with genuine stone/earth base distinctions, fitted openings,
+friezes, wind tower/manzar, joins and part-level evidence; then replicate.
+Finish all roof-link end openings/landings and their routes, courts/yards/
+pockets, full stone/earth/vine/jump parkour and the well's scheduled vessel/
+head/lid/trunk. Current diagnostics still explicitly call these incomplete.
+
+**Evidence:** the roof-ramp overview is useful, but `old_passage_10` is
+mostly wall and `oldhigh`/`oldhigh_route` are effectively blank brown frames.
+The well close is an overhead composition rather than the required readable
+ground-level form. Change only the failed poses, inspect them before keeping
+them, and supply real +14 m route visibility plus both-side join captures.
+No need for another full screenshot/performance sweep of unchanged geometry.
+
+**Area and plan:** current matched owner-attributed P0 remains owed after
+these changes. Reconcile the generated-plan drift described in P3's sixth
+review before claiming the locked plan is unchanged; some ring reordering
+is equivalent, but that does not establish every changed polygon/front is.
+Preserve unrelated work and regenerate through `city_layout.py` only.
+
+Both remain fix. Continue with construction rather than another broad report
+round, preserve credited passage/service progress and stop at a substantial
+verifiable milestone for the next automated review.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
