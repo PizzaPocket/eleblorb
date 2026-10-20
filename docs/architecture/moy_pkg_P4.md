@@ -504,6 +504,51 @@ is historical for this changed bake. Keep city-wide optimization with P2,
 finish a coherent milestone, write separate package diagnostics and stop
 editing so the automated reviewer can inspect a stable state.
 
+## Fifth build review — 2026-10-20: fix (automated loop)
+
+Reviewed the package's `../diagnostics/2026-10-20-moy-PP4-fixes-final.md`,
+its ledger, current controller/saved-pack harnesses, raw evidence and all noon
+captures. Builder hash `6d736880bdf78f899e3648c89bfe5eaf75d781524faa9fedd9028afeb609545f`
+and manifest hash `d6e88eaab2080b3b7629a978b9a3b601902dffba23accf1399e4650afb1891bb`
+match the submission. Fresh bake freshness check passes (247 packs).
+**Result: fix; no L2 acceptance.**
+
+**Progress:** a fresh rendered audit and saved-pack subset are now available.
+The owner-filtered audit records 18 overlaps and 372 guard warnings; it is
+useful attribution, not proof that full-area reach/trap findings are unrelated.
+No required P4 route passed; the ledger still marks every part partial.
+
+**Next milestone, after the P3 shared grammar:**
+1. Complete a representative stone/earth house and its scheduled joins,
+   then replicate the actual 51-part/10-join kit. Build passages 0/10/44 and
+   fifteen usable ramp ends/landings. The principal implementation blockers
+   have remained open across reviews; another inventory or performance run
+   does not replace the work.
+2. Repair the shared controller harness as P3's fifth review specifies.
+   The arbitrary three-route straight-z test does not implement the P4
+   stone/earth/vine/ramp/jump/passage suite. Inspect the intended walk path
+   and bench contact before moving `OldMoyCourtBench_00`; a camera/start
+   inside a furnishing is a harness defect, not sufficient evidence that
+   the locked city's walk route needs redesign. Run actual routes both ways
+   on saved packs, with support and anchor assertions, using the rendered
+   compatibility backend that already works for captures and P0.
+3. Make the saved-pack geometry test fail on real orientation/support defects
+   and record coverage after merging. Current counts are not asserted and
+   local triangle height is not a reliable roof classifier. Investigate
+   flagged zero-area faces without discarding thin valid geometry.
+4. Resolve owned overlap pairs and explain reach/trap attribution by plan
+   ownership/location, including numbered buildings and both collision owners;
+   an empty name-filter result does not close these checks. Keep valid new
+   audit evidence and use focused reruns after each fix.
+5. `oldhigh` and `oldhigh_route` are now dominated by a wall; well close is
+   also blocked. Correct poses by visibility checks and self-inspection,
+   retaining a real +14 m route view and readable ground-level composition.
+   Do not recapture the entire city or rerun P2 to document unchanged failure.
+
+Both packages remain fix. The next automated continuation prioritizes actual
+construction and a valid harness; final acceptance still requires every
+scheduled kit part/join, completed route suite and current geometry proof.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door

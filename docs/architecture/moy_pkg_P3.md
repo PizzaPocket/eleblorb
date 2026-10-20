@@ -499,6 +499,57 @@ this source: keep them historical, not current performance evidence. Return
 separate package diagnostics when a coherent milestone is complete, with
 source/bake hashes and remaining failures; stop editing for review.
 
+## Fifth build review — 2026-10-20: fix (automated loop)
+
+Reviewed the package's `../diagnostics/2026-10-20-moy-PP3-fixes-final.md`,
+its ledger, current controller/saved-pack harnesses, raw evidence and all noon
+captures. Builder hash `6d736880bdf78f899e3648c89bfe5eaf75d781524faa9fedd9028afeb609545f`
+and manifest hash `d6e88eaab2080b3b7629a978b9a3b601902dffba23accf1399e4650afb1891bb`
+match the submission. Fresh bake freshness check passes (247 packs).
+**Result: fix; no L2 acceptance.**
+
+**Progress:** the rendered audit now runs, its package subset identifies
+17 overlaps and seven disconnected market-door targets, and actual input
+traces plus saved-pack inspection exist. `arcade_close` now shows a readable
+repeated arch run. The per-part ledger honestly marks everything partial;
+function-name mapping does not establish any scheduled part as complete.
+
+**Prioritized next milestone (not another whole-city report round):**
+1. Build and verify one complete boom-house representative from the existing
+   schedule, with part-level construction and both-side joins. Then complete
+   tile/lock-up representatives and replicate the kit. Do not stop after
+   transcription, isolated surface tweaks or another performance sample.
+2. Correct the route harness before diagnosing world geometry: LOT34 spans
+   z=155..167 with front=s, so the labelled street-to-court start z=155 is
+   not the street-side exterior. The current pass threshold permits stopping
+   at z=165, inside the parcel. Use COURT_WAYS endpoints extended outside
+   both openings, run both directions, assert continuous corridor clearance
+   and actual arrival. Reset velocity, inputs and traversal state between
+   teleports; wait for stable support on loaded geometry. Two physics frames
+   after placing the body 0.5 m high do not establish a grounded start.
+   Identify a floor contact by normal, not the last slide collision, which
+   may be a wall. Run with the working rendered backend and assert active
+   controller identity. Keep failure diagnostics; do not loosen tolerances.
+3. Expand beyond simple z walks: LOT71, required parkour/anchors, shop UI,
+   vendor reach/stock/uniqueness and entry/exit for both characters. A hero
+   room-arrival record is not service proof. Diagnose Xiao's shop obstruction
+   with collider/contact and room/threshold measurements after harness reset.
+4. Resolve attributed overlaps and disconnected doors, and make the shop
+   capture readable. Existing `helmsmith_front` still shows foreground trim.
+   Keep useful arcade evidence; add required isolated joins.
+
+**Saved-pack test limits:** its exit status ignores degenerate/downward-face
+counts, only matching vertex normals cannot establish exterior orientation,
+and its hard-coded local centre_y>0.5 heuristic is not a roof-plane test.
+Assert expected outward/top planes with transforms, nonempty inspected mesh
+coverage after StaticMerge, material override culling and real support. Do
+not remove nondegenerate faces by increasing a triangle-area threshold.
+
+Do not repeat full P2 samples while these failures remain unchanged. Finish
+a coherent implementation milestone with narrowly scoped fresh checks and
+stable evidence, then return for review. All prior acceptance requirements
+remain binding.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
