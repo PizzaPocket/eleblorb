@@ -346,6 +346,65 @@ separate commits/diagnostics and do not redesign the locked layout.
 Write `docs/diagnostics/<date>-moy-P3-fixes.md`; stop if a shared blocker
 prevents useful P4 progress, otherwise continue to P4 sequentially.
 
+## Second build review — 2026-10-20: fix
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-fixes.md`, all eight supplied
+noon/dusk images and their manifest, the final area JSON and rendered probe,
+and the current builder/shop code. **Result: fix; not accepted at L2.**
+The diagnostic honestly identifies a proxy pass; listing the schedule's IDs
+is not an as-built ledger or completion of the 66 parts and 15 joins.
+
+**Progress credited.** The reviewer reran `check_moy_bake.py`: 248 current
+packs. `validate_moy_passages.tscn` exited 0: lots 34 and 71 each clear a
+0.4 m radius / 1.8 m capsule both ways (four fractions 1.0). This closes the
+isolated plinth-obstruction regression, not the approaches in the loaded
+city or either playable controller's route. The shared winding fixture also
+exited 0. Both final district probe JSONs report
+`cycles_complete_and_settled: true`; close the earlier 34/36-request symptom
+for those sampled unload cycles. Actor uniqueness, rapid re-entry and
+occupied support safety remain unproved. Do not repeat the deferred full
+P2 optimization loop to finish this kit.
+
+**Remaining fix list (build P3 before P4):**
+
+1. Complete the existing 66-part/15-join schedule, including the market
+   flats, boom verandas and French leaves/shutters, rounded tile corners and
+   balcony joins, dressed shop windows, roof variants, picture signs and
+   genuine arcade arches/panels. Report each part and join with its builder
+   function and status; include close views from both sides of each join.
+   Preserve the locked layout and private solid homes.
+2. Prove both court approaches and every section 3 parkour route with the
+   actual hero and Xiao Hou Zi: movement, supports and anchors, not camera
+   teleportation or the isolated capsule fixture. Test the Helmsmith from
+   Lamp Lane through entry, counter service UI and exit; confirm his stock,
+   counter reach, one vendor after reload, clear former plaza, and dusk light.
+   Keep the shared room/display code and the revised atmospheric second line.
+3. Attribute the area failures by check/location/both owners and compare
+   matched settings. The supplied audit has 1,230 findings, including 83
+   reach and 221 trap findings; do not assign its 98.50% trapped-cell rate
+   entirely to P3 without attribution. There are concrete kit intersections:
+   overlap between `MarketHouse_049` and `_050` at (-600, -40.30, 188.88),
+   plus other market-house overlap findings. Resolve package-owned blocking
+   geometry and explain inherited debt individually.
+4. Recapture useful acceptance views after the kit is built. `arcade` shows
+   posts and nearby blank walls, without a readable roof/arch run; `southst`
+   is dominated by transport structure; `lamplane` does not demonstrate the
+   entered shop. Keep district context but add clear kit, roof and shop
+   views. Ensure visible packs around the subject are loaded, record poses
+   and loaded-state evidence, and retain the named noon/dusk set.
+5. Supply a new fixes diagnostic with the as-built ledger, real movement
+   routes, join close-ups and final area checks. The partial rendered P2
+   sample passes its stationary p95 budget but has `acceptance_passed: false`
+   and no controlled-route proof; it supports observations, not acceptance.
+
+**Verification limits.** Fresh fixture runs used an explicit `/tmp` log
+path because default user-log access crashed Godot in this sandbox. They
+returned 0 but emitted Dummy-renderer/resource-cleanup errors. The winding
+validator calls `BUILDER.build_packs()`; its twelve representatives are
+rebuilt source geometry, not independently loaded committed `.tscn` packs.
+Freshness and supplied rendered roofs support the correction; final baked
+support/collision and loaded-city controller proof are still required.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

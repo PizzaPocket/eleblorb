@@ -354,6 +354,67 @@ accepting approximations or writing a smaller replacement specification.
 **Handoff:** P3 first, then P4, using the existing binding schedules. Neither
 package is accepted as a finished district by this review.
 
+## Second build review — 2026-10-20: fix
+
+Reviewed `../diagnostics/2026-10-20-moy-P4-fixes.md`, all twelve final-bake
+noon/dusk images and their manifest, the final-rebake area JSON, rendered
+probe, winding validator and current builder. **Result: fix; not L2.**
+The 99 owners and 15 ramps remain useful integration work; the diagnostic
+explicitly says the 51-part/10-join kit is still a proxy.
+
+**Progress credited.** `check_moy_bake.py` passes with 248 current packs.
+The reviewer reran `validate_moy_winding.tscn`: CW/CCW rectangle and concave
+building/floor fixtures and twelve generated house representatives (eleven
+towers, one infill), `failures=0`, exit 0. The roof images now show visible
+top faces with the supplied default-culling capture. This resolves the
+identified source winding defect. Important limit: `_check_baked_houses`
+calls `BUILDER.build_packs()`, not `ResourceLoader` on the saved packs; its
+name overstates its final-bake proof. Audit representative saved collision
+and top support before acceptance. The run emits Dummy-renderer cleanup
+errors; it is not a clean full-area rendering audit. Paired rail collision
+is now present on the ramps; this alone does not make their ends walkable.
+The final P3 and P4 probe JSONs both report settled unload cycles; the
+previous 34/36-request symptom is closed for those samples, with controlled
+re-entry/actor/support correctness still owed.
+
+**Remaining fix list (after P3's shared tile grammar):**
+
+1. Build all 51 parts and 10 joins from the unchanged plan: distinguish
+   stone from battered superellipse earth bases, surface-fit openings and
+   trim, complete friezes/qamariya/kishks, wind towers and manzars. Replace
+   the proxy masses/strips with scheduled construction. Supply the missing
+   part/function/status ledger and isolated join close-ups from both sides.
+2. Cut passages through old houses 0, 10 and 44, including the colliders
+   and plinths, with the scheduled arches and lamps. Complete courts,
+   pockets, yard/gateway and planting; the current well is only a cylinder,
+   without its complete lid/trough/ghaf composition. Prove entry and return
+   through each court route with both playable controllers.
+3. Finish all 15 roof links: actual gaps through the correct parapets,
+   floor-plane end cuts, usable landings and clear kiosk/manzar positions.
+   Rails leave 1.04 m between their inner faces on a 1.2 m ramp; report actual
+   clear width and prove both controllers fit. Complete both-direction
+   roof traversal and all five section 4 parkour routes with actual movement,
+   supports and vine anchors. Counts and inclined-box collision do not pass.
+4. Attribute and fix package-owned audit failures against a matched baseline.
+   The latest report still has 1,220 findings (108 reach, 96 trap), with
+   14,769 trapped cells. It includes surrounding stations and estate bodies;
+   do not call that total all P4 debt or dismiss it all as inherited.
+   Resolve the reported RID/mesh-access errors for a trustworthy underside
+   result, or rerun the affected audit with a backend that can inspect it.
+5. Fix the evidence views. `oldhigh` shows one isolated rooftop against
+   empty space; it does not show the street corridor claimed in the report
+   or the required route at +14 m. Verify subject/neighbour pack readiness
+   and record loaded state before recapturing the route. `cinemasq` shows
+   the bare well cylinder, without the specified composition. Keep useful
+   overview/roof images, add street-height base/opening and passage views,
+   and retain the six named noon/dusk views and exact camera poses.
+6. Write the next fixes diagnostic after final rebake and freshness checks,
+   with saved-pack winding/support proof, full schedule ledger, resolved
+   owner findings and real-hero/Xiao runs. P4's partial rendered probe passed
+   its sampled p95 budget but lacks controlled routes and uses different
+   before viewpoints: it is not matched performance acceptance. City-wide
+   performance optimization stays with P2.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
