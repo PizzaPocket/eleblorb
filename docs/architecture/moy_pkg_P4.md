@@ -724,6 +724,47 @@ The next handoff must deliver actual complete scheduled construction and
 repair the four current route failures, not another report-only round.
 Full L2 criteria remain unchanged; P2 optimization remains deferred.
 
+## Twelfth build review — 2026-10-21: fix; paused for reassessment
+
+Reviewed the stable final build turn `01a158c0-4dc2-7b32-9318-8bdfde9d840d`
+after it stopped editing. Evidence is the package's
+`../diagnostics/2026-10-20-moy-P4-current-fixes-pass.md`, current route JSON,
+saved-pack checks, source and actual focused GPU screenshots. Independently
+rechecked bake freshness: 259 packs. Builder SHA-256 is
+`5af1395374f6e414b90631d3cb0c05e813827e9cfc331dc07db754d8a268517b`;
+manifest is `d28fd5d1ba31f4b6a101274f91b3832069e1b44ebf756c5caf90833f66b0a816`.
+Source/evidence hashes match. **P4 remains fix; L2 is not accepted.**
+
+Credit the repaired hero ramps 01/02: the current JSON reports 72/72 input-driven
+passage/roof movements for both controllers, including all 15 roof links in
+both directions and three court passages. Landing/support assertions retain
+the custom controller grounding distinction. Headless/Dummy execution and
+mesh/RID noise limit this to measured physics evidence. Do not reopen the
+four earlier failures on the basis of the superseded report, or treat these
+routes as the five required stone/earth/jump/vine parkour tasks.
+
+The eight-pack audit's zero failures are sampled heuristic checks, not a
+51-part/10-join as-built ledger or acceptance of all 99 houses. Complete the
+scheduled tower forms and court/pocket/yard/well details; verify each roof
+opening, clear width, landing and physical join, plus remaining parkour,
+re-entry and occupied-support behavior. Current owner-attributed matched
+audit evidence is still missing; the old 123-blocking snapshot is historical.
+
+Inspected all three current GPU images: the ramp is visible in isolation,
+the passage crop is wall-dominated, and the well/trough/tree remain visibly
+separate proxy forms. Required readable street-height, elevated route and
+both-side join views remain outstanding. These isolated saved-pack captures
+are genuine GPU evidence but do not establish district visual acceptance.
+
+The user requested one final review, then reassessment. **Automated build/fix
+rounds stop here; no implementation continuation is authorized by this review.**
+Across the loop, route tooling, evidence provenance and a boom representative
+improved more than full kit completion. Preserve that progress, but focus any
+future authorized work on complete scheduled construction before another
+broad validation round. City-wide P2 optimization and final performance
+acceptance remain deferred. The implementation working tree is preserved;
+this checkpoint commits review documents only.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door

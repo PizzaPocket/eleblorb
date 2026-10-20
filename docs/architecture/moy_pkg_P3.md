@@ -841,6 +841,49 @@ performance work deferred. Historical leading sections in the diagnostic
 still describe older hashes/results; rewrite the report around the final
 submission instead of accumulating contradictory superseded paragraphs.
 
+## Twelfth build review — 2026-10-21: fix; paused for reassessment
+
+Reviewed the stable final build turn `01a158c0-4dc2-7b32-9318-8bdfde9d840d`
+after it stopped editing. Evidence is the package's
+`../diagnostics/2026-10-20-moy-P3-current-fixes-pass.md`, current route JSON,
+saved-pack checks, source and actual focused GPU screenshots. Independently
+rechecked bake freshness: 259 packs. Builder SHA-256 is
+`5af1395374f6e414b90631d3cb0c05e813827e9cfc331dc07db754d8a268517b`;
+manifest is `d28fd5d1ba31f4b6a101274f91b3832069e1b44ebf756c5caf90833f66b0a816`.
+Source/evidence hashes match. **P3 remains fix; L2 is not accepted.**
+
+Credit the representative boom's split leaves/shutters, matching doorway,
+tank seats/vessels/caps and veranda returns. The saved MarketHouse_076 ledger
+has 211 passing assertions: 23 present parts, two represented by the shared
+punched wall and 41 not applicable to that variant; 11 present joins and four
+not applicable. This is useful scoped evidence, not a completed 66-part,
+15-join market kit across all applicable owners and variants.
+
+Current JSON reports 12/12 court/shop movements and both controllers' service
+interactions passing. Source checks include support rays, custom grounding,
+30-frame landing holds and bounded drift. These are headless/Dummy physics
+results with mesh/RID noise, not clean rendered runtime acceptance. Retain
+that credit without conflating it with the six required parkour/anchor tasks.
+
+Inspected all four current GPU images. Boom front and arcade are visible;
+the veranda-return crop does not show the return's two-sided fit clearly,
+and the market-flat facade remains largely proxy. Saved-pack isolation does
+not supply the required streamed noon/dusk district, shop/counter and readable
+join evidence. Complete applicable scheduled variants, flats, signs, stalls
+and court construction; verify physical joins and the remaining parkour and
+service/re-entry/occupied-support requirements. A current matched audit with
+actual owner attribution is still required: the prior 267-blocking snapshot
+predates this bake and is neither a current count nor proof of closure.
+
+The user requested one final review, then reassessment. **Automated build/fix
+rounds stop here; no implementation continuation is authorized by this review.**
+Across the loop, route tooling, evidence provenance and a boom representative
+improved more than full kit completion. Preserve that progress, but focus any
+future authorized work on complete scheduled construction before another
+broad validation round. City-wide P2 optimization and final performance
+acceptance remain deferred. The implementation working tree is preserved;
+this checkpoint commits review documents only.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
