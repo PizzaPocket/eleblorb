@@ -469,6 +469,41 @@ failed sampled performance evidence, with full city optimization in P2.
 second-review list plus these corrections. Return with final saved-pack
 checks, useful join/route captures and actual hero/Xiao movement evidence.
 
+## Fourth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-P4-third-review-build.md`
+and current builder SHA-256
+`9a4327d0a5290916fab051238c84f0a2e67e8d9a35715b017e1489c71fd1531f`.
+No new screenshots, controller routes or area audit were submitted.
+Fresh reviewer bake check passes with 247 packs; targeted source whitespace
+check passes. **Result: fix; not accepted at L2.**
+
+Credit the trough orientation correction and removal of the floating single
+sphere. Saved `cell_00_04.tscn` has the new three-mesh crown at world
+(-746.5, -53.28, 24), matching the builder; its base is now below the trunk
+top. This closes the prior 1.44 m air gap at source/placement level. The
+five-box trough and cylinder head/lid/trunk still depart from the binding
+scheduled forms. No new rendered tree/well or support proof was supplied.
+
+**Next build round, after P3's shared grammar:**
+1. Build the unchanged 51-part/10-join kit with its function/status ledger,
+   the scheduled well vessel/profiles and a coherent authored tree form.
+   Preserve the plan's dimensions; moving foliage to hide the gap is not
+   itself acceptance of the tree silhouette.
+2. Cut old-house passages 0/10/44 and finish all fifteen roof-link parapet
+   openings/landings. Demonstrate both controllers through courts and roof
+   links, plus all required stone/earth/vine/jump routes, on saved loaded packs.
+3. Recover area/runtime inspection with a working rendered backend or the
+   actual mesh lifecycle fix, not another identical failed Dummy run. Supply
+   current owner attribution, saved-pack winding/top support and readable
+   passage/roof/well/join captures. Existing historical totals remain open.
+
+The build explicitly reports no controller or current audit proof; do not
+repeat that partial submission as acceptance. Earlier performance evidence
+is historical for this changed bake. Keep city-wide optimization with P2,
+finish a coherent milestone, write separate package diagnostics and stop
+editing so the automated reviewer can inspect a stable state.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door

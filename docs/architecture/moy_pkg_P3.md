@@ -464,6 +464,41 @@ while occupied-support and re-entry correctness remain package blockers.
 **Handoff:** finish P3's existing second-review list plus these corrections,
 then P4; supply a complete as-built diagnostic rather than another ID list.
 
+## Fourth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-P4-third-review-build.md`
+and current builder SHA-256
+`9a4327d0a5290916fab051238c84f0a2e67e8d9a35715b017e1489c71fd1531f`.
+No new screenshots, controller routes or area audit were submitted.
+Fresh reviewer bake check passes with 247 packs; targeted source whitespace
+check passes. **Result: fix; not accepted at L2.**
+
+Credit the source corrections: ribs/panels now consume the same 32-segment
+profile at exponent 2.5, panel z-end caps were added, and steel versus French
+window details now follow tile versus boom generation. Close the previous
+curve-formula and generation-selection regressions at source level. Final
+saved-pack join/winding/support and readable rendered evidence remain owed;
+these source fixes do not complete the kit.
+
+**Next build round:**
+1. Complete the existing 66-part/15-join kit and function/status ledger,
+   with one representative boom, tile and lock-up verified before replication.
+   Do not spend another round only correcting the latest isolated regression.
+2. Recover the verification path: stop retrying the same Dummy-renderer
+   runtime/audit failure. Use the already working rendered compatibility
+   backend for affected checks, or fix the actual mesh lifetime/inspection
+   fault. A generic runtime validator is not a controller-route harness.
+   Add actual hero/Xiao input-driven movement with support/anchor traces,
+   assertions and artifacts for the brief's required routes and shop service.
+3. Finish readable, self-inspected kit/join/shop captures and the current
+   owner-attributed area audit. Fix owned blockers. Reuse successful bake/plan
+   checks but do not substitute them for missing routes or schedule coverage.
+
+City-wide P2 optimization remains deferred. Earlier performance JSONs predate
+this source: keep them historical, not current performance evidence. Return
+separate package diagnostics when a coherent milestone is complete, with
+source/bake hashes and remaining failures; stop editing for review.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
