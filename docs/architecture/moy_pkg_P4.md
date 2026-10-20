@@ -415,6 +415,60 @@ re-entry/actor/support correctness still owed.
    before viewpoints: it is not matched performance acceptance. City-wide
    performance optimization stays with P2.
 
+## Third build review — 2026-10-20: fix
+
+Reviewed `../diagnostics/2026-10-20-moy-P4-second-review.md`, all fourteen
+noon/dusk captures and their manifest, the well builder and saved
+`assets/generated/moy_city/cell_00_04.tscn`, the unchanged schedule and new
+rendered probe. **Result: fix; not accepted at L2.**
+
+**Progress credited.** The saved pack contains the added lid, hollow trough,
+trunk collider and decorative crown. Fresh reviewer checks: bake freshness
+passes (248 packs), plan validator exits 0 with 0 failures, and diff whitespace
+passes. These are useful additions, but the claim that the composition is
+complete from plan-owned dimensions is not supported by its forms or joins.
+
+**New concrete fixes, in addition to the second review:**
+
+1. **Fit the well composition to the plan and schedule.** The trough is
+   `along: z` in the plan. Its saved identity transform and 3.2 m BoxMesh run
+   along x: honour the authored orientation. Replace the five intersecting
+   box pieces with the scheduled clipped, hollowed vessel and landing
+   collision, and build the head/lid/trunk from their scheduled profiles.
+   The crown is a single scaled SphereMesh, not the scheduled soft-egg
+   cluster or shared round-tree kit. It also floats: for h=14, trunk top is
+   +7.70 m and crown bottom is +9.14 m, leaving a 1.44 m gap. Join the crown
+   to the trunk through the authored tree form. Verify the saved geometry
+   from ground level and above, including top support and collision policy.
+2. **Fix the well and route captures.** `cinemasq_close` shows the crown and
+   surrounding walls but hides the well/trough. `oldhigh` now has surrounding
+   rooftops visible, an improvement over the isolated rooftop, but remains
+   a roof view rather than the required +14 m street/vine route. Capture
+   readable ground-level well/passage views and the actual route, with loaded
+   neighbour state and exact poses; retain the useful district overviews.
+3. **Supply current verification.** There is no new full P4 area audit,
+   saved-pack winding/support test or real-controller route proof in this
+   pass. Historical checks cannot close the unchanged 108 reach/96 trap
+   findings. Recover P0 mesh inspection from the reported renderer failures,
+   attribute both owners of each intersection, and resolve P4-owned blockers
+   with matched settings rather than requesting a pass from coverage counts.
+
+**Still open.** The 51-part/10-join house kit and as-built ledger, passages
+through old houses 0/10/44, court/yard/pocket work, all fifteen roof-link end
+openings/landings, and both controllers' court/roof/parkour routes remain
+unbuilt or unproved. The second-review requirements remain binding; adding
+the well does not close the house kit or circulation.
+
+**Performance scope.** The new compatibility-renderer probe's recorded
+source hashes match current files and unload cycles settle. Its six P4
+views have p95 39.745–70.099 ms; budget and repeated-stall gates fail and
+controlled routes are absent. Its before route is unmatched. Keep this as
+failed sampled performance evidence, with full city optimization in P2.
+
+**Handoff:** complete P3's shared tile grammar first, then P4's existing
+second-review list plus these corrections. Return with final saved-pack
+checks, useful join/route captures and actual hero/Xiao movement evidence.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door

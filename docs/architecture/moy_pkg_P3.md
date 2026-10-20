@@ -405,6 +405,65 @@ rebuilt source geometry, not independently loaded committed `.tscn` packs.
 Freshness and supplied rendered roofs support the correction; final baked
 support/collision and loaded-city controller proof are still required.
 
+## Third build review — 2026-10-20: fix
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-second-review.md`, all twelve
+noon/dusk captures and their manifest, the changed builder, unchanged plan
+schedule and new rendered probe. **Result: fix; not accepted at L2.**
+The submission is incremental work, not completion of the second-review list.
+
+**Progress credited.** The ordinary plinth now stays within the parcel, and
+curved ribs/panels replace the straight arcade roof proxies. Fresh reviewer
+checks: `check_moy_bake.py` passes (248 packs), `validate_city_plan.tscn`
+exits 0 with 0 failures, and `git diff --check` passes. The plan run emits a
+system-certificate error and an ObjectDB cleanup warning. No new successful
+P0 overlap result exists: the builder's attempted focused rerun crashed.
+Therefore the plinth change is credited as a source correction, not closure
+of the MarketHouse_049/_050 audited intersection. The new probe's recorded
+source hashes match the current files and its unload cycles settle.
+
+**New concrete fixes, in addition to the second review:**
+
+1. **Make the arcade one fitted vault.** `_market_arch_mesh` samples
+   `x = mid + half_width * sign(cos(theta)) * abs(cos(theta))^(2/n)`;
+   `_market_arch_panel_mesh` instead uses linear x and
+   `y = base + rise * sin(PI*x_fraction)^(2/n)`. These are different curves.
+   At rib path vertex 8 of 32, x fraction 0.920448, the current 8 m rise
+   gives a rib centreline 2.764 m above the interpolated panel surface.
+   The thick turquoise silhouette in `arcade` is not a fitted rib/panel
+   assembly. Derive both meshes from one profile and shared station samples;
+   use the scheduled exponent 2.5, not hard-coded 4.0. Close the panel's
+   longitudinal bay ends: its current faces omit the z-end caps and instead
+   add internal x-strip end faces. Fit and cap the post/spring joins, verify
+   winding/collision on the saved arcade pack, and show both sides of joins.
+2. **Put each window grammar on its correct generation.** The new French
+   leaves/timber shutters are inside `if tile`. Tile houses require steel
+   windows; French windows and their split leaves/shutters belong to boom
+   houses. Restore that distinction from `MARKET_HOUSE.parts`, including
+   the scheduled cut-and-cap profiles, rather than rectangular visual overlays.
+3. **Repair the evidence pipeline before another acceptance submission.**
+   `arcade_close` is almost entirely a nearby wall; `helmsmith_front` is
+   dominated by foreground sign/trim and does not show entry, room or counter.
+   Inspect each capture and reposition until its subject is readable; record
+   loaded subject/neighbour packs and add isolated joins. Recover the P0
+   `_world_aabb`/RID crash on a supported renderer, then supply a fresh matched
+   owner-attributed audit. Historical totals cannot establish the new result.
+
+**Still open.** Finish all 66 parts/15 joins and their function/status ledger,
+market flats and remaining variants. Run both real controllers through court
+approaches, the required parkour routes and the Helmsmith's service/exit;
+prove counter reach, vendor uniqueness and plaza clearance. No such runs
+were supplied. Keep the remaining second-review requirements binding.
+
+**Performance scope.** The new compatibility-renderer sample records p95
+45.090–94.012 ms across P3's four views, fails its stationary budget and
+repeated-stall gates, and lacks controlled routes. Record these failures;
+do not claim a passing rendered budget. Full city optimization remains P2,
+while occupied-support and re-entry correctness remain package blockers.
+
+**Handoff:** finish P3's existing second-review list plus these corrections,
+then P4; supply a complete as-built diagnostic rather than another ID list.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
