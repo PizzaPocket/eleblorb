@@ -696,6 +696,60 @@ before/after changes. This preserves existing design, not a new layout choice.
 Full 66/15 kit, required parkour, current owned audit and readable remaining
 joins/shop composition are still binding acceptance work. No new P2 runs.
 
+## Ninth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-second-third-review-fixes.md`,
+current generated source, route/pack JSON and mesh/validation code. Builder
+`216dfc8579db6aa06737d70d396a1e2a449e7a4f63cdd59c9c83a26ab9c9f7eb`
+and manifest `d21450a1138cddaa758fc3b66477e0eea331dbdec368f856891841d147080ff4`
+match the submission. Reviewer bake check passes (259 packs).
+**P3 remains fix; fresh topology and readiness checks fail.**
+
+**Priority 0 — confirmed winding regression in new representative helpers.**
+`_market_rep_triangle` orients `(b-a).cross(c-a)` toward the expected exterior.
+Godot's clockwise front is `(c-a).cross(b-a)`, as the existing
+`_add_facing_triangle` correctly implements. These normals have opposite
+signs. New representative faces are therefore wound inward even when their
+assigned shading normal says outside. `_mesh_topology` then requires positive
+`a.dot(b.cross(c))/6` volume, rewarding that opposite convention. Its passing
+side-wall/parapet orientation claims are invalid. Correct both helper and
+validator against Godot front normals and independently expected outside
+planes; prove a known outward cube and its deliberately reversed fixture,
+then saved front/back/side/roof meshes under ordinary back-face culling.
+Do not fix only shading normals, disable culling or change expected volume
+sign without a fixture establishing the convention.
+
+**Priority 1 — close actual topology faults.** Even under the current flawed
+orientation check, ground facade has 197 bad edges, French floor 123, and
+door/window rings four each. Duplicate reveal/interior faces and T-junctions
+must be removed from the actual boundary mesh. Emit connected front/back
+surfaces and only external reveals/caps, sharing exact sample vertices at
+opening extrema. Keep edge incidence, nondegenerate-face and signed volume
+checks separate so a winding change cannot conceal closure errors. Finish
+and verify these on the representative before mass replication.
+
+**Priority 2 — restore truthful readiness and captures.** All 28 movements
+and endpoint holds pass, but their combined reports contain two explicit
+local-pack timeout failures. Do not describe overall route acceptance as
+passing. `moy_packs_ready` checks every required pack around all interest
+points; identify exact missing paths, request/load/activation states, stale
+interest points and actor/resource lifetime errors. Focused capture readiness
+may assert a documented subject/neighbor pack set for a view, but must not
+hide a global timeout or bypass gameplay loading. Fix the underlying stalled
+required path; no longer timeout, disabled gate or silhouette-only success.
+Fresh screenshots were not produced; historical images remain historical.
+
+**Plan preservation credited:** independent comparison confirms owner 16's
+polygon symmetric difference is now zero, shop=true and world-facing edge
+match the locked plan; owner 43 is five storeys with the same polygon/edge.
+Source anchors and generation checks implement the planning decision.
+Remaining WALL/CROSSING/OLD_TOWN changes still need a semantic inventory.
+
+The complete scheduled kit, parkour, owned area audit and readable joins remain
+open. Work the geometry and readiness faults before more broad reports;
+performance optimization stays deferred. Preserve successful unchanged scoped
+movement/service evidence without treating readiness failures as unrelated.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

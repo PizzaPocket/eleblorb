@@ -641,6 +641,28 @@ and shared grammar, then implement the outstanding P4 kit and routes in a
 coherent build round. Preserve tested passages/ramp00 and avoid unrelated
 performance or repeated full screenshot sweeps.
 
+## Ninth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P4-second-third-review-fixes.md` and
+current route report against the same source/manifest identity as P3's ninth
+review. **P4 remains fix.** Sixteen movement/hold records pass, but the shared
+run explicitly fails neighborhood readiness twice, including the OldHouse10
+street approach. Movement scope remains credited; readiness/safety is not.
+No fresh screenshot or matched owned audit closes the other package blockers.
+
+Preserve corrected locked owner16/43 decisions. Finish P3's winding/topology
+and readiness recovery before extending its shared grammar: the current new
+representative mesh helper and signed-volume test use the opposite front
+convention from Godot. Never propagate that helper into the tower kit.
+Then complete the actual 51/10 tower forms and fourteen remaining roof-link
+proofs, all parkour/courts/well work and current owned audit. Retake failed
+views only after subject/neighbor packs are demonstrably active; do not use a
+narrow capture set to conceal unresolved required gameplay packs.
+
+No L2 or clean saved-pack orientation claim follows from the current reports.
+The earlier scoped route/service progress stands; full acceptance criteria
+remain unchanged and city-wide P2 work stays deferred.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
