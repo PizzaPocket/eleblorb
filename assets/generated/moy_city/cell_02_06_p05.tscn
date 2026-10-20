@@ -1,0 +1,24 @@
+[gd_scene format=3]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hjrgw"]
+size = Vector3(3.6790488, 0.2, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gw7sj"]
+albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_e66mv"]
+size = Vector3(3.6790488, 0.2, 0.16)
+
+[node name="MoyCell_02_06_Part_05" type="Node3D" unique_id=1374112576]
+
+[node name="WallLine_Rail_78_1_1" type="StaticBody3D" parent="." unique_id=2081439349]
+transform = Transform3D(-0.8526393, 0, 0.5224999, 0, 1, 0, -0.5224999, 0, -0.8526393, -669.7102, -46.7, 179.03336)
+metadata/walk_run_id = "WallLine_Rail"
+
+[node name="@CollisionShape3D@25107" type="CollisionShape3D" parent="WallLine_Rail_78_1_1" unique_id=770414500]
+shape = SubResource("BoxShape3D_hjrgw")
+
+[node name="@MeshInstance3D@25108" type="MeshInstance3D" parent="WallLine_Rail_78_1_1" unique_id=1180604107]
+material_override = SubResource("StandardMaterial3D_gw7sj")
+mesh = SubResource("BoxMesh_e66mv")

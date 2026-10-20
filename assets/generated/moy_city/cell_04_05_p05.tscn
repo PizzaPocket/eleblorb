@@ -84,30 +84,30 @@ roughness = 0.6
 [sub_resource type="SphereShape3D" id="SphereShape3D_m8lhc"]
 radius = 1.2
 
-[node name="MoyCell_04_05_Part_05" type="Node3D" unique_id=177779080]
+[node name="MoyCell_04_05_Part_05" type="Node3D" unique_id=628967822]
 
-[node name="DeckLiftControls_Market_Square" type="Node3D" parent="." unique_id=1665454681]
+[node name="DeckLiftControls_Market_Square" type="Node3D" parent="." unique_id=556596343]
 
-[node name="DeckLift_Market_Square_Call_park_ground" type="Node3D" parent="DeckLiftControls_Market_Square" unique_id=1579682832]
+[node name="DeckLift_Market_Square_Call_park_ground" type="Node3D" parent="DeckLiftControls_Market_Square" unique_id=346172604]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -533, -60, 132.3)
 metadata/reach_target = true
 metadata/reach_link_id = "DeckLift_Market_Square"
 
-[node name="@MeshInstance3D@21728" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground" unique_id=816052759]
+[node name="@MeshInstance3D@21430" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground" unique_id=1329307854]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_ho1fy")
 mesh = SubResource("ArrayMesh_e0pf3")
 surface_material_override/0 = SubResource("StandardMaterial3D_mw6xn")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@21729" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground" unique_id=982042761]
+[node name="@MeshInstance3D@21431" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground" unique_id=1641514490]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_xo6rt")
 mesh = SubResource("ArrayMesh_r2ot6")
 surface_material_override/0 = SubResource("StandardMaterial3D_nq0lh")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@21731" type="Area3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground" unique_id=842421217]
+[node name="@Area3D@21433" type="Area3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground" unique_id=1528154594]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -116,29 +116,29 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@21730" type="CollisionShape3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground/@Area3D@21731" unique_id=1589563872]
+[node name="@CollisionShape3D@21432" type="CollisionShape3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_park_ground/@Area3D@21433" unique_id=1194465323]
 shape = SubResource("SphereShape3D_u32te")
 
-[node name="DeckLift_Market_Square_Call_deck" type="Node3D" parent="DeckLiftControls_Market_Square" unique_id=1133028516]
+[node name="DeckLift_Market_Square_Call_deck" type="Node3D" parent="DeckLiftControls_Market_Square" unique_id=1499221917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -533, -53.5, 132.3)
 metadata/reach_target = true
 metadata/reach_link_id = "DeckLift_Market_Square"
 
-[node name="@MeshInstance3D@21732" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck" unique_id=805666211]
+[node name="@MeshInstance3D@21434" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck" unique_id=1658612986]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 material_override = SubResource("StandardMaterial3D_2wsy5")
 mesh = SubResource("ArrayMesh_2ubol")
 surface_material_override/0 = SubResource("StandardMaterial3D_jsi5x")
 metadata/collision_policy = &"decorative"
 
-[node name="@MeshInstance3D@21733" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck" unique_id=965313239]
+[node name="@MeshInstance3D@21435" type="MeshInstance3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck" unique_id=924029603]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.04, 0)
 material_override = SubResource("StandardMaterial3D_jmbrv")
 mesh = SubResource("ArrayMesh_mb3y8")
 surface_material_override/0 = SubResource("StandardMaterial3D_q20e8")
 metadata/collision_policy = &"decorative"
 
-[node name="@Area3D@21735" type="Area3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck" unique_id=1210783087]
+[node name="@Area3D@21437" type="Area3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck" unique_id=600853083]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 collision_layer = 0
 collision_mask = 2
@@ -147,5 +147,5 @@ metadata/activate = Callable()
 metadata/interaction_radius = 1.2
 metadata/max_vertical_distance = 1.5
 
-[node name="@CollisionShape3D@21734" type="CollisionShape3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck/@Area3D@21735" unique_id=624052062]
+[node name="@CollisionShape3D@21436" type="CollisionShape3D" parent="DeckLiftControls_Market_Square/DeckLift_Market_Square_Call_deck/@Area3D@21437" unique_id=720987721]
 shape = SubResource("SphereShape3D_m8lhc")

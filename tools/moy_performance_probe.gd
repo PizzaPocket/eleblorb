@@ -112,6 +112,7 @@ func _ready() -> void:
 		_raw["activation_stages"] = (_city.get("_moy_stage_records") as Array).duplicate(true)
 		_raw["activation_frames"] = (_city.get("_moy_activation_frame_records") as Array).duplicate(true)
 		_raw["release_stages"] = (_city.get("_moy_release_records") as Array).duplicate(true)
+		_raw["request_drain_stages"] = (_city.get("_moy_request_drain_records") as Array).duplicate(true)
 	var valid_samples: bool = _raw.get("samples", []).size() > 0
 	var visible := false
 	for sample in _raw.samples:
@@ -665,6 +666,15 @@ func _stream_state(include_paths: bool = false, include_actor_paths: bool = fals
 		"city_actor_group_identities":city_actor_ids,
 		"static_mib":_monitor_mib(Performance.MEMORY_STATIC),
 		"retained_manifest_refs":_retained_resources(), "actors_ready":bool(_city.call("moy_actors_ready")) if _city and _city.has_method("moy_actors_ready") else false}
+	if _city:
+		var pending_requests: Array[Dictionary] = []
+		for path_variant in _city.get("_moy_requested").keys():
+			var path := String(path_variant)
+			var record: Dictionary = _city.get("_moy_requested")[path_variant]
+			pending_requests.append({"path":path.get_file(),
+				"loader_status":ResourceLoader.load_threaded_get_status(path),
+				"age_ms":float(Time.get_ticks_usec() - int(record.get("requested_usec", Time.get_ticks_usec()))) / 1000.0})
+		result["pending_request_details"] = pending_requests
 	if include_paths and tree != null:
 		var node_inventory: Dictionary = {}
 		_collect_node_inventory(tree.root, node_inventory)

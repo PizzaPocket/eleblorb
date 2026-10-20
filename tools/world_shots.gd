@@ -28,7 +28,7 @@ func _render_set() -> void:
 	var date := String(args.get("date", Time.get_date_string_from_system()))
 	var views := _package_views(package)
 	var root := (load("res://scenes/main.tscn") as PackedScene).instantiate() as Node3D
-	if package in ["P2", "P3", "P4"]:
+	if package == "P2":
 		var city_before_ready := root.get_node_or_null("WesternCity")
 		if city_before_ready != null:
 			city_before_ready.set_meta("moy_force_all_packs", true)
@@ -40,10 +40,14 @@ func _render_set() -> void:
 	if player != null:
 		player.global_position = Vector3(-540, -58, 0)
 		player.set_physics_process(false)
+		if package in ["P3", "P4"]:
+			_hide_capture_geometry(player)
+			_hide_capture_hud(root)
 	var city := root.get_node_or_null("WesternCity")
-	var deadline := Time.get_ticks_msec() + 240000
-	while city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec() < deadline:
-		await get_tree().create_timer(0.25).timeout
+	if package not in ["P3", "P4"]:
+		var deadline := Time.get_ticks_msec() + 240000
+		while city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec() < deadline:
+			await get_tree().create_timer(0.25).timeout
 	await get_tree().physics_frame
 	if package not in ["P2", "P3", "P4"]:
 		var reach_helper := _prepare_reach_helper(root, player)
@@ -66,6 +70,26 @@ func _render_set() -> void:
 		"camera_far": camera.far, "screenshots": []}
 	for view_name in views:
 		var view: Dictionary = views[view_name]
+		# Package captures stream the packs around each viewpoint. Forcing the
+		# entire city into memory here can take minutes and hides real loading
+		# behaviour; move the frozen player and controlled body together instead.
+		if package in ["P3", "P4"] and player != null:
+			# The camera may sit well outside the district (notably the P3
+			# overview). Stream around both the camera and its subject so the
+			# rendered frame does not show unloaded neighbours.
+			player.global_position = view.camera
+			if player.has_method("get_controlled_body"):
+				var controlled := player.call("get_controlled_body") as Node3D
+				if is_instance_valid(controlled) and controlled != player:
+					controlled.global_position = view.at
+			var deadline := Time.get_ticks_msec() + 60000
+			while city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec() < deadline:
+				await get_tree().create_timer(0.25).timeout
+			if city != null and city.has_method("moy_packs_ready") and not city.moy_packs_ready():
+				push_error("Timed out streaming package view %s" % view_name)
+				get_tree().quit(1)
+				return
+			await get_tree().physics_frame
 		camera.global_position = view.camera
 		var up := Vector3.UP
 		if absf((view.at - view.camera).normalized().dot(up)) > 0.98: up = Vector3.FORWARD
@@ -111,6 +135,12 @@ func _package_views(package:String)->Dictionary:
 	for match_view in names.search_all(heading_match.get_string(1)):
 		var id := match_view.get_string(1)
 		if available.has(id): selected[id] = available[id]
+	# The source camera clipped behind a nearby house. Lift only this camera
+	# above the roofline and aim down the route so the street and its houses read
+	# in the review capture; the locked city geometry and walkable route are fixed.
+	if package == "P4" and selected.has("oldhigh"):
+		selected.oldhigh = {"camera": Vector3(-755.0, -25.0, -20.0),
+			"at": Vector3(-712.0, -48.0, -78.0)}
 	return selected
 
 func _git_commit() -> String:
@@ -287,6 +317,18 @@ func _parse_vector(raw:String)->Array[float]:
 	for part in raw.split(","):
 		result.append(float(part.strip_edges()))
 	return result
+
+func _hide_capture_geometry(node: Node) -> void:
+	if node is VisualInstance3D:
+		(node as VisualInstance3D).visible = false
+	for child in node.get_children():
+		_hide_capture_geometry(child)
+
+func _hide_capture_hud(node: Node) -> void:
+	if node is CanvasLayer:
+		(node as CanvasLayer).visible = false
+	for child in node.get_children():
+		_hide_capture_hud(child)
 
 func _set_lighting(root: Node, dusk: bool) -> void:
 	for node in _walk(root):

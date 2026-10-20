@@ -256,7 +256,6 @@ static func _market_house(index: int, rect: Rect2, kit: Dictionary) -> StaticBod
 	# closed at the plan's threshold; the facade layers use the same palette.
 	var passage_lot := index == 34 or index == 71
 	if passage_lot:
-		root.set_meta("ways_out", true)
 		var opening := float(cfg.passage.w)
 		var side_span := maxf(0.0, width - opening) * 0.5
 		if along_x:
@@ -268,9 +267,17 @@ static func _market_house(index: int, rect: Rect2, kit: Dictionary) -> StaticBod
 				_add_building_box_part(root, Vector3(rect.size.x, float(cfg.storey), side_span), Vector3(0, float(cfg.storey) * 0.5, side * (opening * 0.5 + side_span * 0.5)), colour)
 			_add_building_box_part(root, Vector3(rect.size.x, float(cfg.storey) - float(cfg.passage.h), opening), Vector3(0, (float(cfg.storey) + float(cfg.passage.h)) * 0.5, 0), colour)
 		_add_building_box_part(root, Vector3(rect.size.x, height - float(cfg.storey), rect.size.y), Vector3(0, height * 0.5 + float(cfg.storey) * 0.5, 0), colour)
+		# Keep the passage open through the foundation as well as the wall; the
+		# threshold is the lane's ground plane and remains collision clear.
+		var plinth_side := maxf(0.0, width - opening) * 0.5
+		var passage_tangent := Vector3.RIGHT if along_x else Vector3.FORWARD
+		for side in [-1.0, 1.0]:
+			var plinth_size := _market_face_size(plinth_side, float(cfg.plinth), depth, along_x)
+			var plinth_offset: Vector3 = passage_tangent * side * (opening * 0.5 + plinth_side * 0.5)
+			_add_building_box_part(root, plinth_size, plinth_offset + Vector3.UP * (float(cfg.plinth) * 0.5), Color("#77766f"))
 	else:
 		_add_building_box_part(root, Vector3(rect.size.x, height, rect.size.y), Vector3(0, height * 0.5, 0), colour)
-	_add_building_box_part(root, Vector3(rect.size.x + 0.12, 0.6, rect.size.y + 0.12), Vector3(0, 0.3, 0), Color("#77766f"))
+		_add_building_box_part(root, Vector3(rect.size.x + 0.12, float(cfg.plinth), rect.size.y + 0.12), Vector3(0, float(cfg.plinth) * 0.5, 0), Color("#77766f"))
 	var outward := Vector3(0, 0, 1) if front == "s" else (Vector3(0, 0, -1) if front == "n" else (Vector3(1, 0, 0) if front == "e" else Vector3(-1, 0, 0)))
 	var tangent := Vector3.RIGHT if along_x else Vector3.FORWARD
 	var facade_depth := depth * 0.5 + 0.045
@@ -326,6 +333,12 @@ static func _market_house(index: int, rect: Rect2, kit: Dictionary) -> StaticBod
 		# Shopfront canopy, picture sign frames and a simple closed street door.
 		if String(kit.get("gen", "")) == "tile":
 			_add_building_box_part(root, _market_face_size(width * 0.94, 0.2, float(cfg.tile.canopy.d), along_x), outward * (depth * 0.5 + float(cfg.tile.canopy.d) * 0.5) + Vector3.UP * float(cfg.tile.canopy.y), Color("#b9ad98"))
+		elif passage_lot:
+			var frontage_side := maxf(0.0, width - float(cfg.passage.w)) * 0.5
+			for side in [-1.0, 1.0]:
+				var side_shop := _market_face_size(frontage_side, 2.1, 0.08, along_x)
+				var side_center: Vector3 = tangent * side * (float(cfg.passage.w) * 0.5 + frontage_side * 0.5)
+				_add_building_box_part(root, side_shop, side_center + outward * facade_depth + Vector3.UP * 1.4, Color("#343e40"))
 		else:
 			_add_building_box_part(root, _market_face_size(width * 0.7, 2.1, 0.08, along_x), outward * facade_depth + Vector3.UP * 1.4, Color("#343e40"))
 		var door_data: Variant = kit.get("door")
@@ -1351,6 +1364,20 @@ static func _add_old_moy_shared_spaces(packs: Dictionary) -> void:
 		ramp.rotation.y = atan2(delta.x, delta.z)
 		ramp.rotation.x = -atan2(delta.y, Vector2(delta.x, delta.z).length())
 		for child in ramp.get_children(): child.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+		# Paired timber rails follow the ramp's local run and stay with its
+		# collider, leaving the 1.2 m walking strip clear between them.
+		for side in [-1.0, 1.0]:
+			var rail_size := Vector3(0.08, 0.9, delta.length())
+			var rail_mesh := BoxMesh.new(); rail_mesh.size = rail_size
+			var rail_visual := MeshInstance3D.new(); rail_visual.mesh = rail_mesh
+			rail_visual.position = Vector3(side * (float(link.w) * 0.5 - 0.04), 0.52, 0.0)
+			rail_visual.material_override = _material(Color("#76573f"))
+			CollisionPolicy.mark_decorative(rail_visual); ramp.add_child(rail_visual)
+			var rail_shape := BoxShape3D.new(); rail_shape.size = rail_size
+			var rail_collision := CollisionShape3D.new(); rail_collision.shape = rail_shape
+			rail_collision.position = rail_visual.position
+			rail_collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+			ramp.add_child(rail_collision)
 		_add(packs, _cell(Vector2((foot[0] + head[0]) * 0.5, (foot[1] + head[1]) * 0.5)), ramp)
 	var first_square: Dictionary = PLAN.OLD_TOWN.squares[0]
 	var well: Dictionary = first_square.get("first_well", {})
@@ -1368,42 +1395,62 @@ static func _polygon_center(points: Array) -> Vector2:
 	return c / float(points.size())
 
 
+static func _normalise_polygon_ring(points: Array) -> PackedVector2Array:
+	var ring := PackedVector2Array()
+	for point in points:
+		ring.append(Vector2(float(point[0]), float(point[1])))
+	if ring.size() < 3:
+		return ring
+	var area_twice := 0.0
+	for i in ring.size():
+		var a := ring[i]
+		var b := ring[(i + 1) % ring.size()]
+		area_twice += a.x * b.y - b.x * a.y
+	# Geometry2D and the checks use Godot's clockwise-front convention:
+	# (c - a) x (b - a). In our XZ plane, positive signed area makes the
+	# emitted (a,b,c) top triangles face +Y under that convention.
+	if area_twice < 0.0:
+		ring.reverse()
+	return ring
+
+
 static func _poly_floor(label: String, points: Array, y: float, color: Color) -> StaticBody3D:
 	var body := StaticBody3D.new(); body.name = label; body.collision_layer = 1; body.collision_mask = 1
 	var center := _polygon_center(points); body.position = Vector3(center.x, y, center.y)
 	var vertices := PackedVector2Array()
-	for p in points: vertices.append(Vector2(p[0]-center.x, p[1]-center.y))
+	for p in _normalise_polygon_ring(points): vertices.append(Vector2(p.x-center.x, p.y-center.y))
 	var indices := Geometry2D.triangulate_polygon(vertices)
 	var st := SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for t in range(0, indices.size(), 3):
 		var a: Vector2 = vertices[indices[t]]; var b: Vector2 = vertices[indices[t+1]]; var c: Vector2 = vertices[indices[t+2]]
-		st.set_normal(Vector3.UP); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(c.x,0,c.y)); st.add_vertex(Vector3(b.x,0,b.y))
+		st.set_normal(Vector3.UP); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(b.x,0,b.y)); st.add_vertex(Vector3(c.x,0,c.y))
 	var mesh := st.commit(); mesh.surface_set_material(0,_material(color))
-	var visual := MeshInstance3D.new(); visual.mesh=mesh; body.add_child(visual)
-	var collision := CollisionShape3D.new(); collision.shape=mesh.create_trimesh_shape(); body.add_child(collision)
+	var visual := MeshInstance3D.new(); visual.name = "PolygonFloorMesh"; visual.mesh=mesh; body.add_child(visual)
+	var collision := CollisionShape3D.new(); collision.name = "PolygonFloorCollision"; collision.shape=mesh.create_trimesh_shape(); body.add_child(collision)
 	return body
 
 
 static func _polygon_building(label: String, points: Array, height: float, color: Color) -> StaticBody3D:
 	var body := StaticBody3D.new(); body.name = label; body.collision_layer = 1; body.collision_mask = 1
 	var center := _polygon_center(points); body.position = Vector3(center.x, DATUM, center.y)
+	body.set_meta("polygon_points", points.duplicate(true))
+	body.set_meta("polygon_height", height)
 	var vertices := PackedVector2Array()
-	for p in points: vertices.append(Vector2(p[0]-center.x, p[1]-center.y))
+	for p in _normalise_polygon_ring(points): vertices.append(Vector2(p.x-center.x, p.y-center.y))
 	var indices := Geometry2D.triangulate_polygon(vertices)
 	var st := SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for t in range(0, indices.size(), 3):
 		var a: Vector2 = vertices[indices[t]]; var b: Vector2 = vertices[indices[t+1]]; var c: Vector2 = vertices[indices[t+2]]
-		st.set_normal(Vector3.UP); st.add_vertex(Vector3(a.x,height,a.y)); st.add_vertex(Vector3(c.x,height,c.y)); st.add_vertex(Vector3(b.x,height,b.y))
-		st.set_normal(Vector3.DOWN); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(b.x,0,b.y)); st.add_vertex(Vector3(c.x,0,c.y))
+		st.set_normal(Vector3.UP); st.add_vertex(Vector3(a.x,height,a.y)); st.add_vertex(Vector3(b.x,height,b.y)); st.add_vertex(Vector3(c.x,height,c.y))
+		st.set_normal(Vector3.DOWN); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(c.x,0,c.y)); st.add_vertex(Vector3(b.x,0,b.y))
 	for i in vertices.size():
 		var a: Vector2 = vertices[i]; var b: Vector2 = vertices[(i+1)%vertices.size()]
 		var n := Vector3(b.y-a.y, 0, a.x-b.x).normalized()
-		st.set_normal(n); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(a.x,height,a.y)); st.add_vertex(Vector3(b.x,height,b.y))
-		st.set_normal(n); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(b.x,height,b.y)); st.add_vertex(Vector3(b.x,0,b.y))
+		st.set_normal(n); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(b.x,height,b.y)); st.add_vertex(Vector3(a.x,height,a.y))
+		st.set_normal(n); st.add_vertex(Vector3(a.x,0,a.y)); st.add_vertex(Vector3(b.x,0,b.y)); st.add_vertex(Vector3(b.x,height,b.y))
 	var mesh := st.commit(); mesh.surface_set_material(0, _material(color))
-	var visual := MeshInstance3D.new(); visual.mesh = mesh; body.add_child(visual)
-	var collision := CollisionShape3D.new(); collision.shape = mesh.create_trimesh_shape(); body.add_child(collision)
-	var roof := MeshInstance3D.new(); var cap := BoxMesh.new(); cap.size = Vector3(0.3,0.15,0.3); roof.mesh = cap; roof.position = Vector3(0,height-0.075,0); roof.material_override = _material(color.lightened(0.15)); body.add_child(roof)
+	var visual := MeshInstance3D.new(); visual.name = "PolygonBuildingMesh"; visual.mesh = mesh; body.add_child(visual)
+	var collision := CollisionShape3D.new(); collision.name = "PolygonBuildingCollision"; collision.shape = mesh.create_trimesh_shape(); body.add_child(collision)
 	return body
 
 

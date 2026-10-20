@@ -104,6 +104,7 @@ var _moy_launch_requested := false
 var _moy_launch_active: Node3D
 var _moy_active: Dictionary = {}
 var _moy_requested := {}
+var _moy_request_cooldown := {}
 var _moy_unload_queue: Array[String] = []
 var _moy_unload_pending: Dictionary = {}
 var _moy_poll_cursor := 0
@@ -119,6 +120,7 @@ const MOY_STATUS_POLLS_PER_FRAME := 8
 var _moy_stage_records: Array[Dictionary] = []
 var _moy_activation_frame_records: Array[Dictionary] = []
 var _moy_release_records: Array[Dictionary] = []
+var _moy_request_drain_records: Array[Dictionary] = []
 var _moy_resident_index := 0
 var _moy_shop_added := false
 var _moy_resident_points := [Vector2(-600,0),Vector2(-600,-54),Vector2(-600,54),Vector2(-700,2),Vector2(-690,-40),Vector2(-695,-63),Vector2(-743,20),Vector2(-720,60),Vector2(-620,-94),Vector2(-600,120),Vector2(-450,-18),Vector2(-360,2)]
@@ -137,6 +139,7 @@ func set_moy_performance_telemetry(enabled: bool) -> void:
 		_moy_stage_records.clear()
 		_moy_activation_frame_records.clear()
 		_moy_release_records.clear()
+		_moy_request_drain_records.clear()
 
 
 func _process(delta: float) -> void:
@@ -207,7 +210,15 @@ func _stream_moy_city() -> void:
 	for path in _moy_paths:
 		var hotel_pack := _moy_hotel_paths.has(path)
 		if hotel_pack and not force_hotel and hotel_distance > MOY_HOTEL_REQUEST_RADIUS: continue
-		if not hotel_pack and not force_all and _moy_path_distance(request_points, path) > MOY_REQUEST_RADIUS: continue
+		var request_distance := hotel_distance if hotel_pack else _moy_path_distance(request_points, path)
+		var request_radius := MOY_HOTEL_REQUEST_RADIUS if hotel_pack else MOY_REQUEST_RADIUS
+		var activate_radius := MOY_HOTEL_ACTIVATE_RADIUS if hotel_pack else MOY_ACTIVATE_RADIUS
+		if _moy_request_cooldown.has(path):
+			if request_distance < activate_radius or request_distance >= request_radius:
+				_moy_request_cooldown.erase(path)
+			else:
+				continue
+		if not force_all and not (hotel_pack and force_hotel) and request_distance > request_radius: continue
 		if _moy_requested.has(path) or _moy_active.has(path): continue
 		var request_started := Time.get_ticks_usec()
 		var err := ResourceLoader.load_threaded_request(path, "", false, ResourceLoader.CACHE_MODE_REUSE)
@@ -235,15 +246,35 @@ func _stream_moy_city() -> void:
 			elif load_state == ResourceLoader.THREAD_LOAD_FAILED:
 				push_error("Moy pack failed to load: %s" % requested_path)
 				_moy_requested.erase(requested_path)
+			elif load_state == ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+				# The loader has no live threaded request for this path. This can
+				# happen when load_threaded_request returned ERR_BUSY for a request
+				# owned by another scene, then that owner consumed it. There is no
+				# result left to get here; release our stale bookkeeping explicitly.
+				_moy_requested.erase(requested_path)
+				if _moy_performance_telemetry and _moy_request_drain_records.size() < MOY_TELEMETRY_RECORD_LIMIT:
+					_moy_request_drain_records.append({"path":requested_path.get_file(),
+						"resolution":"loader_invalid_no_live_request",
+						"age_ms":float(Time.get_ticks_usec() - int(request_record.get("requested_usec", Time.get_ticks_usec()))) / 1000.0})
 			# In-flight requests stay tracked through the hysteresis band. Once
 			# loaded beyond that path class's release radius, consume the result and
 			# drop the final local handle safely.
-			var release_radius := MOY_HOTEL_REQUEST_RELEASE_RADIUS if _moy_hotel_paths.has(requested_path) else MOY_REQUEST_RELEASE_RADIUS
-			var request_distance := hotel_distance if _moy_hotel_paths.has(requested_path) else _moy_path_distance(interest_points, requested_path)
+			# Once a requested scene is ready but remains outside activation range,
+			# consume its completed result and suppress re-requesting it in the
+			# prefetch/activation hysteresis band. This drains request bookkeeping
+			# without cancelling an in-flight load or creating a load/drop loop.
+			var release_radius := MOY_HOTEL_ACTIVATE_RADIUS if _moy_hotel_paths.has(requested_path) else MOY_ACTIVATE_RADIUS
+			var request_distance := hotel_distance if _moy_hotel_paths.has(requested_path) else _moy_path_distance(request_points, requested_path)
 			if request_distance >= release_radius and load_state == ResourceLoader.THREAD_LOAD_LOADED:
 				var discard: Resource = ResourceLoader.load_threaded_get(requested_path)
 				discard = null
 				_moy_requested.erase(requested_path)
+				if request_distance < (MOY_HOTEL_REQUEST_RADIUS if _moy_hotel_paths.has(requested_path) else MOY_REQUEST_RADIUS):
+					_moy_request_cooldown[requested_path] = true
+				if _moy_performance_telemetry and _moy_request_drain_records.size() < MOY_TELEMETRY_RECORD_LIMIT:
+					_moy_request_drain_records.append({"path":requested_path.get_file(),
+						"resolution":"loaded_result_consumed_outside_release_radius",
+						"age_ms":float(Time.get_ticks_usec() - int(request_record.get("requested_usec", Time.get_ticks_usec()))) / 1000.0})
 		if _moy_performance_telemetry:
 			set_meta("moy_request_status_poll_us", int(get_meta("moy_request_status_poll_us", 0)) + Time.get_ticks_usec() - poll_started_usec)
 	for path in _moy_paths:
@@ -510,14 +541,20 @@ func _add_moy_helmsmith() -> void:
 	# Building 38 on Lamp Lane keeps the original walk-in room, display and
 	# catalogue models; only its location and the proprietor's line change.
 	var shop := StaticBody3D.new(); shop.name="MoyHelmsmithShop"; shop.position=Vector3(-595,_ground(Vector2(-595,180)),180); add_child(shop)
-	_build_helmsmith_storefront(shop,{"width":2,"depth":2,"width_m":10.0,"depth_m":12.0,"light_seed":0})
+	var shop_kit: Dictionary = MOY_PLAN.BUILDING_KITS.get(38, {})
+	var floor_spec: Dictionary = shop_kit.get("shop_floor", {})
+	_build_helmsmith_storefront(shop,{"width":2,"depth":2,"width_m":10.0,"depth_m":12.0,
+		"shop_floor_h":float(floor_spec.get("h", TownProps.FLOOR_HEIGHT)),
+		"shop_floor_depth":float(floor_spec.get("depth", 8.0)),
+		"workshop_entrance":1.6,"light_seed":0})
 	var entrance_target := Node3D.new(); entrance_target.name = "Helmsmith_Lamp_Lane_Entrance"
 	entrance_target.position = Vector3(0, 0.1, -6.25); entrance_target.set_meta("reach_target", true); shop.add_child(entrance_target)
+	_add_helmsmith_upper_home(shop, 10.0, 12.0, float(floor_spec.get("h", TownProps.FLOOR_HEIGHT)))
 	var vendor=packed.instantiate(); vendor.set_terrain_reference(terrain); vendor.stationary=true; vendor.is_vendor=true
 	vendor.display_name="Helmsmith"; vendor.shop_category="city"
 	var vendor_lines: Array[String]=["A good helm does not ask who is inside it. This one will fit a blorb just fine.","The old bronze one came in with sand still in its hinges."]
 	vendor.vendor_lines=vendor_lines; vendor.skin_color=Color(0.38,0.24,0.16); vendor.shirt_color=Color(0.23,0.25,0.29); vendor.pants_color=Color(0.12,0.14,0.17); vendor.hair_color=Color(0.12,0.1,0.08); vendor.hair_style=FigureHair.STYLE_FLAT_TOP
-	vendor.position=Vector3(0,0,5.2); vendor.facing_degrees=180.0; vendor.add_to_group("city_npcs"); shop.add_child(vendor)
+	vendor.position=Vector3(0,0,1.2); vendor.facing_degrees=180.0; vendor.add_to_group("city_npcs"); shop.add_child(vendor)
 	_moy_shop_added = true
 	_moy_activation_frame_pending = true
 
@@ -868,7 +905,10 @@ func _build_helmsmith_storefront(tower: StaticBody3D, spec: Dictionary) -> void:
 	var coral := Color(0.82, 0.24, 0.22)
 	var gold := Color(0.94, 0.68, 0.15)
 	var navy := Color(0.06, 0.1, 0.17)
-	_build_helmsmith_room(tower, shop, width, depth, teal, coral)
+	var shop_floor_depth := minf(float(spec.get("shop_floor_depth", 8.0)), depth)
+	var shop_floor_h := float(spec.get("shop_floor_h", TownProps.FLOOR_HEIGHT))
+	var workshop_entrance := float(spec.get("workshop_entrance", 1.6))
+	_build_helmsmith_room(tower, shop, width, depth, shop_floor_depth, shop_floor_h, workshop_entrance, teal, coral)
 	# The raised tower's fire-escape landing occupies the old awning zone, so
 	# the main entrance stays fully open. Its compact sign sits below that
 	# landing but above comfortable head clearance instead of crossing either.
@@ -880,19 +920,30 @@ func _build_helmsmith_storefront(tower: StaticBody3D, spec: Dictionary) -> void:
 	_build_helmsmith_lighting(shop, width, half_width, half_depth, teal, coral)
 	# Actual wares sit on a back-wall display behind the service counter,
 	# visible from the entrance without narrowing either doorway.
-	_add_store_part(shop, Vector3(width * 0.27, 0.08, 0.34), Vector3(0, 1.3, half_depth - 0.3), Color(0.28, 0.18, 0.1), SuperEgg.EPSILON_FLAT)
+	var shop_back_z := -half_depth + shop_floor_depth
+	_add_store_part(shop, Vector3(width * 0.44, 0.08, 0.34), Vector3(0, 1.3, shop_back_z - 0.28), Color(0.28, 0.18, 0.1), SuperEgg.EPSILON_FLAT)
 	var item_index := 0
 	for raw_item in ShopCatalog.get_items_for_shop("city"):
 		var item: Dictionary = raw_item
 		if not item.get("purchasable", false):
 			continue
 		var visual: Node3D = (item["build_visual"] as Callable).call(1.0) as Node3D
-		visual.position = Vector3((float(item_index) - 0.5) * 0.82, 1.56, half_depth - 0.3)
+		visual.position = Vector3((float(item_index) - 1.0) * 1.25, 1.56, shop_back_z - 0.55)
 		# ShopCatalog models face local +Z. This shelf backs onto the +Z wall,
 		# so turn display copies toward the room rather than into the plaster.
 		visual.rotation.y = PI
 		shop.add_child(visual)
 		item_index += 1
+	var side_index := 0
+	for raw_item in ShopCatalog.get_items_for_shop("city"):
+		var item: Dictionary = raw_item
+		if not item.get("purchasable", false) or side_index >= 2: continue
+		var side := -1.0 if side_index == 0 else 1.0
+		_add_store_part(shop, Vector3(0.55, 0.72, 0.55), Vector3(side * (width * 0.39), 0.36, -0.65), Color(0.28, 0.18, 0.1), SuperEgg.EPSILON_SOFT)
+		var stand_visual: Node3D = (item["build_visual"] as Callable).call(0.72) as Node3D
+		stand_visual.position = Vector3(side * (width * 0.39), 0.9, -0.65)
+		shop.add_child(stand_visual)
+		side_index += 1
 
 
 ## Purpose-built ground floor beneath the raised generic tower. Wide main
@@ -901,14 +952,16 @@ func _build_helmsmith_storefront(tower: StaticBody3D, spec: Dictionary) -> void:
 ## front-to-back path through the room.
 func _build_helmsmith_room(
 	tower: StaticBody3D, shop: Node3D,
-	width: float, depth: float, wall_color: Color, interior_accent: Color
+	width: float, depth: float, shop_depth: float, height: float, workshop_entrance: float,
+	wall_color: Color, interior_accent: Color
 ) -> void:
 	const MAIN_DOOR_WIDTH := 3.0
 	const SIDE_DOOR_WIDTH := 2.4
 	const WALL_DEPTH := 0.18
-	var height := TownProps.FLOOR_HEIGHT
 	var half_w := width * 0.5
 	var half_d := depth * 0.5
+	var front_z := -half_d
+	var shop_back_z := front_z + shop_depth
 
 	_add_shop_architecture_box(tower, "ShopFloor", Vector3(width, 0.16, depth), Vector3(0, 0.08, 0), Color(0.22, 0.18, 0.15))
 	# Front wall splits around a generous primary entrance.
@@ -916,9 +969,14 @@ func _build_helmsmith_room(
 	for side in [-1.0, 1.0]:
 		_add_shop_architecture_box(
 			tower, "FrontWall", Vector3(front_bay, height, WALL_DEPTH),
-			Vector3(side * (MAIN_DOOR_WIDTH + front_bay) * 0.5, height * 0.5, -half_d), wall_color
+			Vector3(side * (MAIN_DOOR_WIDTH + front_bay) * 0.5, height * 0.5, front_z), wall_color
 		)
-	# Back and left walls are calm display surfaces.
+	# The public shop is eight metres deep. A framed opening in its rear divider
+	# looks into the four-metre workshop, which stays closed to visitors.
+	var workshop_bay := maxf(0.0, width - workshop_entrance) * 0.5
+	for side in [-1.0, 1.0]:
+		_add_shop_architecture_box(tower, "WorkshopDivider", Vector3(workshop_bay, height, WALL_DEPTH),
+			Vector3(side * (workshop_entrance + workshop_bay) * 0.5, height * 0.5, shop_back_z), wall_color)
 	_add_shop_architecture_box(tower, "BackWall", Vector3(width, height, WALL_DEPTH), Vector3(0, height * 0.5, half_d), wall_color)
 	_add_shop_architecture_box(tower, "LeftWall", Vector3(WALL_DEPTH, height, depth), Vector3(-half_w, height * 0.5, 0), wall_color)
 	# The right wall retains a broad secondary street entrance, but it is no
@@ -930,20 +988,56 @@ func _build_helmsmith_room(
 			Vector3(half_w, height * 0.5, z_side * (SIDE_DOOR_WIDTH + side_bay) * 0.5), wall_color
 		)
 
-	# Interior accent panels and counter establish a warmer room within the
-	# single-color exterior shell. The counter stays away from both doors.
-	_add_store_part(shop, Vector3(width * 0.46, height * 0.18, 0.035), Vector3(0, height * 0.22, half_d - 0.11), interior_accent.darkened(0.18), SuperEgg.EPSILON_FLAT)
-	_add_store_part(shop, Vector3(0.035, height * 0.18, depth * 0.42), Vector3(-half_w + 0.11, height * 0.22, 0), interior_accent.darkened(0.24), SuperEgg.EPSILON_FLAT)
+	# The counter crosses the room behind the entrance. The proprietor stands
+	# behind it facing the doorway, while display shelves sit on the rear wall.
+	_add_store_part(shop, Vector3(width * 0.46, height * 0.18, 0.035), Vector3(0, height * 0.22, shop_back_z - 0.11), interior_accent.darkened(0.18), SuperEgg.EPSILON_FLAT)
+	_add_store_part(shop, Vector3(0.035, height * 0.18, shop_depth * 0.55), Vector3(-half_w + 0.11, height * 0.22, (front_z + shop_back_z) * 0.5), interior_accent.darkened(0.24), SuperEgg.EPSILON_FLAT)
 	_add_shop_architecture_box(
 		tower, "ServiceCounter", Vector3(width * 0.58, 0.82, 0.78),
-		Vector3(width * 0.08, 0.41, half_d - 1.55), Color(0.28, 0.18, 0.1)
+		Vector3(width * 0.08, 0.41, shop_back_z - 2.0), Color(0.28, 0.18, 0.1)
 	)
 	# A low side display encourages a loop through the room without becoming
 	# another waist-high obstacle directly in the entry axis.
 	_add_shop_architecture_box(
 		tower, "SideDisplay", Vector3(0.72, 0.62, depth * 0.34),
-		Vector3(-half_w + 0.62, 0.31, 0.45), Color(0.31, 0.2, 0.11)
+		Vector3(-half_w + 0.62, 0.31, (front_z + shop_back_z) * 0.5), Color(0.31, 0.2, 0.11)
 	)
+	# A glazed workshop door gives a clear view of the bench while keeping the
+	# workroom outside the public walkable floor.
+	var workshop_glass := SuperEgg.build_part(Vector3(workshop_entrance * 0.5, height * 0.47, 0.035), Color(0.26, 0.43, 0.45, 0.68), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	workshop_glass.position = Vector3(0, height * 0.47, shop_back_z)
+	var glass_material := StandardMaterial3D.new(); glass_material.albedo_color = Color(0.26, 0.43, 0.45, 0.68)
+	glass_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; glass_material.roughness = 0.2
+	workshop_glass.material_override = glass_material; CollisionPolicy.mark_decorative(workshop_glass); tower.add_child(workshop_glass)
+	var glass_shape := BoxShape3D.new(); glass_shape.size = Vector3(workshop_entrance, height * 0.94, 0.08)
+	var glass_collision := CollisionShape3D.new(); glass_collision.shape = glass_shape
+	glass_collision.position = workshop_glass.position; tower.add_child(glass_collision)
+	var workshop_z := shop_back_z + (half_d - shop_back_z) * 0.55
+	_add_store_part(shop, Vector3(2.2, 0.42, 0.55), Vector3(0, 0.85, workshop_z), Color(0.31, 0.2, 0.11), SuperEgg.EPSILON_SOFT)
+	_add_store_part(shop, Vector3(0.42, 0.62, 0.42), Vector3(-2.6, 0.72, workshop_z), Color(0.48, 0.5, 0.49), SuperEgg.EPSILON_SOFT)
+	for helm_index in 3:
+		_add_store_part(shop, Vector3(0.38, 0.32, 0.36), Vector3(-0.65 + float(helm_index) * 0.65, 1.23, workshop_z - 0.12),
+			[Color("#6b777a"), Color("#b18b4e"), Color("#a35853")][helm_index], SuperEgg.EPSILON_SOFT)
+
+
+func _add_helmsmith_upper_home(parent: StaticBody3D, width: float, depth: float, floor_h: float) -> void:
+	var wall_h := 2.65
+	var half_w := width * 0.5
+	var half_d := depth * 0.5
+	var center_y := floor_h + wall_h * 0.5
+	var plaster := Color("#b8a88d")
+	for spec in [
+		[Vector3(width, wall_h, 0.2), Vector3(0, center_y, -half_d + 0.1)],
+		[Vector3(width, wall_h, 0.2), Vector3(0, center_y, half_d - 0.1)],
+		[Vector3(0.2, wall_h, depth), Vector3(-half_w + 0.1, center_y, 0)],
+		[Vector3(0.2, wall_h, depth), Vector3(half_w - 0.1, center_y, 0)]]:
+		_add_shop_architecture_box(parent, "HelmsmithHomeWall", spec[0], spec[1], plaster)
+	_add_shop_architecture_box(parent, "HelmsmithHomeRoof", Vector3(width, 0.2, depth), Vector3(0, floor_h + wall_h + 0.1, 0), Color("#776a59"))
+	_add_shop_architecture_box(parent, "HelmsmithHomeParapet", Vector3(width, 0.85, 0.18), Vector3(0, floor_h + wall_h + 0.625, -half_d + 0.1), plaster.darkened(0.1))
+	for side in [-1.0, 1.0]:
+		var window := SuperEgg.build_part(Vector3(0.95, 0.66, 0.035), Color("#30444a"), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+		window.position = Vector3(side * 2.35, floor_h + 1.6, -half_d - 0.12)
+		CollisionPolicy.mark_decorative(window); parent.add_child(window)
 
 
 func _add_shop_architecture_box(

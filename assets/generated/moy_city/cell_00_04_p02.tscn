@@ -13,20 +13,30 @@ roughness = 0.92
 size = Vector3(0.45, 40.2, 0.45)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_v0lm3"]
-size = Vector3(14.202112, 0.9, 1.196)
+size = Vector3(0.45, 40.2, 0.45)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uohfp"]
-albedo_color = Color(0.7019608, 0.63529414, 0.49411765, 1)
+albedo_color = Color(0.6627451, 0.6039216, 0.4745098, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_eu8l8"]
+size = Vector3(0.45, 40.2, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ehih3"]
 size = Vector3(14.202112, 0.9, 1.196)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ehih3"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1w5d3"]
+albedo_color = Color(0.7019608, 0.63529414, 0.49411765, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_lfgfm"]
+size = Vector3(14.202112, 0.9, 1.196)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ilvq3"]
 albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
 roughness = 0.92
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_1w5d3"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_s2iyu"]
 _surfaces = [{
 "aabb": AABB(-7.551056, -0.45, -0.598, 15.102112, 0.9, 1.196),
 "format": 34359738369,
@@ -36,43 +46,33 @@ _surfaces = [{
 "vertex_data": PackedByteArray("2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhk/2jvjQGZm5j6HFhk/2jvjwGZm5j6HFhm/2jvjQGZm5j6HFhk/2jvjQGZm5j6HFhm/2jvjQGZm5j6HFhm/2jvjQGZm5j6HFhk/k77oQKLc1D6HFhk/2jvjQGZm5j6HFhm/k77oQKLc1D6HFhk/k77oQKLc1D6HFhm/k77oQKLc1D6HFhm/k77oQKLc1D6HFhk/iGrtQNvqoj6HFhk/k77oQKLc1D6HFhm/iGrtQNvqoj6HFhk/iGrtQNvqoj6HFhm/iGrtQNvqoj6HFhm/iGrtQNvqoj6HFhk/pInwQC1XMD6HFhk/iGrtQNvqoj6HFhm/pInwQC1XMD6HFhk/pInwQC1XMD6HFhm/pInwQC1XMD6HFhm/pInwQC1XMD6HFhk/QKLxQAAAAACHFhk/pInwQC1XMD6HFhm/QKLxQAAAAACHFhk/QKLxQAAAAACHFhm/QKLxQAAAAACHFhm/QKLxQAAAAACHFhk/pInwQC1XML6HFhk/QKLxQAAAAACHFhm/pInwQC1XML6HFhk/pInwQC1XML6HFhm/pInwQC1XML6HFhm/pInwQC1XML6HFhk/iGrtQNvqor6HFhk/pInwQC1XML6HFhm/iGrtQNvqor6HFhk/iGrtQNvqor6HFhm/iGrtQNvqor6HFhm/iGrtQNvqor6HFhk/k77oQKLc1L6HFhk/iGrtQNvqor6HFhm/k77oQKLc1L6HFhk/k77oQKLc1L6HFhm/k77oQKLc1L6HFhm/k77oQKLc1L6HFhk/2jvjQGZm5r6HFhk/k77oQKLc1L6HFhm/2jvjQGZm5r6HFhk/2jvjQGZm5r6HFhm/2jvjQGZm5r6HFhm/2jvjQGZm5r6HFhk/2jvjwGZm5r6HFhk/2jvjQGZm5r6HFhm/2jvjwGZm5r6HFhk/2jvjwGZm5r6HFhm/2jvjwGZm5r6HFhm/2jvjwGZm5r6HFhk/k77owKLc1L6HFhk/2jvjwGZm5r6HFhm/k77owKLc1L6HFhk/k77owKLc1L6HFhm/k77owKLc1L6HFhm/k77owKLc1L6HFhk/iGrtwNvqor6HFhk/k77owKLc1L6HFhm/iGrtwNvqor6HFhk/iGrtwNvqor6HFhm/iGrtwNvqor6HFhm/iGrtwNvqor6HFhk/pInwwC1XML6HFhk/iGrtwNvqor6HFhm/pInwwC1XML6HFhk/pInwwC1XML6HFhm/pInwwC1XML6HFhm/pInwwC1XML6HFhk/QKLxwFklfqSHFhk/pInwwC1XML6HFhm/QKLxwFklfqSHFhk/QKLxwFklfqSHFhm/QKLxwFklfqSHFhm/QKLxwFklfqSHFhk/pInwwC1XMD6HFhk/QKLxwFklfqSHFhm/pInwwC1XMD6HFhk/pInwwC1XMD6HFhm/pInwwC1XMD6HFhm/pInwwC1XMD6HFhk/iGrtwNvqoj6HFhk/pInwwC1XMD6HFhm/iGrtwNvqoj6HFhk/iGrtwNvqoj6HFhm/iGrtwNvqoj6HFhm/iGrtwNvqoj6HFhk/k77owKLc1D6HFhk/iGrtwNvqoj6HFhm/k77owKLc1D6HFhk/k77owKLc1D6HFhm/k77owKLc1D6HFhm/k77owKLc1D6HFhk/2jvjwGZm5j6HFhk/k77owKLc1D6HFhm/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhm/")
 }]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lfgfm"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rpnje"]
 albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ilvq3"]
+[sub_resource type="BoxMesh" id="BoxMesh_jvxf7"]
 size = Vector3(0.055, 0.035, 1.05248)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_s2iyu"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_c7vmv"]
 size = Vector3(14.202112, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rpnje"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b45a5"]
 transparency = 1
 albedo_color = Color(0.48, 0.68, 0.72, 0.24)
 roughness = 0.2
 
-[sub_resource type="BoxMesh" id="BoxMesh_jvxf7"]
+[sub_resource type="BoxMesh" id="BoxMesh_2r6rf"]
 size = Vector3(14.202112, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c7vmv"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wodpo"]
 albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
 roughness = 0.4
 
-[sub_resource type="BoxMesh" id="BoxMesh_b45a5"]
+[sub_resource type="BoxMesh" id="BoxMesh_cuo2t"]
 size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxMesh" id="BoxMesh_2r6rf"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_wodpo"]
-size = Vector3(0.22, 0.9, 0.22)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cuo2t"]
-albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
-roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_axgj7"]
-size = Vector3(0.22, 0.9, 0.22)
+size = Vector3(0.75, 0.09, 0.13)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cqxrf"]
 size = Vector3(0.22, 0.9, 0.22)
@@ -85,30 +85,30 @@ roughness = 0.92
 size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_e12ik"]
-size = Vector3(14.202112, 0.95, 0.11)
-
-[sub_resource type="BoxMesh" id="BoxMesh_titxl"]
-size = Vector3(14.202112, 0.95, 0.11)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r1nru"]
-albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
-roughness = 0.4
-
-[sub_resource type="BoxMesh" id="BoxMesh_omlcp"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxMesh" id="BoxMesh_i47ur"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_3f2fl"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_swuob"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_titxl"]
 albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_o7adu"]
+[sub_resource type="BoxMesh" id="BoxMesh_r1nru"]
 size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_omlcp"]
+size = Vector3(14.202112, 0.95, 0.11)
+
+[sub_resource type="BoxMesh" id="BoxMesh_i47ur"]
+size = Vector3(14.202112, 0.95, 0.11)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3f2fl"]
+albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_swuob"]
+size = Vector3(0.75, 0.09, 0.13)
+
+[sub_resource type="BoxMesh" id="BoxMesh_o7adu"]
+size = Vector3(0.75, 0.09, 0.13)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_sdu22"]
 size = Vector3(0.22, 0.9, 0.22)
@@ -121,20 +121,30 @@ roughness = 0.92
 size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_p5hcp"]
-size = Vector3(14.202112, 0.9, 1.196)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w3xlg"]
-albedo_color = Color(0.6431373, 0.5764706, 0.44705883, 1)
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_sgssv"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7p8rq"]
 size = Vector3(14.202112, 0.9, 1.196)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7p8rq"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7x8n6"]
+albedo_color = Color(0.6431373, 0.5764706, 0.44705883, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_1uh30"]
+size = Vector3(14.202112, 0.9, 1.196)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dfvg2"]
 albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
 roughness = 0.92
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_7x8n6"]
+[sub_resource type="ArrayMesh" id="ArrayMesh_uu7t4"]
 _surfaces = [{
 "aabb": AABB(-7.551056, -0.45, -0.598, 15.102112, 0.9, 1.196),
 "format": 34359738369,
@@ -144,43 +154,33 @@ _surfaces = [{
 "vertex_data": PackedByteArray("2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhk/2jvjQGZm5j6HFhk/2jvjwGZm5j6HFhm/2jvjQGZm5j6HFhk/2jvjQGZm5j6HFhm/2jvjQGZm5j6HFhm/2jvjQGZm5j6HFhk/k77oQKLc1D6HFhk/2jvjQGZm5j6HFhm/k77oQKLc1D6HFhk/k77oQKLc1D6HFhm/k77oQKLc1D6HFhm/k77oQKLc1D6HFhk/iGrtQNvqoj6HFhk/k77oQKLc1D6HFhm/iGrtQNvqoj6HFhk/iGrtQNvqoj6HFhm/iGrtQNvqoj6HFhm/iGrtQNvqoj6HFhk/pInwQC1XMD6HFhk/iGrtQNvqoj6HFhm/pInwQC1XMD6HFhk/pInwQC1XMD6HFhm/pInwQC1XMD6HFhm/pInwQC1XMD6HFhk/QKLxQAAAAACHFhk/pInwQC1XMD6HFhm/QKLxQAAAAACHFhk/QKLxQAAAAACHFhm/QKLxQAAAAACHFhm/QKLxQAAAAACHFhk/pInwQC1XML6HFhk/QKLxQAAAAACHFhm/pInwQC1XML6HFhk/pInwQC1XML6HFhm/pInwQC1XML6HFhm/pInwQC1XML6HFhk/iGrtQNvqor6HFhk/pInwQC1XML6HFhm/iGrtQNvqor6HFhk/iGrtQNvqor6HFhm/iGrtQNvqor6HFhm/iGrtQNvqor6HFhk/k77oQKLc1L6HFhk/iGrtQNvqor6HFhm/k77oQKLc1L6HFhk/k77oQKLc1L6HFhm/k77oQKLc1L6HFhm/k77oQKLc1L6HFhk/2jvjQGZm5r6HFhk/k77oQKLc1L6HFhm/2jvjQGZm5r6HFhk/2jvjQGZm5r6HFhm/2jvjQGZm5r6HFhm/2jvjQGZm5r6HFhk/2jvjwGZm5r6HFhk/2jvjQGZm5r6HFhm/2jvjwGZm5r6HFhk/2jvjwGZm5r6HFhm/2jvjwGZm5r6HFhm/2jvjwGZm5r6HFhk/k77owKLc1L6HFhk/2jvjwGZm5r6HFhm/k77owKLc1L6HFhk/k77owKLc1L6HFhm/k77owKLc1L6HFhm/k77owKLc1L6HFhk/iGrtwNvqor6HFhk/k77owKLc1L6HFhm/iGrtwNvqor6HFhk/iGrtwNvqor6HFhm/iGrtwNvqor6HFhm/iGrtwNvqor6HFhk/pInwwC1XML6HFhk/iGrtwNvqor6HFhm/pInwwC1XML6HFhk/pInwwC1XML6HFhm/pInwwC1XML6HFhm/pInwwC1XML6HFhk/QKLxwFklfqSHFhk/pInwwC1XML6HFhm/QKLxwFklfqSHFhk/QKLxwFklfqSHFhm/QKLxwFklfqSHFhm/QKLxwFklfqSHFhk/pInwwC1XMD6HFhk/QKLxwFklfqSHFhm/pInwwC1XMD6HFhk/pInwwC1XMD6HFhm/pInwwC1XMD6HFhm/pInwwC1XMD6HFhk/iGrtwNvqoj6HFhk/pInwwC1XMD6HFhm/iGrtwNvqoj6HFhk/iGrtwNvqoj6HFhm/iGrtwNvqoj6HFhm/iGrtwNvqoj6HFhk/k77owKLc1D6HFhk/iGrtwNvqoj6HFhm/k77owKLc1D6HFhk/k77owKLc1D6HFhm/k77owKLc1D6HFhm/k77owKLc1D6HFhk/2jvjwGZm5j6HFhk/k77owKLc1D6HFhm/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhm/2jvjwGZm5j6HFhk/2jvjwGZm5j6HFhm/")
 }]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1uh30"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktc11"]
 albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_dfvg2"]
+[sub_resource type="BoxMesh" id="BoxMesh_s6fg8"]
 size = Vector3(0.055, 0.035, 1.05248)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_uu7t4"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_u38x7"]
 size = Vector3(14.202112, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktc11"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_br6w7"]
 transparency = 1
 albedo_color = Color(0.48, 0.68, 0.72, 0.24)
 roughness = 0.2
 
-[sub_resource type="BoxMesh" id="BoxMesh_s6fg8"]
+[sub_resource type="BoxMesh" id="BoxMesh_x510h"]
 size = Vector3(14.202112, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u38x7"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uik83"]
 albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
 roughness = 0.4
 
-[sub_resource type="BoxMesh" id="BoxMesh_br6w7"]
+[sub_resource type="BoxMesh" id="BoxMesh_62cxo"]
 size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxMesh" id="BoxMesh_x510h"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_uik83"]
-size = Vector3(0.22, 0.9, 0.22)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_62cxo"]
-albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
-roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_e46su"]
-size = Vector3(0.22, 0.9, 0.22)
+size = Vector3(0.75, 0.09, 0.13)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mkkrm"]
 size = Vector3(0.22, 0.9, 0.22)
@@ -193,30 +193,30 @@ roughness = 0.92
 size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_y3d8w"]
-size = Vector3(14.202112, 0.95, 0.11)
-
-[sub_resource type="BoxMesh" id="BoxMesh_0ggpt"]
-size = Vector3(14.202112, 0.95, 0.11)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5d76l"]
-albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
-roughness = 0.4
-
-[sub_resource type="BoxMesh" id="BoxMesh_7vlsp"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxMesh" id="BoxMesh_rmvtb"]
-size = Vector3(0.75, 0.09, 0.13)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_t24ev"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m6m4m"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0ggpt"]
 albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_fk8n4"]
+[sub_resource type="BoxMesh" id="BoxMesh_5d76l"]
 size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7vlsp"]
+size = Vector3(14.202112, 0.95, 0.11)
+
+[sub_resource type="BoxMesh" id="BoxMesh_rmvtb"]
+size = Vector3(14.202112, 0.95, 0.11)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t24ev"]
+albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_m6m4m"]
+size = Vector3(0.75, 0.09, 0.13)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fk8n4"]
+size = Vector3(0.75, 0.09, 0.13)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yf6kr"]
 size = Vector3(0.22, 0.9, 0.22)
@@ -229,48 +229,68 @@ roughness = 0.92
 size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_4qnwd"]
-size = Vector3(3.2, 0.3, 2.4)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3xik1"]
-albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_jg35r"]
-size = Vector3(3.2, 0.3, 2.4)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bkvuo"]
-size = Vector3(3.6, 0.35, 1.5)
+size = Vector3(3.2, 0.3, 2.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u5av8"]
-albedo_color = Color(0.7294118, 0.654902, 0.5058824, 1)
+albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_irut7"]
-size = Vector3(3.6, 0.35, 1.5)
+size = Vector3(3.2, 0.3, 2.4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nqg3f"]
-size = Vector3(14.202112, 0.16, 2.9)
+size = Vector3(3.6, 0.35, 1.5)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_myk2l"]
-albedo_color = Color(0.6117647, 0.57254905, 0.49019608, 1)
+albedo_color = Color(0.7294118, 0.654902, 0.5058824, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_puyr2"]
+size = Vector3(3.6, 0.35, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_n8teo"]
 size = Vector3(14.202112, 0.16, 2.9)
 
-[node name="MoyCell_00_04_Part_02" type="Node3D" unique_id=1251956179]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_holg2"]
+albedo_color = Color(0.6117647, 0.57254905, 0.49019608, 1)
+roughness = 0.92
 
-[node name="WestGateCore_south_tower_Frame_3" type="StaticBody3D" parent="." unique_id=1396436988]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -775.85, -39.9, 25.55)
+[sub_resource type="BoxMesh" id="BoxMesh_f2jf2"]
+size = Vector3(14.202112, 0.16, 2.9)
 
-[node name="@CollisionShape3D@27562" type="CollisionShape3D" parent="WestGateCore_south_tower_Frame_3" unique_id=724838846]
+[node name="MoyCell_00_04_Part_02" type="Node3D" unique_id=2102299341]
+
+[node name="WestGateCore_south_tower_Frame_2" type="StaticBody3D" parent="." unique_id=1459828251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -775.85, -39.9, 10.45)
+
+[node name="@CollisionShape3D@27259" type="CollisionShape3D" parent="WestGateCore_south_tower_Frame_2" unique_id=510266529]
 shape = SubResource("BoxShape3D_hsy8x")
 
-[node name="@MeshInstance3D@27563" type="MeshInstance3D" parent="WestGateCore_south_tower_Frame_3" unique_id=1393520604]
+[node name="@MeshInstance3D@27260" type="MeshInstance3D" parent="WestGateCore_south_tower_Frame_2" unique_id=1851205460]
 material_override = SubResource("StandardMaterial3D_3e77n")
 mesh = SubResource("BoxMesh_ft1ko")
 
-[node name="WestGateCore_south_tower_Flight_00_Up" type="StaticBody3D" parent="." unique_id=1191851755]
+[node name="WestGateCore_south_tower_Frame_3" type="StaticBody3D" parent="." unique_id=1159699872]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -775.85, -39.9, 25.55)
+
+[node name="@CollisionShape3D@27261" type="CollisionShape3D" parent="WestGateCore_south_tower_Frame_3" unique_id=990807245]
+shape = SubResource("BoxShape3D_v0lm3")
+
+[node name="@MeshInstance3D@27262" type="MeshInstance3D" parent="WestGateCore_south_tower_Frame_3" unique_id=1620084357]
+material_override = SubResource("StandardMaterial3D_uohfp")
+mesh = SubResource("BoxMesh_eu8l8")
+
+[node name="WestGateCore_south_tower_Flight_00_Up" type="StaticBody3D" parent="." unique_id=502967617]
 transform = Transform3D(0, 0, -1, 0.49992552, 0.8660684, 0, 0.86606836, -0.49992555, 0, -778.20197, -56.45, 17.85)
 script = ExtResource("1_vgaux")
 travel_direction = Vector3(0, 0.49992552, 0.86606836)
@@ -282,366 +302,366 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_00"
 
-[node name="@CollisionShape3D@27564" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=8075486]
-shape = SubResource("BoxShape3D_v0lm3")
+[node name="@CollisionShape3D@27263" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=282681198]
+shape = SubResource("BoxShape3D_ehih3")
 
-[node name="@MeshInstance3D@27565" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1172442076]
-material_override = SubResource("StandardMaterial3D_uohfp")
-mesh = SubResource("BoxMesh_eu8l8")
+[node name="@MeshInstance3D@27264" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1308187465]
+material_override = SubResource("StandardMaterial3D_1w5d3")
+mesh = SubResource("BoxMesh_lfgfm")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1051369724]
-material_override = SubResource("StandardMaterial3D_ehih3")
-mesh = SubResource("ArrayMesh_1w5d3")
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1102633984]
+material_override = SubResource("StandardMaterial3D_ilvq3")
+mesh = SubResource("ArrayMesh_s2iyu")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=316051619]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=644640107]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 0.0
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=377500371]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=406486665]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 0.6940368396440615
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=143600924]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1865585704]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 1.388073679288123
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=25416174]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=66317868]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 2.0821105189321845
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1190534976]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1514555560]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 2.776147358576246
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1411311820]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1801814811]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 3.4701841982203074
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1764941489]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1621173143]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 4.164221037864369
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=73738722]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=855333447]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 4.85825787750843
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1924241449]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=726275716]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 5.552294717152492
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=510036256]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=368432141]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 6.246331556796553
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1591808755]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=638792459]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 6.940368396440615
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=573251168]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=568402819]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 7.634405236084676
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=173176470]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1636089079]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 8.328442075728738
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=89574391]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=612259291]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 9.0224789153728
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1404452778]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=523919725]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 9.71651575501686
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=440514177]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1668253872]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 10.410552594660922
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1232598601]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1822806581]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 11.104589434304984
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1370297195]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1657797540]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 11.798626273949045
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1977831907]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1283277585]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 12.492663113593107
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1862255420]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1432844728]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 13.186699953237168
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=49021897]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=69466295]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 13.88073679288123
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1131670307]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=981932845]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 14.574773632525291
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=495664371]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1654109518]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 15.268810472169353
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=91899730]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1496075028]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 15.962847311813416
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=233320524]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1217870529]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 16.656884151457476
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2046013131]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=932142600]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 17.35092099110154
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=359112780]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=58428581]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 18.0449578307456
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1410655336]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=83554242]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 18.738994670389662
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1213141529]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=402241952]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 19.43303151003372
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=644870620]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1786691036]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 20.127068349677785
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1916026141]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1244242427]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 20.821105189321845
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2108959297]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2093447703]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 21.515142028965908
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1943190470]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1865448594]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 22.209178868609968
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=854820325]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1819358849]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 22.903215708254034
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1256631384]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1230607713]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 23.59725254789809
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=656351775]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1416340158]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 24.29128938754215
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=81850207]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=577060128]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 24.985326227186214
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1342364979]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2106498192]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 25.67936306683028
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=143449110]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1882249216]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 26.373399906474337
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=819082512]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1916992180]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 27.067436746118396
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=23070667]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2018481010]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 27.76147358576246
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1266155784]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=346599761]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 28.455510425406526
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_42" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=96993623]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=182610722]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 29.149547265050582
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_43" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1254705827]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1143691540]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 29.843584104694642
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_44" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=926927385]
-material_override = SubResource("StandardMaterial3D_lfgfm")
-mesh = SubResource("BoxMesh_ilvq3")
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=696860508]
+material_override = SubResource("StandardMaterial3D_rpnje")
+mesh = SubResource("BoxMesh_jvxf7")
 metadata/belt_distance = 30.537620944338705
 metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@27566" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=245243984]
+[node name="@CollisionShape3D@27265" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1804738322]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
-shape = SubResource("BoxShape3D_s2iyu")
+shape = SubResource("BoxShape3D_c7vmv")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=534227227]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=194614881]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
-material_override = SubResource("StandardMaterial3D_rpnje")
-mesh = SubResource("BoxMesh_jvxf7")
+material_override = SubResource("StandardMaterial3D_b45a5")
+mesh = SubResource("BoxMesh_2r6rf")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=319742182]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=846493510]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550528, 1.4, -0.543)
-material_override = SubResource("StandardMaterial3D_c7vmv")
-mesh = SubResource("BoxMesh_b45a5")
+material_override = SubResource("StandardMaterial3D_wodpo")
+mesh = SubResource("BoxMesh_cuo2t")
 metadata/handrail_distance = 3.550528
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2146308345]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1975633554]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550528, 1.4, -0.543)
-material_override = SubResource("StandardMaterial3D_c7vmv")
-mesh = SubResource("BoxMesh_2r6rf")
+material_override = SubResource("StandardMaterial3D_wodpo")
+mesh = SubResource("BoxMesh_axgj7")
 metadata/handrail_distance = 10.651584148406982
 
-[node name="@CollisionShape3D@27568" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=894461836]
+[node name="@CollisionShape3D@27267" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1443393388]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, -0.543)
-shape = SubResource("BoxShape3D_wodpo")
-
-[node name="@MeshInstance3D@27569" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=500558803]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, -0.543)
-material_override = SubResource("StandardMaterial3D_cuo2t")
-mesh = SubResource("BoxMesh_axgj7")
-
-[node name="@CollisionShape3D@27570" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1257170910]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
 shape = SubResource("BoxShape3D_cqxrf")
 
-[node name="@MeshInstance3D@27571" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=692988378]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
+[node name="@MeshInstance3D@27268" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=801714025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_hr3qj")
 mesh = SubResource("BoxMesh_cxa2o")
 
-[node name="@CollisionShape3D@27572" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1156674687]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
+[node name="@CollisionShape3D@27269" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=623700601]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
 shape = SubResource("BoxShape3D_e12ik")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1923476179]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
-material_override = SubResource("StandardMaterial3D_rpnje")
-mesh = SubResource("BoxMesh_titxl")
+[node name="@MeshInstance3D@27270" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=295593386]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
+material_override = SubResource("StandardMaterial3D_titxl")
+mesh = SubResource("BoxMesh_r1nru")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1162498445]
+[node name="@CollisionShape3D@27271" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1243250873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
+shape = SubResource("BoxShape3D_omlcp")
+
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1284805416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
+material_override = SubResource("StandardMaterial3D_b45a5")
+mesh = SubResource("BoxMesh_i47ur")
+
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=918336869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550528, 1.4, 0.543)
-material_override = SubResource("StandardMaterial3D_r1nru")
-mesh = SubResource("BoxMesh_omlcp")
+material_override = SubResource("StandardMaterial3D_3f2fl")
+mesh = SubResource("BoxMesh_swuob")
 metadata/handrail_distance = 3.550528
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1600639220]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1253745054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550528, 1.4, 0.543)
-material_override = SubResource("StandardMaterial3D_r1nru")
-mesh = SubResource("BoxMesh_i47ur")
+material_override = SubResource("StandardMaterial3D_3f2fl")
+mesh = SubResource("BoxMesh_o7adu")
 metadata/handrail_distance = 10.651584148406982
 
-[node name="@CollisionShape3D@27574" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=2023026481]
+[node name="@CollisionShape3D@27273" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=927964786]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, 0.543)
-shape = SubResource("BoxShape3D_3f2fl")
-
-[node name="@MeshInstance3D@27575" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=793684482]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, 0.543)
-material_override = SubResource("StandardMaterial3D_swuob")
-mesh = SubResource("BoxMesh_o7adu")
-
-[node name="@CollisionShape3D@27576" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=787284486]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
 shape = SubResource("BoxShape3D_sdu22")
 
-[node name="@MeshInstance3D@27577" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=356837115]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
+[node name="@MeshInstance3D@27274" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=1594662617]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_ehi8t")
 mesh = SubResource("BoxMesh_rdqu1")
 
-[node name="WestGateCore_south_tower_Flight_00_Down" type="StaticBody3D" parent="." unique_id=1588401143]
+[node name="@CollisionShape3D@27275" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=779238142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
+shape = SubResource("BoxShape3D_p5hcp")
+
+[node name="@MeshInstance3D@27276" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Up" unique_id=91162379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
+material_override = SubResource("StandardMaterial3D_w3xlg")
+mesh = SubResource("BoxMesh_sgssv")
+
+[node name="WestGateCore_south_tower_Flight_00_Down" type="StaticBody3D" parent="." unique_id=1948340997]
 transform = Transform3D(0, 0, 1, -0.49992552, 0.8660684, 0, -0.86606836, -0.49992555, 0, -779.398, -56.45, 17.85)
 script = ExtResource("1_vgaux")
 travel_direction = Vector3(0, -0.49992552, -0.86606836)
@@ -653,397 +673,397 @@ metadata/flight = true
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_00"
 
-[node name="@CollisionShape3D@27578" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=840379601]
-shape = SubResource("BoxShape3D_p5hcp")
+[node name="@CollisionShape3D@27277" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=71802270]
+shape = SubResource("BoxShape3D_7p8rq")
 
-[node name="@MeshInstance3D@27579" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=814494913]
-material_override = SubResource("StandardMaterial3D_w3xlg")
-mesh = SubResource("BoxMesh_sgssv")
+[node name="@MeshInstance3D@27278" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=716305352]
+material_override = SubResource("StandardMaterial3D_7x8n6")
+mesh = SubResource("BoxMesh_1uh30")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=229885205]
-material_override = SubResource("StandardMaterial3D_7p8rq")
-mesh = SubResource("ArrayMesh_7x8n6")
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=611926522]
+material_override = SubResource("StandardMaterial3D_dfvg2")
+mesh = SubResource("ArrayMesh_uu7t4")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1381678061]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1734363032]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 0.0
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1828283823]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=817782551]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 0.6940368396440615
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1332188211]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1715292191]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 1.388073679288123
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=11077786]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1487639618]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 2.0821105189321845
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=531693759]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1167247840]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 2.776147358576246
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=76103567]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1024888226]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 3.4701841982203074
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=327165431]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1498447047]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 4.164221037864369
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1524726431]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2142040201]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 4.85825787750843
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1297075661]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=19754932]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 5.552294717152492
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=975448535]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=9633523]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 6.246331556796553
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1136111045]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1001096589]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 6.940368396440615
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2105088663]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=982776992]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 7.634405236084676
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1135761763]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=596838542]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 8.328442075728738
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=932078659]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=182686768]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 9.0224789153728
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1413309351]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=208112277]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 9.71651575501686
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=816776103]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=466612959]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 10.410552594660922
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1682947146]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1210413525]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 11.104589434304984
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1337802966]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1826974361]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 11.798626273949045
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1039877210]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2122639895]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 12.492663113593107
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=355899516]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1979740507]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 13.186699953237168
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1333091351]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=731608852]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 13.88073679288123
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=293240475]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=958835745]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 14.574773632525291
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1361652880]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=845882597]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 15.268810472169353
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2022685869]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=992708401]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 15.962847311813416
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=940055708]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1381223791]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 16.656884151457476
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=411692838]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=183215775]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 17.35092099110154
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=546054777]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1567453561]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 18.0449578307456
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1234859462]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1165513514]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 18.738994670389662
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1301092576]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1891657404]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 19.43303151003372
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1480714542]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=710981116]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 20.127068349677785
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1573423536]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=84908075]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 20.821105189321845
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=198725009]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1386468405]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 21.515142028965908
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1617687434]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1655742674]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 22.209178868609968
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=950323302]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=941367155]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 22.903215708254034
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1159040122]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1761504890]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 23.59725254789809
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=265705757]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2123620224]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 24.29128938754215
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=574776145]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1282000223]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 24.985326227186214
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=713064766]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2132982504]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 25.67936306683028
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=352883055]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2053413974]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 26.373399906474337
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2076015034]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=405252952]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 27.067436746118396
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=163447892]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=4097326]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 27.76147358576246
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=869741718]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1428791002]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 28.455510425406526
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_42" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1587897546]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=113570075]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 29.149547265050582
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_43" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=58228921]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1398313177]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 29.843584104694642
 metadata/underside_visual_only = true
 
-[node name="Moving_Tread_44" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1744152316]
-material_override = SubResource("StandardMaterial3D_1uh30")
-mesh = SubResource("BoxMesh_dfvg2")
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2112304265]
+material_override = SubResource("StandardMaterial3D_ktc11")
+mesh = SubResource("BoxMesh_s6fg8")
 metadata/belt_distance = 30.537620944338705
 metadata/underside_visual_only = true
 
-[node name="@CollisionShape3D@27580" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=423313809]
+[node name="@CollisionShape3D@27279" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1073775693]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
-shape = SubResource("BoxShape3D_uu7t4")
+shape = SubResource("BoxShape3D_u38x7")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1850643827]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=940825711]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
-material_override = SubResource("StandardMaterial3D_ktc11")
-mesh = SubResource("BoxMesh_s6fg8")
+material_override = SubResource("StandardMaterial3D_br6w7")
+mesh = SubResource("BoxMesh_x510h")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1964081800]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1168789278]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550528, 1.4, -0.543)
-material_override = SubResource("StandardMaterial3D_u38x7")
-mesh = SubResource("BoxMesh_br6w7")
+material_override = SubResource("StandardMaterial3D_uik83")
+mesh = SubResource("BoxMesh_62cxo")
 metadata/handrail_distance = 3.550528
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1739801129]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=734776399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550528, 1.4, -0.543)
-material_override = SubResource("StandardMaterial3D_u38x7")
-mesh = SubResource("BoxMesh_x510h")
+material_override = SubResource("StandardMaterial3D_uik83")
+mesh = SubResource("BoxMesh_e46su")
 metadata/handrail_distance = 10.651584148406982
 
-[node name="@CollisionShape3D@27582" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=175194650]
+[node name="@CollisionShape3D@27281" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=281927550]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, -0.543)
-shape = SubResource("BoxShape3D_uik83")
-
-[node name="@MeshInstance3D@27583" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=2017731168]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, -0.543)
-material_override = SubResource("StandardMaterial3D_62cxo")
-mesh = SubResource("BoxMesh_e46su")
-
-[node name="@CollisionShape3D@27584" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1186457370]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
 shape = SubResource("BoxShape3D_mkkrm")
 
-[node name="@MeshInstance3D@27585" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=483258688]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
+[node name="@MeshInstance3D@27282" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1887736945]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_ohrcm")
 mesh = SubResource("BoxMesh_nxbje")
 
-[node name="@CollisionShape3D@27586" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1961855127]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
+[node name="@CollisionShape3D@27283" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1853643035]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
 shape = SubResource("BoxShape3D_y3d8w")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1146985339]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
-material_override = SubResource("StandardMaterial3D_ktc11")
-mesh = SubResource("BoxMesh_0ggpt")
+[node name="@MeshInstance3D@27284" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=432810593]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, -0.543)
+material_override = SubResource("StandardMaterial3D_0ggpt")
+mesh = SubResource("BoxMesh_5d76l")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1722927780]
+[node name="@CollisionShape3D@27285" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1711662752]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
+shape = SubResource("BoxShape3D_7vlsp")
+
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=502261789]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
+material_override = SubResource("StandardMaterial3D_br6w7")
+mesh = SubResource("BoxMesh_rmvtb")
+
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1006035921]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550528, 1.4, 0.543)
-material_override = SubResource("StandardMaterial3D_5d76l")
-mesh = SubResource("BoxMesh_7vlsp")
+material_override = SubResource("StandardMaterial3D_t24ev")
+mesh = SubResource("BoxMesh_m6m4m")
 metadata/handrail_distance = 3.550528
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=983710597]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1728868097]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550528, 1.4, 0.543)
-material_override = SubResource("StandardMaterial3D_5d76l")
-mesh = SubResource("BoxMesh_rmvtb")
+material_override = SubResource("StandardMaterial3D_t24ev")
+mesh = SubResource("BoxMesh_fk8n4")
 metadata/handrail_distance = 10.651584148406982
 
-[node name="@CollisionShape3D@27588" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1443878714]
+[node name="@CollisionShape3D@27287" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=852318413]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, 0.543)
-shape = SubResource("BoxShape3D_t24ev")
-
-[node name="@MeshInstance3D@27589" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=920972283]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, 0.543)
-material_override = SubResource("StandardMaterial3D_m6m4m")
-mesh = SubResource("BoxMesh_fk8n4")
-
-[node name="@CollisionShape3D@27590" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=979881452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
 shape = SubResource("BoxShape3D_yf6kr")
 
-[node name="@MeshInstance3D@27591" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1533945452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
+[node name="@MeshInstance3D@27288" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1273473719]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951056, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_i53rd")
 mesh = SubResource("BoxMesh_dgsuq")
 
-[node name="WestGateCore_south_tower_Flight_00_Landing_1" type="StaticBody3D" parent="." unique_id=775430264]
+[node name="@CollisionShape3D@27289" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=758454514]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
+shape = SubResource("BoxShape3D_4qnwd")
+
+[node name="@MeshInstance3D@27290" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Down" unique_id=1778029161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951056, 0.925, 0.543)
+material_override = SubResource("StandardMaterial3D_3xik1")
+mesh = SubResource("BoxMesh_jg35r")
+
+[node name="WestGateCore_south_tower_Flight_00_Landing_1" type="StaticBody3D" parent="." unique_id=683619893]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -53.050003, 24)
 metadata/walk_deck = true
 metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_00"
 metadata/reach_link_id = "Escalator:WestGateCore_south_tower_Flight_00"
 metadata/reach_target = true
 
-[node name="@CollisionShape3D@27594" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Landing_1" unique_id=427295316]
-shape = SubResource("BoxShape3D_4qnwd")
+[node name="@CollisionShape3D@27293" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_00_Landing_1" unique_id=171811365]
+shape = SubResource("BoxShape3D_bkvuo")
 
-[node name="@MeshInstance3D@27595" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Landing_1" unique_id=1071299153]
-material_override = SubResource("StandardMaterial3D_3xik1")
-mesh = SubResource("BoxMesh_jg35r")
+[node name="@MeshInstance3D@27294" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_00_Landing_1" unique_id=2110117238]
+material_override = SubResource("StandardMaterial3D_u5av8")
+mesh = SubResource("BoxMesh_irut7")
 
-[node name="WestGateCore_south_tower_Landing_00" type="StaticBody3D" parent="." unique_id=1170495271]
+[node name="WestGateCore_south_tower_Landing_00" type="StaticBody3D" parent="." unique_id=957649651]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -53.075, 24.75)
 metadata/reach_target = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@27596" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_00" unique_id=261614787]
-shape = SubResource("BoxShape3D_bkvuo")
-
-[node name="@MeshInstance3D@27597" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_00" unique_id=582675490]
-material_override = SubResource("StandardMaterial3D_u5av8")
-mesh = SubResource("BoxMesh_irut7")
-
-[node name="WestGateCore_south_tower_Canopy_00" type="StaticBody3D" parent="." unique_id=1157078272]
-transform = Transform3D(0, 0, -1, 0.49992552, 0.8660684, 0, 0.86606836, -0.49992555, 0, -778.8, -53.25, 17.85)
-
-[node name="@CollisionShape3D@27598" type="CollisionShape3D" parent="WestGateCore_south_tower_Canopy_00" unique_id=1420400793]
+[node name="@CollisionShape3D@27295" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_00" unique_id=762951945]
 shape = SubResource("BoxShape3D_nqg3f")
 
-[node name="@MeshInstance3D@27599" type="MeshInstance3D" parent="WestGateCore_south_tower_Canopy_00" unique_id=1597201419]
+[node name="@MeshInstance3D@27296" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_00" unique_id=1784079577]
 material_override = SubResource("StandardMaterial3D_myk2l")
 mesh = SubResource("BoxMesh_puyr2")
+
+[node name="WestGateCore_south_tower_Canopy_00" type="StaticBody3D" parent="." unique_id=755675907]
+transform = Transform3D(0, 0, -1, 0.49992552, 0.8660684, 0, 0.86606836, -0.49992555, 0, -778.8, -53.25, 17.85)
+
+[node name="@CollisionShape3D@27297" type="CollisionShape3D" parent="WestGateCore_south_tower_Canopy_00" unique_id=312510423]
+shape = SubResource("BoxShape3D_n8teo")
+
+[node name="@MeshInstance3D@27298" type="MeshInstance3D" parent="WestGateCore_south_tower_Canopy_00" unique_id=1978133174]
+material_override = SubResource("StandardMaterial3D_holg2")
+mesh = SubResource("BoxMesh_f2jf2")

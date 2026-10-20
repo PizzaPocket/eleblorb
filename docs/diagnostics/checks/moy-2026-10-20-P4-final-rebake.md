@@ -1,0 +1,135 @@
+# moy world checks — 2026-10-20-P4-final-rebake
+
+Area: -790.0, -210.0 to -637.0, 210.0. Findings: 1220.
+
+Walk grid: 0.50 m; 258187 columns; 428068 walk cells; overlap grid: 0.25 m; 52695 overlap cells.
+
+Primary reach start: (-713.50, -58.00, 0.00); reachable cells: 296555; trapped cells: 14769 (4.980189% of reachable).
+
+Preflight: walk grid 5375.7 ms; reach graph 13350.9 ms.
+
+Total elapsed: 32110.7 ms.
+
+## overlap — 72 findings (1082.0 ms)
+
+- blocking `/root/Main/WesternCity/MoyCell_00_03/Station_Meridian Line_West_Gate_-1` at (-770.25, -23.00, -4.88): walk cells on different bodies share height within 0.02 m (1150 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/Station_Meridian Line_West_Gate_1` at (-770.25, -23.00, 4.88): walk cells on different bodies share height within 0.02 m (1150 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_08/WestGateCore_north_tower_Flight_05_Landing_1` at (-778.75, -23.00, -24.88): walk cells on different bodies share height within 0.02 m (52 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_06/WestGateCore_north_tower_Flight_03_Landing_1` at (-778.75, -34.40, -24.32): walk cells on different bodies share height within 0.02 m (105 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_06/WestGateCore_north_tower_Flight_03_Landing_1` at (-778.75, -34.40, -24.88): walk cells on different bodies share height within 0.02 m (52 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_06/WestGateCore_north_tower_Landing_03` at (-778.75, -34.40, -24.88): walk cells on different bodies share height within 0.02 m (52 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_04/WestGateCore_north_tower_Flight_01_Landing_1` at (-778.75, -45.80, -24.33): walk cells on different bodies share height within 0.02 m (103 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_04/WestGateCore_north_tower_Landing_01` at (-778.75, -45.80, -24.88): walk cells on different bodies share height within 0.02 m (52 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_04/WestGateCore_north_tower_Flight_01_Landing_1` at (-778.75, -45.80, -24.88): walk cells on different bodies share height within 0.02 m (52 cells)
+- blocking `/root/Main/Terrain` at (-778.78, -60.00, -24.34): flush with terrain: walk cells share height within 0.02 m (100 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_07/WestGateCore_north_tower_Flight_04_Landing_1` at (-778.75, -28.70, -14.30): walk cells on different bodies share height within 0.02 m (118 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_07/WestGateCore_north_tower_Landing_04` at (-778.75, -28.70, -13.75): walk cells on different bodies share height within 0.02 m (65 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_07/WestGateCore_north_tower_Flight_04_Landing_1` at (-778.75, -28.70, -13.75): walk cells on different bodies share height within 0.02 m (65 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_05/WestGateCore_north_tower_Flight_02_Landing_1` at (-778.75, -40.10, -14.30): walk cells on different bodies share height within 0.02 m (118 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_05/WestGateCore_north_tower_Landing_02` at (-778.75, -40.10, -13.75): walk cells on different bodies share height within 0.02 m (65 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_05/WestGateCore_north_tower_Flight_02_Landing_1` at (-778.75, -40.10, -13.75): walk cells on different bodies share height within 0.02 m (65 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_03/WestGateCore_north_tower_Flight_00_Landing_1` at (-778.75, -52.90, -12.00): walk cells on different bodies share height within 0.02 m (117 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_03/WestGateCore_north_tower_Flight_00_Landing_1` at (-778.75, -52.90, -11.50): walk cells on different bodies share height within 0.02 m (65 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_03/WestGateCore_north_tower_Landing_00` at (-778.75, -52.90, -11.50): walk cells on different bodies share height within 0.02 m (65 cells)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_08/WestGateCore_south_tower_Flight_05_Landing_1` at (-778.75, -23.00, 11.00): walk cells on different bodies share height within 0.02 m (65 cells)
+
+## buried — 2 findings (4434.5 ms)
+
+- blocking `/root/Main/WesternCity/MoyCell_00_01/Street_Tank Lane` at (-772.94, -59.97, -120.11): terrain stands above walk surface (261 samples)
+- blocking `/root/Main/WesternCity/MoyCell_01_04/Street_Clinic Lane` at (-779.28, -59.97, 60.12): terrain stands above walk surface (34 samples)
+
+## water — 0 findings (6.6 ms)
+
+
+## reach — 108 findings (58.6 ms)
+
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_08/WestGateCore_north_tower_LiftControls_0/WestGateCore_north_tower_Lift_0_Call_station_deck` at (-783.10, -23.00, -18.00): reach link endpoint has no walk cell within 3 m (link WestGateCore_north_tower_Lift_0)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_08/WestGateCore_north_tower_LiftControls_1/WestGateCore_north_tower_Lift_1_Call_station_deck` at (-774.50, -23.00, -18.00): reach link endpoint has no walk cell within 3 m (link WestGateCore_north_tower_Lift_1)
+- blocking `/root/Main/WesternCity/MoyCell_00_04_Part_07/WestGateCore_south_tower_LiftControls_0/WestGateCore_south_tower_Lift_0_Call_station_deck` at (-783.10, -23.00, 18.00): reach link endpoint has no walk cell within 3 m (link WestGateCore_south_tower_Lift_0)
+- blocking `/root/Main/WesternCity/MoyCell_00_04_Part_07/WestGateCore_south_tower_LiftControls_1/WestGateCore_south_tower_Lift_1_Call_station_deck` at (-774.50, -23.00, 18.00): reach link endpoint has no walk cell within 3 m (link WestGateCore_south_tower_Lift_1)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_01/SpineAccess_North_Gate_west_0_Landing_0` at (-564.50, -60.15, -142.40): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_west_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_01/SpineAccess_North_Gate_west_0_Landing_1` at (-564.50, -53.05, -154.70): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_west_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_02/SpineAccess_North_Gate_west_1_Landing_0` at (-564.50, -53.05, -156.70): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_west_1)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_02/SpineAccess_North_Gate_west_1_Landing_1` at (-564.50, -45.95, -169.00): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_west_1)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_03/SpineAccess_North_Gate_east_0_Landing_0` at (-555.50, -60.15, -142.40): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_east_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_03/SpineAccess_North_Gate_east_0_Landing_1` at (-555.50, -53.05, -154.70): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_east_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_04/SpineAccess_North_Gate_east_1_Landing_0` at (-555.50, -53.05, -156.70): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_east_1)
+- blocking `/root/Main/WesternCity/MoyCell_03_01_Part_04/SpineAccess_North_Gate_east_1_Landing_1` at (-555.50, -45.95, -169.00): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_North_Gate_east_1)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_04/SpineAccess_Estate_Square_west_0_Landing_0` at (-564.50, -53.65, -71.66): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_Estate_Square_west_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_04/SpineAccess_Estate_Square_west_0_Landing_1` at (-564.50, -45.95, -85.00): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_Estate_Square_west_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_05/SpineAccess_Estate_Square_east_0_Landing_0` at (-555.50, -53.65, -71.66): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_Estate_Square_east_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_05/SpineAccess_Estate_Square_east_0_Landing_1` at (-555.50, -45.95, -85.00): reach link endpoint has no walk cell within 3 m (link Escalator:SpineAccess_Estate_Square_east_0)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_03/DeckEscalator_Estate Square_Landing_0` at (-545.70, -60.15, -104.00): reach link endpoint has no walk cell within 3 m (link Escalator:DeckEscalator_Estate Square)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_03/DeckEscalator_Estate Square_Landing_1` at (-557.00, -53.65, -104.00): reach link endpoint has no walk cell within 3 m (link Escalator:DeckEscalator_Estate Square)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_03/DeckLiftControls_Estate_Square/DeckLift_Estate_Square_Call_park_ground` at (-555.40, -60.00, -109.40): reach link endpoint has no walk cell within 3 m (link DeckLift_Estate_Square)
+- blocking `/root/Main/WesternCity/MoyCell_03_02_Part_03/DeckLiftControls_Estate_Square/DeckLift_Estate_Square_Call_deck` at (-555.40, -53.50, -109.40): reach link endpoint has no walk cell within 3 m (link DeckLift_Estate_Square)
+
+## trap — 96 findings (164.0 ms)
+
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_0_0` at (-763.25, -45.80, 11.50): reachable pocket cannot return to spawn (44 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_0_1` at (-763.53, -45.80, 5.54): reachable pocket cannot return to spawn (58 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_0_2` at (-764.00, -45.80, 0.00): reachable pocket cannot return to spawn (55 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_0_3` at (-763.53, -45.80, -5.54): reachable pocket cannot return to spawn (58 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_0_4` at (-763.25, -45.80, -11.50): reachable pocket cannot return to spawn (44 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_1_0` at (-773.84, -45.80, 12.09): reachable pocket cannot return to spawn (58 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_1_1` at (-774.00, -45.80, 6.25): reachable pocket cannot return to spawn (60 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_1_2` at (-774.02, -45.80, 0.00): reachable pocket cannot return to spawn (64 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_1_3` at (-774.00, -45.80, -6.25): reachable pocket cannot return to spawn (60 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Station_West_Gate_Platform_1_4` at (-773.84, -45.80, -12.09): reachable pocket cannot return to spawn (58 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateBridgePlatform` at (-769.75, -23.00, -4.75): reachable pocket cannot return to spawn (240 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_02/@StaticBody3D@27010` at (-769.75, -23.00, 4.75): reachable pocket cannot return to spawn (240 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/Station_Meridian Line_West_Gate_-1` at (-770.75, -23.00, -4.75): reachable pocket cannot return to spawn (240 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/Station_Meridian Line_West_Gate_1` at (-770.75, -23.00, 4.75): reachable pocket cannot return to spawn (240 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/WallLine_Track_114` at (-769.49, -46.10, 10.99): reachable pocket cannot return to spawn (225 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/WallLine_Track_117` at (-769.49, -46.10, -10.99): reachable pocket cannot return to spawn (225 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/WallLine_Track_115` at (-769.25, -46.10, 3.58): reachable pocket cannot return to spawn (226 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03/WallLine_Track_116` at (-769.25, -46.10, -3.58): reachable pocket cannot return to spawn (226 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_04_Part_01/WallLine_Track_113` at (-768.66, -46.10, 16.37): reachable pocket cannot return to spawn (103 walk samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_01/WallLine_Track_118` at (-768.66, -46.10, -16.37): reachable pocket cannot return to spawn (103 walk samples)
+
+## headroom — 8 findings (816.1 ms)
+
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateCore_north_tower_Flight_00_Up` at (-778.25, -60.00, -20.00): solid geometry within standing height (2 samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_04_Part_02/WestGateCore_south_tower_Flight_00_Up` at (-778.25, -60.00, 16.00): solid geometry within standing height (2 samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_03_Part_03/WestGateCore_north_tower_Flight_00_Down` at (-779.25, -60.00, -20.00): solid geometry within standing height (2 samples)
+- blocking `/root/Main/WesternCity/MoyCell_00_04_Part_02/WestGateCore_south_tower_Flight_00_Down` at (-779.25, -60.00, 16.00): solid geometry within standing height (2 samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGatePassageLintel` at (-778.50, -56.28, -18.75): solid geometry within standing height (2 samples)
+- warning `/root/Main/WesternCity/MoyCell_00_04_Part_01/WestGatePassageLintel` at (-778.50, -56.28, 17.25): solid geometry within standing height (2 samples)
+- warning `/root/Main/WesternCity/MoyCell_02_06_Part_03/LampLane_Stall_01` at (-637.50, -60.00, 173.50): solid geometry within standing height (3 samples)
+- warning `/root/Main/WesternCity/MoyCell_02_06_Part_03/LampLane_Stall_00` at (-652.00, -60.00, 170.50): solid geometry within standing height (5 samples)
+
+## underside — 0 findings (437.0 ms)
+
+
+## solid — 7 findings (16.3 ms)
+
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_17_Block_1/@MeshInstance3D@18518` at (-680.61, -58.00, -136.97): substantial visual has no collider within 0.05 m
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_17_Block_1/@MeshInstance3D@18520` at (-664.31, -58.00, -108.73): substantial visual has no collider within 0.05 m
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_17_Block_1/@MeshInstance3D@18522` at (-669.69, -58.00, -143.27): substantial visual has no collider within 0.05 m
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_17_Block_1/@MeshInstance3D@18524` at (-653.39, -58.00, -115.03): substantial visual has no collider within 0.05 m
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_20_Block_4/@MeshInstance3D@18548` at (-645.57, -58.00, -123.90): substantial visual has no collider within 0.05 m
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_53_Block_9/@MeshInstance3D@19545` at (-657.96, -58.00, -157.17): substantial visual has no collider within 0.05 m
+- warning `/root/Main/WesternCity/MoyCell_02_01/Building_53_Block_9/@MeshInstance3D@19547` at (-650.66, -58.00, -144.53): substantial visual has no collider within 0.05 m
+
+## guard — 927 findings (1840.5 ms)
+
+- warning `/root/Main/WesternCity/MoyCell_03_03_Part_20/Meridian Line_Track_0` at (-789.03, -24.10, 0.00): drop of at least 1 m without a guard within 0.3 m (29 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03/StationCanopy_Meridian Line_West_Gate_-1` at (-771.00, -19.62, -4.75): drop of at least 1 m without a guard within 0.3 m (122 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03/Station_Meridian Line_West_Gate_-1` at (-770.99, -23.00, -4.75): drop of at least 1 m without a guard within 0.3 m (122 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_03_03_Part_20/Meridian Line_Track_0` at (-785.25, -24.10, -3.50): drop of at least 1 m without a guard within 0.3 m (2 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_03_03_Part_20/Meridian Line_Track_0` at (-785.25, -24.10, 3.50): drop of at least 1 m without a guard within 0.3 m (2 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03/StationCanopy_Meridian Line_West_Gate_1` at (-771.00, -19.62, 4.75): drop of at least 1 m without a guard within 0.3 m (122 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03/Station_Meridian Line_West_Gate_1` at (-770.99, -23.00, 4.75): drop of at least 1 m without a guard within 0.3 m (122 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateBridgePlatform` at (-769.51, -23.00, -4.75): drop of at least 1 m without a guard within 0.3 m (122 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/@StaticBody3D@27010` at (-769.51, -23.00, 4.75): drop of at least 1 m without a guard within 0.3 m (122 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_03_03_Part_20/Meridian Line_Track_0` at (-770.25, -24.10, -3.50): drop of at least 1 m without a guard within 0.3 m (56 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_03_03_Part_20/Meridian Line_Track_0` at (-770.25, -24.10, 3.50): drop of at least 1 m without a guard within 0.3 m (56 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateTowerUpper` at (-769.50, -16.00, -18.00): drop of at least 1 m without a guard within 0.3 m (156 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateTrainHallPier` at (-778.50, -39.00, -18.00): drop of at least 1 m without a guard within 0.3 m (84 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGatePassageLintel` at (-769.50, -53.00, -18.00): drop of at least 1 m without a guard within 0.3 m (156 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGatePassagePier` at (-780.94, -54.00, -24.94): drop of at least 1 m without a guard within 0.3 m (9 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/@StaticBody3D@26961` at (-780.94, -54.00, -11.06): drop of at least 1 m without a guard within 0.3 m (9 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateBridgeRoof` at (-769.50, -18.00, -11.44): drop of at least 1 m without a guard within 0.3 m (53 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateBridgeFloor` at (-781.50, -27.20, -11.25): drop of at least 1 m without a guard within 0.3 m (2 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateBridgeRoof` at (-781.50, -18.00, 0.00): drop of at least 1 m without a guard within 0.3 m (39 edge samples)
+- warning `/root/Main/WesternCity/MoyCell_00_03_Part_02/WestGateBridgeFloor` at (-781.50, -27.20, 0.00): drop of at least 1 m without a guard within 0.3 m (39 edge samples)

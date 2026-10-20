@@ -173,187 +173,187 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_25mg4"]
 size = Vector3(1.2, 2.5, 0.08)
 
-[node name="MoyCell_05_02" type="Node3D" unique_id=1308168676]
+[node name="MoyCell_05_02" type="Node3D" unique_id=130875009]
 
-[node name="Lot_111" type="StaticBody3D" parent="." unique_id=1538821793]
+[node name="Lot_111" type="StaticBody3D" parent="." unique_id=1369038670]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -439, -20.4, -112)
 metadata/walk_run_id = "Lot_111"
 
-[node name="@CollisionShape3D@11729" type="CollisionShape3D" parent="Lot_111" unique_id=1001106701]
+[node name="@CollisionShape3D@11733" type="CollisionShape3D" parent="Lot_111" unique_id=103628513]
 shape = SubResource("BoxShape3D_fx54l")
 
-[node name="@MeshInstance3D@11730" type="MeshInstance3D" parent="Lot_111" unique_id=673765471]
+[node name="@MeshInstance3D@11734" type="MeshInstance3D" parent="Lot_111" unique_id=1702890501]
 material_override = SubResource("StandardMaterial3D_erhwg")
 mesh = SubResource("BoxMesh_u7khq")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_111" unique_id=316069272]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_111" unique_id=1573954313]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 39.525, 0)
 material_override = SubResource("StandardMaterial3D_nidqu")
 mesh = SubResource("BoxMesh_jclm0")
 
-[node name="Lot_112" type="StaticBody3D" parent="." unique_id=913822361]
+[node name="Lot_112" type="StaticBody3D" parent="." unique_id=23658624]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -423, -24, -112)
 metadata/walk_run_id = "Lot_112"
 
-[node name="@CollisionShape3D@11731" type="CollisionShape3D" parent="Lot_112" unique_id=673576702]
+[node name="@CollisionShape3D@11735" type="CollisionShape3D" parent="Lot_112" unique_id=1918600101]
 shape = SubResource("BoxShape3D_wvu0k")
 
-[node name="@MeshInstance3D@11732" type="MeshInstance3D" parent="Lot_112" unique_id=634795622]
+[node name="@MeshInstance3D@11736" type="MeshInstance3D" parent="Lot_112" unique_id=1883094867]
 material_override = SubResource("StandardMaterial3D_p5b1d")
 mesh = SubResource("BoxMesh_w0ty6")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_112" unique_id=303196262]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_112" unique_id=951914402]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 35.925, 0)
 material_override = SubResource("StandardMaterial3D_na8q0")
 mesh = SubResource("BoxMesh_d6x8a")
 
-[node name="Lot_115" type="StaticBody3D" parent="." unique_id=963318792]
+[node name="Lot_115" type="StaticBody3D" parent="." unique_id=238777660]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -419, -13.2, -89)
 metadata/walk_run_id = "Lot_115"
 
-[node name="@CollisionShape3D@11737" type="CollisionShape3D" parent="Lot_115" unique_id=173003788]
+[node name="@CollisionShape3D@11741" type="CollisionShape3D" parent="Lot_115" unique_id=1861422357]
 shape = SubResource("BoxShape3D_3l43p")
 
-[node name="@MeshInstance3D@11738" type="MeshInstance3D" parent="Lot_115" unique_id=947214089]
+[node name="@MeshInstance3D@11742" type="MeshInstance3D" parent="Lot_115" unique_id=999750250]
 material_override = SubResource("StandardMaterial3D_aahfm")
 mesh = SubResource("BoxMesh_q787j")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_115" unique_id=1335399731]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_115" unique_id=36651858]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 46.725, 0)
 material_override = SubResource("StandardMaterial3D_5ld5g")
 mesh = SubResource("BoxMesh_kkl7f")
 
-[node name="Building_1_GrandHotel" type="Node3D" parent="." unique_id=1113473085]
+[node name="Building_1_GrandHotel" type="Node3D" parent="." unique_id=1081976111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -457, -60, -68)
 metadata/closed_shell = true
 metadata/enterable = true
 
-[node name="HotelPublicEntranceReachTarget" type="Node3D" parent="Building_1_GrandHotel" unique_id=205423511]
+[node name="HotelPublicEntranceReachTarget" type="Node3D" parent="Building_1_GrandHotel" unique_id=1182683280]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 24)
 metadata/reach_target = true
 
-[node name="HotelAtriumWing" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=492360595]
+[node name="HotelAtriumWing" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=100772104]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 22, 0)
 
-[node name="@CollisionShape3D@17113" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelAtriumWing" unique_id=1461161437]
+[node name="@CollisionShape3D@16840" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelAtriumWing" unique_id=921624576]
 shape = SubResource("BoxShape3D_062v5")
 
-[node name="@MeshInstance3D@17114" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelAtriumWing" unique_id=1160435895]
+[node name="@MeshInstance3D@16841" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelAtriumWing" unique_id=1618071439]
 material_override = SubResource("StandardMaterial3D_tpmvk")
 mesh = SubResource("BoxMesh_1dgie")
 
-[node name="@StaticBody3D@17117" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=2072127355]
+[node name="@StaticBody3D@16844" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=1657066051]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 22, 0)
 
-[node name="@CollisionShape3D@17115" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@17117" unique_id=687752457]
+[node name="@CollisionShape3D@16842" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@16844" unique_id=2065141538]
 shape = SubResource("BoxShape3D_l0r1x")
 
-[node name="@MeshInstance3D@17116" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@17117" unique_id=676042914]
+[node name="@MeshInstance3D@16843" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@16844" unique_id=778187347]
 material_override = SubResource("StandardMaterial3D_s6auq")
 mesh = SubResource("BoxMesh_j02r7")
 
-[node name="@StaticBody3D@17120" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=244687898]
+[node name="@StaticBody3D@16847" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=2038092363]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22, -30)
 
-[node name="@CollisionShape3D@17118" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@17120" unique_id=1276696088]
+[node name="@CollisionShape3D@16845" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@16847" unique_id=1832453903]
 shape = SubResource("BoxShape3D_shl2w")
 
-[node name="@MeshInstance3D@17119" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@17120" unique_id=1427739878]
+[node name="@MeshInstance3D@16846" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@16847" unique_id=1777314324]
 material_override = SubResource("StandardMaterial3D_nsi6b")
 mesh = SubResource("BoxMesh_r40rq")
 
-[node name="@StaticBody3D@17123" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=636484637]
+[node name="@StaticBody3D@16850" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=1055710635]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.7, 22, 30)
 
-[node name="@CollisionShape3D@17121" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@17123" unique_id=2102173929]
+[node name="@CollisionShape3D@16848" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@16850" unique_id=1513469842]
 shape = SubResource("BoxShape3D_gaygn")
 
-[node name="@MeshInstance3D@17122" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@17123" unique_id=817370602]
+[node name="@MeshInstance3D@16849" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@16850" unique_id=93447851]
 material_override = SubResource("StandardMaterial3D_od8pe")
 mesh = SubResource("BoxMesh_0sk78")
 
-[node name="@StaticBody3D@17126" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=787039450]
+[node name="@StaticBody3D@16853" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=369139145]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.7, 22, 30)
 
-[node name="@CollisionShape3D@17124" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@17126" unique_id=1821102165]
+[node name="@CollisionShape3D@16851" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@16853" unique_id=649609673]
 shape = SubResource("BoxShape3D_dt6hr")
 
-[node name="@MeshInstance3D@17125" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@17126" unique_id=947384301]
+[node name="@MeshInstance3D@16852" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@16853" unique_id=1559672062]
 material_override = SubResource("StandardMaterial3D_3ppb5")
 mesh = SubResource("BoxMesh_lv3o4")
 
-[node name="HotelRevolvingDoor" type="AnimatableBody3D" parent="Building_1_GrandHotel" unique_id=77935514]
+[node name="HotelRevolvingDoor" type="AnimatableBody3D" parent="Building_1_GrandHotel" unique_id=477815953]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 24)
 script = ExtResource("1_0ty1g")
 
-[node name="@MeshInstance3D@17127" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=2002224695]
+[node name="@MeshInstance3D@16854" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=266205136]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
 material_override = SubResource("StandardMaterial3D_j3400")
 mesh = SubResource("CylinderMesh_q340e")
 
-[node name="@Node3D@17130" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=989232229]
+[node name="@Node3D@16857" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=535636512]
 
-[node name="@MeshInstance3D@17128" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17130" unique_id=2097984488]
+[node name="@MeshInstance3D@16855" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16857" unique_id=453472958]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 material_override = SubResource("StandardMaterial3D_ks55k")
 mesh = SubResource("BoxMesh_6ld52")
 
-[node name="@CollisionShape3D@17129" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17130" unique_id=759729700]
+[node name="@CollisionShape3D@16856" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16857" unique_id=2053621524]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 shape = SubResource("BoxShape3D_g1spe")
 
-[node name="@Node3D@17133" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=583264183]
+[node name="@Node3D@16860" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=743007872]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="@MeshInstance3D@17131" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17133" unique_id=202893175]
+[node name="@MeshInstance3D@16858" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16860" unique_id=436648374]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 material_override = SubResource("StandardMaterial3D_s81fa")
 mesh = SubResource("BoxMesh_nfpj0")
 
-[node name="@CollisionShape3D@17132" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17133" unique_id=1210935512]
+[node name="@CollisionShape3D@16859" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16860" unique_id=877796668]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 shape = SubResource("BoxShape3D_aadfd")
 
-[node name="@Node3D@17136" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=1558398739]
+[node name="@Node3D@16863" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=337635862]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
-[node name="@MeshInstance3D@17134" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17136" unique_id=1658441866]
+[node name="@MeshInstance3D@16861" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16863" unique_id=253161859]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 material_override = SubResource("StandardMaterial3D_v5u43")
 mesh = SubResource("BoxMesh_tkviv")
 
-[node name="@CollisionShape3D@17135" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17136" unique_id=434909372]
+[node name="@CollisionShape3D@16862" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16863" unique_id=1398787778]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 shape = SubResource("BoxShape3D_onhxv")
 
-[node name="@Node3D@17139" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=1123427445]
+[node name="@Node3D@16866" type="Node3D" parent="Building_1_GrandHotel/HotelRevolvingDoor" unique_id=1315511416]
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, 0, 0, 0)
 
-[node name="@MeshInstance3D@17137" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17139" unique_id=278875015]
+[node name="@MeshInstance3D@16864" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16866" unique_id=1237067532]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 material_override = SubResource("StandardMaterial3D_q8fyl")
 mesh = SubResource("BoxMesh_llpgo")
 
-[node name="@CollisionShape3D@17138" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@17139" unique_id=2139920142]
+[node name="@CollisionShape3D@16865" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelRevolvingDoor/@Node3D@16866" unique_id=2065303071]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.64, 1.3, 0)
 shape = SubResource("BoxShape3D_ce50s")
 
-[node name="HotelSwingDoorLeaf" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=1625911218]
+[node name="HotelSwingDoorLeaf" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=306331714]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.05, 1.25, 24)
 
-[node name="@CollisionShape3D@17140" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelSwingDoorLeaf" unique_id=298384072]
+[node name="@CollisionShape3D@16867" type="CollisionShape3D" parent="Building_1_GrandHotel/HotelSwingDoorLeaf" unique_id=1295388200]
 shape = SubResource("BoxShape3D_0cduw")
 
-[node name="@MeshInstance3D@17141" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelSwingDoorLeaf" unique_id=509013745]
+[node name="@MeshInstance3D@16868" type="MeshInstance3D" parent="Building_1_GrandHotel/HotelSwingDoorLeaf" unique_id=1764239065]
 material_override = SubResource("StandardMaterial3D_war68")
 mesh = SubResource("BoxMesh_84iyc")
 
-[node name="@StaticBody3D@17144" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=1428340561]
+[node name="@StaticBody3D@16871" type="StaticBody3D" parent="Building_1_GrandHotel" unique_id=1186467913]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.05, 1.25, 24)
 
-[node name="@CollisionShape3D@17142" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@17144" unique_id=397953779]
+[node name="@CollisionShape3D@16869" type="CollisionShape3D" parent="Building_1_GrandHotel/@StaticBody3D@16871" unique_id=2008443240]
 shape = SubResource("BoxShape3D_la3x2")
 
-[node name="@MeshInstance3D@17143" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@17144" unique_id=1940808905]
+[node name="@MeshInstance3D@16870" type="MeshInstance3D" parent="Building_1_GrandHotel/@StaticBody3D@16871" unique_id=807837781]
 material_override = SubResource("StandardMaterial3D_n48ko")
 mesh = SubResource("BoxMesh_25mg4")
