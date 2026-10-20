@@ -803,6 +803,44 @@ hide invalid_resource, but it is not a reason to postpone independent P3 kit
 construction or rerun P2 optimization. Link it to the owning scope and keep
 local gameplay-readiness/occupied-support requirements intact.
 
+## Eleventh build review — 2026-10-20: fix (automated loop)
+
+Reviewed the fresh continuation sections in `../diagnostics/2026-10-20-moy-P3.md`,
+current 259-pack bake, hashes, route/audit artifacts and all six isolated GPU
+captures across P3/P4. Builder remains
+`77df0a47f8df9bde5ba5552fa7420729042d86427ffaec749174882ef9038810`;
+manifest is `a659891e27f948b64acc90597813198e17c740e7fc18dc1788cfa2df0289854b`.
+Fresh bake check passes. **P3 remains fix.**
+
+Credit explicit headless/Dummy route metadata and 12 passing local-ready
+court/shop movements/holds, and successful isolated Apple M5 Metal captures.
+The isolated boom/arcade views now make their assets visible; the market-flat
+view confirms a largely plain proxy facade. Isolation is not district,
+noon/dusk, street/shop or two-sided join acceptance. It removes the earlier
+claim that no GPU captures are possible; finish focused real-city views with
+subject/neighbour readiness using that working graphics path.
+
+The current area snapshot is useful: 315 findings, 267 blocking. Attribution
+is a path heuristic, not full plan ownership or matched baseline evidence.
+Fix owned overlap/reach/headroom findings with actual owner ids and both
+bodies, then targeted checks. Do not keep replacing snapshots without fixing
+construction. The full 66/15 grammar and parkour suite remain incomplete;
+no representative or full kit completion was delivered in this round.
+
+Plan generation now runs through source without restoring the generated file.
+The report says all old-house polygons/semantic fields match the locked plan;
+remaining wall/crossing/open-space differences need their semantic inventory
+retained as explicit evidence. The reported wall-centreline Hausdorff delta
+is 0.0361 m, not byte identity. Do not broaden this into layout redesign.
+
+**Next substantive build:** finish a complete scheduled boom grammar across
+applicable owners, then tile/lock-up/flats, with current part/join evidence.
+Do not rerun all already-passing passage/shop routes for metadata-only changes.
+Target tests to changed geometry, preserve prior scoped evidence and keep
+performance work deferred. Historical leading sections in the diagnostic
+still describe older hashes/results; rewrite the report around the final
+submission instead of accumulating contradictory superseded paragraphs.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

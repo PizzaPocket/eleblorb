@@ -694,6 +694,36 @@ the diagnosis/escalation path in P3's tenth review. Source/generator and locked
 output still disagree; follow that review's semantic reconciliation before
 claiming the plan pipeline is repaired. No city-wide optimization is requested.
 
+## Eleventh build review — 2026-10-20: fix (automated loop)
+
+Reviewed the fresh continuation in `../diagnostics/2026-10-20-moy-P4.md`,
+current source/manifest and failed route/audit artifacts. **P4 remains fix.**
+The current generated plan/259-pack bake supersedes the tenth-review snapshot.
+Xiao passes 36/36; hero passes 32/36. Four hero traversals fail on ramps 01/02
+against OldHouse08/12. Withdraw the current all-ramp success claim for the
+hero; retain the older 72-pass report only as historical evidence on its old
+plan/bake. Stable holds at a blocked endpoint do not make a route pass.
+
+Fix the actual corridor obstruction/roof-end collision with the unchanged
+plan and whole hero capsule, then run only the failing directions first and
+regression-test other changed roofs. No tolerance relaxation or arbitrary
+controller teleport target change to hide the collision. Keep the successful
+local readiness and other passage/ramp evidence at its exact source scope.
+
+The fresh area snapshot has 123 blocking findings (23 overlap, 100 reach);
+path attribution remains heuristic and needs actual plan owner/both-body
+resolution. GPU isolation now works, but the well is plainly simple proxy
+forms, and the passage capture is almost entirely wall. These do not pass the
+51/10 kit or district/join/route visual acceptance. Finish the scheduled kit,
+five parkour tasks, courts/yard/well and current owned fixes after P3 shared
+grammar. Rewrite final diagnostics around current results instead of leaving
+72/72/old-bake claims above superseding failure paragraphs.
+
+The construction backlog has persisted while verification tools improved.
+The next handoff must deliver actual complete scheduled construction and
+repair the four current route failures, not another report-only round.
+Full L2 criteria remain unchanged; P2 optimization remains deferred.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
