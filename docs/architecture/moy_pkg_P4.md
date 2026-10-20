@@ -625,6 +625,22 @@ Neither package passes L2. All earlier full-kit, physical collision and
 readable both-side join/route requirements remain binding; new performance
 sampling and city-wide optimization stay deferred.
 
+## Eighth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P4-seventh-build-diagnostic.md` and
+paired P3/plan diagnosis. No P4 geometry or relevant controller changes were
+submitted; do not repeat the unchanged review or its credited sixteen
+route/hold proofs. **P4 remains fix** pending its full 51/10 kit, other roof
+links, parkour, courts/well, current owner audit and readable failed views.
+
+The P3 eighth-review planning decision authorizes source-only preservation
+of the locked owner 16 shop/front/outline and owner 43 five-storey choices,
+with stable identity and explicit generation checks. It does not authorize
+new layouts or city-wide variant reassignment. Finish the P3 representative
+and shared grammar, then implement the outstanding P4 kit and routes in a
+coherent build round. Preserve tested passages/ramp00 and avoid unrelated
+performance or repeated full screenshot sweeps.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door

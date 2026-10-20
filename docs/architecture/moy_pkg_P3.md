@@ -651,6 +651,51 @@ Do not silently choose a new design or hand-edit `city_plan.gd`; bring the
 concrete reconciliation back for planning review while independent kit work
 continues. Both the source-data precedence and locked-plan rules still apply.
 
+## Eighth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P3-seventh-build-diagnostic.md`,
+paired plan-drift report, owner-76 ledger, current profile/mesh construction,
+65-record focused check and both noon window captures. Builder
+`a2a7ca1acc2b08b573a17f2a268a86bd238906d111744935f8437ecc2e27ed27`
+and manifest `65def0cd6c8a4d40a836de7e6bd68a328fff3cebcaae82a394deffbd34d285ec`
+identify the inspected submission. Fresh bake check passes (248 packs).
+**P3 remains fix; the representative and package are incomplete.**
+
+Credit the common-profile front aperture/window ring and door aperture/
+leaf/surround source changes. The current inside view now shows the rounded
+ring following the leaves, and the facade contains actual profile cuts.
+Keep the prior rendered routes/holds as retained scoped evidence: this
+representative-only change does not justify redoing unrelated route suites.
+
+Finish all remaining applicable representative parts/joins before the next
+handoff: actual shop shutter, fanlight opening, side/rear/plinth construction,
+parapet/coping corner closures, rail bays, column/rail/floor seat and chain
+joins, picture motif and tank seats/caps. The 66-row ledger still marks
+numerous applicable items partial/missing; 41 rows belong to other variants.
+Make the grammar owner/schedule driven, then replicate boom variants and
+complete tile/lock-up/market flats. Do not stop again after one outline tweak.
+Verify capped watertight solids and outward winding: the current ring is a
+flat decorative mesh and `_market_rep_wall_prism` emits side/front/back
+faces, not a complete end-cap proof. Presence/rays and auto-generated shading
+normals are not enough. Preserve decorative trim policy where appropriate.
+
+**Planning decision — preserve the locked choices, not numerical drift.**
+The unchanged source hashes unquantized GEOS centroids before rounding its
+published polygons; the supplied diagnosis identifies an unstable selection
+mechanism. Accept a narrowly scoped reconciliation in `city_layout.py` that
+retains owner 16's locked shop=true and world-facing edge, and owner 43's
+five storeys, anchored to stable parcel/quantized geometry identities with
+explicit checks. Preserve owner 16's locked published outline through the
+source if needed to remove the 0.019 m² drift. Canonicalize ring/edge identity
+without changing world-facing sides; do not reseed/reassign all houses or
+hand-edit generated data. Inventory WALL/CROSSING/OLD_TOWN differences for
+semantic equivalence too; reproducibility alone is not equivalence. Regenerate
+and check the plan and dependent data/models as required; report exact semantic
+before/after changes. This preserves existing design, not a new layout choice.
+
+Full 66/15 kit, required parkour, current owned audit and readable remaining
+joins/shop composition are still binding acceptance work. No new P2 runs.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
