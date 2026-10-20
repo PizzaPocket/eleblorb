@@ -750,6 +750,59 @@ open. Work the geometry and readiness faults before more broad reports;
 performance optimization stays deferred. Preserve successful unchanged scoped
 movement/service evidence without treating readiness failures as unrelated.
 
+## Tenth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P3.md`, current mesh helper/101-check
+validator, route JSON, actual run commands and plan/bake hashes. Builder
+`77df0a47f8df9bde5ba5552fa7420729042d86427ffaec749174882ef9038810`
+and manifest `1b914823addc99c91fe3793c5c5336d8e54795da7ed8cafe27f38ec1c6859bd8`
+match the evidence; fresh bake check passes (260 packs). **P3 remains fix.**
+
+**Credit:** the helper again uses Godot's clockwise front. The validator now
+separates edge incidence/direction, Godot-front volume and independent cube
+exterior signs, rejecting the reversed cube. The 101-record saved sample
+reports zero failures, closing the ninth review's sampled topology/winding
+regression. Keep ordinary-culling visual proof open until images exist.
+Twelve controller routes, service and holds now pass with local readiness.
+
+**Evidence correction:** the actual successful invocation was `--headless
+--rendering-driver opengl3`; both final route JSONs have an empty adapter.
+The configured `renderer: gl_compatibility` does not make this GPU-rendered
+proof. Credit actual controller/physics movement on saved packs with clear
+headless metadata; do not repeat it merely to change its label. Capture the
+visual side separately and add actual command line/display-server/backend
+metadata so future reports cannot conflate configuration with rendering.
+
+**Next deliverable: finish the full P3 grammar.** Successful regression tests
+are no longer the work blocking construction. Complete all applicable boom
+parts/joins and replicate; finish tile/lock-up variants and market flats,
+with a current as-built ledger replacing the all-partial historical CSVs.
+Then run the missing parkour/anchor routes and a current owner-attributed
+area audit, fixing owned geometry. Avoid another round spent only on already
+passing passage/shop tests or forced all-city loading.
+
+**Capture recovery:** diagnose the exact normal-process exit134 log before
+calling it an unavailable renderer environment. Use an explicit writable log
+path, close conflicting editor/QA instances and use the tool's scoped sandbox
+escalation for necessary WindowServer/GPU access if supported. Keep permission
+and crash diagnostics precise. A focused saved representative capture can
+isolate renderer access from streaming; then capture its real district with
+subject/neighbour readiness. Do not substitute blank/historical views.
+
+**Plan remains unresolved:** restoring `city_plan.gd` from HEAD before bake
+keeps the locked snapshot but does not reconcile the generator. The unchanged
+locked hash is confirmed; `city_layout.py` still emits different tables.
+Finish semantic inventory/source correction so running the canonical generator
+preserves approved layout/variants without restoring generated output by hand.
+Equivalent ring order/triangulation need not be byte-identical, but every
+changed world polygon/height/front/kit choice needs explicit equivalence or
+planning review; preserve the eighth-review approved owner16/43 decisions.
+
+The forced all-pack hotel failure remains recorded city loading debt. Do not
+hide invalid_resource, but it is not a reason to postpone independent P3 kit
+construction or rerun P2 optimization. Link it to the owning scope and keep
+local gameplay-readiness/occupied-support requirements intact.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

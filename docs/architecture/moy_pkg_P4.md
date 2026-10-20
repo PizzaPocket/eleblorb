@@ -663,6 +663,37 @@ No L2 or clean saved-pack orientation claim follows from the current reports.
 The earlier scoped route/service progress stands; full acceptance criteria
 remain unchanged and city-wide P2 work stays deferred.
 
+## Tenth build review — 2026-10-20: fix (automated loop)
+
+Reviewed `../diagnostics/2026-10-20-moy-P4.md`, final 72-record route report,
+local readiness snapshots, sampled pack report and run command metadata on
+the same source/bake as P3's tenth review. **P4 remains fix.**
+
+Credit both controllers through passages 0/10/44 and every roof link 00..14
+both ways (72 records, no failures), with local-pack waits and endpoint holds.
+This is valuable headless engine/controller physics evidence; the successful
+command used headless OpenGL configuration and adapter is empty, so it is not
+GPU-rendered proof. Keep the scoped movement and repaired ramp05/manzar
+clearance, and do not rerun the full passing suite until relevant geometry
+changes. All fifteen route-traversal requirements now have supplied records;
+actual end geometry/clear width, scheduled forms and visual joins still need
+acceptance evidence.
+
+The 51/10 house kit, five parkour routes, courts/pockets/yard/well, current
+owned audit and fresh readable captures remain the main build work. Complete
+P3 shared grammar, then build the actual tower kit. Do not use all-partial
+historical ledgers as current as-built completion or let repeated full-world
+hotel loading checks consume each construction round.
+
+The forced all-city test still fails five hotel pack states (including one
+invalid_resource) and is not accepted. Record that shared/city loading defect
+with exact paths and attribution; it does not cancel credited local passage/
+roof movement or prevent independent scheduled construction. Preserve
+required local streaming/support safety. Capture actual rendered views by
+the diagnosis/escalation path in P3's tenth review. Source/generator and locked
+output still disagree; follow that review's semantic reconciliation before
+claiming the plan pipeline is repaired. No city-wide optimization is requested.
+
 ## Decisions log
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
