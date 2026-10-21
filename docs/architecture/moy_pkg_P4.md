@@ -2,50 +2,46 @@
 
 ## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
 
-This is the controlling goal: a nice playable city environment that broadly
-matches the provided plan models, about as sophisticated as the existing
-Ohio and Snowhio villages. Earlier precision-manufacturing interpretations,
-exhaustive part/join certification and blanket surface reachability gates
-are superseded. Use the schedules as design references to preserve the
-recognizable architecture, not as an obligation to perfect every small join.
+**Done is better than perfect.** Complete the market town (P3) and Old City
+(P4) as nice playable environments broadly matching the provided3D models
+and briefs, about as sophisticated as Ohio and Snowhio. This replaces earlier
+precision-certification interpretations and universal reachability gates.
 
-Prioritize model silhouettes, proportions, facade rhythm, materials and major
-features, with sound ordinary collision, usable streets/shops/passages and
-intentional playable connections. No major visible holes, broken surfaces or
-blocking circulation. Intended routes remain deliberate checks, not a demand
-to reach every surface. No new climbing behavior or movement retuning.
+The district-level finish line is:
 
-Use existing village construction patterns and pragmatic model-consistent
-geometry. Fix visible defects with proportionate solutions. A clean simplified
-corner can meet the goal without millimetre-level cap certification. No new
-geometry/test framework or exhaustive diagnostic histories.
+1. Planned building sites are visibly built in their appropriate types;
+   no conspicuous unfinished proxy blocks. Preserve locked layout, main
+   silhouettes, heights/proportions, facade rhythm, palette and major features.
+2. Market town has its recognizable boom/tile/lock-up houses, market flats,
+   Arcade roof, Lamp Lane/shop and courts; Old City has recognizable tower
+   forms, infill, courts/passages, roof links and the first well composition.
+   Existing village-level simple geometry and decorative approximations are fine.
+3. Ordinary streets, entered shops, court passages and intentional connecting
+   routes work. Major visible surfaces have sensible collision; no major
+   holes, broken meshes or circulation blockers. Core shop interactions remain
+   usable. Not every surface must be reachable or separately tested.
+4. The districts look coherent and complete at normal gameplay distance,
+   beside their neighbours, by comparison with the plan models and existing
+   villages. Minor seams, small decorative omissions and nonblocking visual
+   imperfections may remain as polish; they do not hold up completion.
+5. A current integrated bake and a focused gameplay walkthrough verify both
+   areas, plus a few representative ordinary-resolution screenshots. Keep
+   required repository checks; no exhaustive part/join spreadsheet, millimetre
+   fit certification, cinematic capture batch or full route matrix is required.
+6. Summarize actual remaining defects honestly. A major gameplay or visual
+   defect still matters; minor polish is a follow-up list, not another build gate.
 
-Iterate with fast local representative previews, reusing an existing Godot
-run where practical. No full-city bake/render/activation cycle for each edit.
-Inspect a couple of changed views at ordinary resolution, then bake and do a
-focused in-game smoke test when a coherent architecture batch is ready.
-Final streamed integration is required; repeated integration runs during
-small edits are not. Run required repository hooks at actual commit/push
-boundaries, without repeatedly running the same broad suite beforehand.
+Schedules remain design references, not manufacturing certificates. Use
+existing Ohio/Snowhio patterns and pragmatic reusable geometry. No new climbing
+system, movement retuning or P2 optimization. Work P3 shared forms then P4,
+in coherent construction batches. Use fast local previews during edits;
+full bake/stream activation/render runs belong at integration milestones and
+final verification, not after every small edit. Do not create new frameworks.
 
-The fresh implementation owner follows `moy_coping_repair_handoff.md`, whose
-current content now covers this practical construction direction. Historical
-test results remain factual records; they do not override this user decision.
-
-
-2026-10-18. Build-session brief. Read `moy_build_roadmap.md` first.
-
-- **Area:** Old Moy, the well town: the Well Quarter's blocks either side of
-  West Street (`CityPlan.OLD_TOWN`, `CityPlan.OLD_HOUSES`) and the Old Moy
-  lots on the grid round them (`old_moy()` in `tools/city_layout.py`).
-- **Target level:** L2, built.
-- **Depends on:**
-  - P0 (the check suite) for its acceptance. It can be built before P0
-    lands, but it is not *done* until the suite passes on its area.
-  - P3's tile house, for the pencil infill (section 2.3). If P3 has not
-    landed, build the tile house once, as P3's brief describes it, where
-    both packages can share it.
-- **Model:** `docs/drawings/moy_old_moy_3d.html`. Match it.
+The fresh implementation owner follows `moy_p3_p4_finish_handoff.md` and works
+toward both districts being finished, rather than stopping at each coping or
+representative for a precision review. Historical raw findings stay intact,
+but older gate lists do not override this direct user clarification.
 
 ## Current acceptance clarification — user decision, 2026-10-21
 

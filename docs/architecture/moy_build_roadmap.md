@@ -37,35 +37,46 @@ matters is in the files listed in section 6.
 
 ## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
 
-This is the controlling goal: a nice playable city environment that broadly
-matches the provided plan models, about as sophisticated as the existing
-Ohio and Snowhio villages. Earlier precision-manufacturing interpretations,
-exhaustive part/join certification and blanket surface reachability gates
-are superseded. Use the schedules as design references to preserve the
-recognizable architecture, not as an obligation to perfect every small join.
+**Done is better than perfect.** Complete the market town (P3) and Old City
+(P4) as nice playable environments broadly matching the provided3D models
+and briefs, about as sophisticated as Ohio and Snowhio. This replaces earlier
+precision-certification interpretations and universal reachability gates.
 
-Prioritize model silhouettes, proportions, facade rhythm, materials and major
-features, with sound ordinary collision, usable streets/shops/passages and
-intentional playable connections. No major visible holes, broken surfaces or
-blocking circulation. Intended routes remain deliberate checks, not a demand
-to reach every surface. No new climbing behavior or movement retuning.
+The district-level finish line is:
 
-Use existing village construction patterns and pragmatic model-consistent
-geometry. Fix visible defects with proportionate solutions. A clean simplified
-corner can meet the goal without millimetre-level cap certification. No new
-geometry/test framework or exhaustive diagnostic histories.
+1. Planned building sites are visibly built in their appropriate types;
+   no conspicuous unfinished proxy blocks. Preserve locked layout, main
+   silhouettes, heights/proportions, facade rhythm, palette and major features.
+2. Market town has its recognizable boom/tile/lock-up houses, market flats,
+   Arcade roof, Lamp Lane/shop and courts; Old City has recognizable tower
+   forms, infill, courts/passages, roof links and the first well composition.
+   Existing village-level simple geometry and decorative approximations are fine.
+3. Ordinary streets, entered shops, court passages and intentional connecting
+   routes work. Major visible surfaces have sensible collision; no major
+   holes, broken meshes or circulation blockers. Core shop interactions remain
+   usable. Not every surface must be reachable or separately tested.
+4. The districts look coherent and complete at normal gameplay distance,
+   beside their neighbours, by comparison with the plan models and existing
+   villages. Minor seams, small decorative omissions and nonblocking visual
+   imperfections may remain as polish; they do not hold up completion.
+5. A current integrated bake and a focused gameplay walkthrough verify both
+   areas, plus a few representative ordinary-resolution screenshots. Keep
+   required repository checks; no exhaustive part/join spreadsheet, millimetre
+   fit certification, cinematic capture batch or full route matrix is required.
+6. Summarize actual remaining defects honestly. A major gameplay or visual
+   defect still matters; minor polish is a follow-up list, not another build gate.
 
-Iterate with fast local representative previews, reusing an existing Godot
-run where practical. No full-city bake/render/activation cycle for each edit.
-Inspect a couple of changed views at ordinary resolution, then bake and do a
-focused in-game smoke test when a coherent architecture batch is ready.
-Final streamed integration is required; repeated integration runs during
-small edits are not. Run required repository hooks at actual commit/push
-boundaries, without repeatedly running the same broad suite beforehand.
+Schedules remain design references, not manufacturing certificates. Use
+existing Ohio/Snowhio patterns and pragmatic reusable geometry. No new climbing
+system, movement retuning or P2 optimization. Work P3 shared forms then P4,
+in coherent construction batches. Use fast local previews during edits;
+full bake/stream activation/render runs belong at integration milestones and
+final verification, not after every small edit. Do not create new frameworks.
 
-The fresh implementation owner follows `moy_coping_repair_handoff.md`, whose
-current content now covers this practical construction direction. Historical
-test results remain factual records; they do not override this user decision.
+The fresh implementation owner follows `moy_p3_p4_finish_handoff.md` and works
+toward both districts being finished, rather than stopping at each coping or
+representative for a precision review. Historical raw findings stay intact,
+but older gate lists do not override this direct user clarification.
 
 **Reachability clarification (user, 2026-10-21).** Finish architecture kits.
 Collision/support applies to substantial geometry; route availability applies
@@ -154,8 +165,8 @@ diagnostic replaces this column.
 | P0 | **The check suite and the screenshot rig** | the whole city (and reused by every kingdom) | built | n/a | **done** (reviewed 2026-10-19; section 12's follow-ups built and closed, section 13; baseline `checks/moy-2026-10-19.*`, 282 s: overlap 405, reach 52, trap 0, headroom 39, underside 0, guard 2,769; fixtures 10/10) | `moy_pkg_P0.md` |
 | P1 | Prototype pass 4: grand square, City Hall's front, the clock dome, the Clock Room, tower ribs, closed escalators, the pond | civic core, Crossing | L1 to L3 | L2 | **done at L2** (2026-10-19, section 8: rain gardens rebuilt, City Hall's front built and reached, `underside` 0; wedges under the flights closed with skirts, the outer pair fixed; the tower lifts' deck calls and the Crossing's overlaps carried to P7; diagnostic `docs/diagnostics/2026-10-19-moy-P1-fixes-4.md`) | `moy_prototype_pass_4.md` |
 | P2 | Bake and performance: the rendered probe, budgets, streaming | the whole city | owed | budgets met | **fix** (second review 2026-10-19, section 11: telemetry/lifetime evidence improved, node growth explained; Estate p95 ~60 ms, stalls and controlled-route proof still open; diagnostic `2026-10-19-moy-P2-fixes.md`) | `moy_pkg_P2.md` |
-| P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **fix / construction active** (2026-10-21 user reset: broad plan-model match at Ohio/Snowhio sophistication; fast local previews, batch integration; fresh Sol implementation owner; no precision-ledger or universal reachability gate; `moy_coping_repair_handoff.md`) | `moy_pkg_P3.md` |
-| P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **fix / next after shared P3 grammar** (2026-10-21 user reset: playable model-matching district at Ohio/Snowhio sophistication; shared forms, usable passages/roof links, ordinary collision; no exhaustive51/10 certification or repeated full-city cycles) | `moy_pkg_P4.md` |
+| P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **construction active** (2026-10-21 user finish line: playable model-matching market town at Ohio/Snowhio detail; minor polish does not block; fresh Sol owns district completion, quick previews/batch integration; `moy_p3_p4_finish_handoff.md`) | `moy_pkg_P3.md` |
+| P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **construction queued after shared P3 forms** (2026-10-21 same owner authorized to finish Old City at Ohio/Snowhio detail; recognizable tower kit, courts/well, usable passages/links and sound ordinary collision; `moy_p3_p4_finish_handoff.md`) | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | **ready** (2026-10-19: colour model and data updated; nine identities, no printed text/numbers, 39 parts/12 joins and SuperEgg safeguards; build after P3/P4 fixes, section 13) | `moy_pkg_P5.md` |
 | P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **ready** (revision 2: ten consolidated sites, separated shafts and substantial bases; 50 parts/17 joins; muted glass/metal mid-rise palette; old 23-tower handoff withdrawn) | `moy_pkg_P6.md` |
 | P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 70-part/18-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
