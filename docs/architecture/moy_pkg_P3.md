@@ -1,5 +1,38 @@
 # Package P3: the market lanes kit
 
+## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
+
+This is the controlling goal: a nice playable city environment that broadly
+matches the provided plan models, about as sophisticated as the existing
+Ohio and Snowhio villages. Earlier precision-manufacturing interpretations,
+exhaustive part/join certification and blanket surface reachability gates
+are superseded. Use the schedules as design references to preserve the
+recognizable architecture, not as an obligation to perfect every small join.
+
+Prioritize model silhouettes, proportions, facade rhythm, materials and major
+features, with sound ordinary collision, usable streets/shops/passages and
+intentional playable connections. No major visible holes, broken surfaces or
+blocking circulation. Intended routes remain deliberate checks, not a demand
+to reach every surface. No new climbing behavior or movement retuning.
+
+Use existing village construction patterns and pragmatic model-consistent
+geometry. Fix visible defects with proportionate solutions. A clean simplified
+corner can meet the goal without millimetre-level cap certification. No new
+geometry/test framework or exhaustive diagnostic histories.
+
+Iterate with fast local representative previews, reusing an existing Godot
+run where practical. No full-city bake/render/activation cycle for each edit.
+Inspect a couple of changed views at ordinary resolution, then bake and do a
+focused in-game smoke test when a coherent architecture batch is ready.
+Final streamed integration is required; repeated integration runs during
+small edits are not. Run required repository hooks at actual commit/push
+boundaries, without repeatedly running the same broad suite beforehand.
+
+The fresh implementation owner follows `moy_coping_repair_handoff.md`, whose
+current content now covers this practical construction direction. Historical
+test results remain factual records; they do not override this user decision.
+
+
 2026-10-18 (revised the same day after a data review). Build-session brief.
 Read `moy_build_roadmap.md` first.
 
