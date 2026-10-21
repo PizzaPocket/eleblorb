@@ -105,9 +105,14 @@ row, nodes are evenly spaced along the perimeter, not bunched at corners.
 Ring counts decrease from72 toward16 at the crown to avoid narrow slivers.
 Triangulation connects adjacent rows exactly; no independently derived radii.
 
-Every eye is the same circular cutter clipped at its flat sill. Members,
-node patches, pane edges, bronze sleeve and collision all respect it. The
-closed boundary graph has six loops: base, crown and four eyes. It is
+The shell cutter is the clock's **outer fixed bezel, radius8 m**, rather
+than its inner eye. Glass, lattice and node patches terminate at that outer
+rim. A bronze reveal/collar up to0.3 m deep closes the curved-shell to planar
+bezel connection, with a recessed continuous gasket. No glass or white bars
+remain behind the rotating annuli. The clock assembly occupies this opening;
+its inner eye retains its own radius2.85 cutter and flat sill+47.7. These are
+two different boundaries. The shell graph has six loops: base, crown and
+four outer clock fittings. It is
 connected, has no zero-length or duplicate edges, pane-edge valence<=2, and
 Euler characteristic−4 before the separate glass cap is applied. Treat a
 failed grid check as an authoring defect, not a reason to disable the check.
@@ -173,10 +178,17 @@ sleeve outside the cutter. Add the0.6 m-deep flat sill from the same cut at
 across the opening. No ordinary route is funnelled onto that exposed sill.
 
 Clocks: separate mechanical hour/minute rings and fixed bezels, proper
-clearances,48 abstract ticks and the approved arrow markers; no seconds bead
+clearances,48 abstract ticks and distinct magenta arrow markers; no seconds bead
 and no numerals. Preserve common centres and shared game-time orientation
 on all four faces. Show that rings turn around the hollow eye and never
 sweep a bar across it. The model's sample time is illustrative only.
+
+Both markers use the original model's magenta-toned `#d8143a` with restrained
+emission. The hour marker has a short broad rectangular base, parallel sides
+and a triangular point; the minute marker is a narrower simple triangle.
+Use the exact two outlines in `kit.clock_markers`, including their radial
+clearances. They must remain identifiable by silhouette without colour.
+Do not recolour the bronze rings or bell magenta.
 
 Bell: hollow flared bronze body, clapper, four0.24 ×0.45 m crown arms
 and a real0.24 m hanger/yoke. The small crown tie is0.45 m deep with its
@@ -230,7 +242,14 @@ for movement proof. Show source bounds/settings and failures as well as passes.
 All70 part templates are in scope. Account for each, including the small
 items, rather than treating the dome as the only scheduled kit. Follow
 `kit.furniture` for the representative benches, Clock Room planters, public
-desk, closed kiosk shells and fountain. Complete ring beds, shared ghafs,
+desk, closed kiosk shells and fountain. `kit.garden_beds` adds four planned
+Clock Room beds at local(±14,±6), each3.2 ×1.4 m with0.6 m raised edges,
+soil and layered desert grasses/low flowering shrubs. They continue the park
+inside the dome rather than leaving it as a bare hall. Keep planting below
+1 m above soil, the central compass rose open, and at least2 m clear walking
+routes; preserve diagonal arrival wells, lift aprons and access to all benches.
+Show physical bed edges, soil and varied foliage in the interior view.
+Complete ring beds, shared ghafs,
 tower climbers, gallery planters, roof grasses, rain-garden edges and draining
 trunks using the existing landscape data and shared NatureProps kit. No new
 species or park redesign. Add the scheduled waste bins and restrained warm
@@ -273,7 +292,7 @@ never count a generic massing proxy or an invisible collider as completion.
 | `arrival_well` (punched) | existing arrivals.well and y37 to41.6 |
 | `grid_node` (chain) | shared node IDs and incident edge tangent/section frames |
 | `glass_seat` (seated) | same pane boundaries, inset under frame seats |
-| `eye_cut` (punched) | circle r2.85 at clock centre, clipped below sill47.7 |
+| `eye_cut` (punched) | shell cut at outer bezel r8; clock eye r2.85 clipped below sill47.7 |
 | `crown_join` (chain) | last nonzero ring radius3 and cap top69.6 |
 | `bell_bearing` (seated) | existing bell bottom/top and crown ring |
 | `clock_turn` (placed) | four cardinal clock planes, centre50.1 |
@@ -349,7 +368,8 @@ it does not prove the game build has welded nodes. The final game close-up
 must show no rounded-bead pattern, pinched ends, faceted-cylinder joints,
 floating bars, clipping seals or panes crossing their supporting frame.
 
-Planning verification: `docs/diagnostics/2026-10-20-moy-P7-planning.md`.
+Planning verification: `docs/diagnostics/2026-10-20-moy-P7-planning.md` and
+`docs/diagnostics/2026-10-22-moy-P7-planning-revision.md` (latest fitting and planting revision).
 
 ## 11. Handoff and decisions
 
@@ -367,3 +387,6 @@ covering all 70 parts and 18 joins. Replace the dome's independent-cylinder
 lattice with the checked shared grid and continuous welded junctions. Complete
 all routes, inherited fixes and L4 checks; write the implementation diagnostic,
 commit and push. Report any failed/unverified gate explicitly.
+
+- 2026-10-22 revision: outer-bezel glazing fit, distinct magenta marker
+  silhouettes and four planned interior garden beds requested by the user.

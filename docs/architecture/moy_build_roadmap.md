@@ -288,3 +288,5 @@ At the end of a planning session, update:
 - any decision made, as a line in that package's brief.
 
 Keep this file short. Detail belongs in the briefs and the design docs.
+
+P7 revision (2026-10-22): outer-bezel shell fittings, distinct magenta hour/minute markers and planned interior beds; ready for implementation.

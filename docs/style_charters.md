@@ -393,3 +393,8 @@ the user's Great Court, Cloud Forest and Flower Dome reference direction.
 The welded-node detail is a Boolean/union exception to separate rounded
 solids: the incident profiles become one continuous surface with small
 fillets and flush boundaries. Batching disconnected meshes does not satisfy it.
+
+P7 refinement (2026-10-22): glass/frame meet the outer clock bezel; the inner
+eye stays open. Magenta `#d8143a` markers use a broad shouldered hour silhouette
+and a slender minute triangle. Four planned interior garden beds extend the
+park into the Clock Room while preserving the central and arrival routes.

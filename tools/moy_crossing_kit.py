@@ -11,8 +11,8 @@ from shapely.ops import triangulate
 
 def build_crossing_kit(crossing, escalators, platforms):
     C=crossing; D=C['dome']; L=D['lattice']; base=D['base']; R=D['drum']['half']; n=D['drum']['n']; dh=D['drum']['h']; ch=D['cupola']['h']
-    kit=dict(version=1,datum=-60.0,printed_marks=False,
-        palette=dict(steel='#eeeae1',bronze='#927349',glass='#b8d9dc',timber='#c5b691',
+    kit=dict(version=2,datum=-60.0,printed_marks=False,
+        palette=dict(marker='#d8143a',steel='#eeeae1',bronze='#927349',glass='#b8d9dc',timber='#c5b691',
                      stone='#c9c7bc',rail='#687b7e',soil='#77715b',leaf='#748a55',flower='#b86c87',ground='#b6b29b'),
         frame=dict(width=L['member'],depth=0.18,n=5.5,fillet=0.006,glass_setback=0.035,
             rule='continuous constant-section profiles, welded flush common-node patches; no six-sided cylinders, capsule ends, ball hubs or overlapping loose struts'),
@@ -21,6 +21,8 @@ def build_crossing_kit(crossing, escalators, platforms):
         curve_steps=128,well_corner=0.1,lift_shaft=(2.8,2.8),lift_outer=(2.6,2.6),lantern_outer=(3.0,3.0),slab=0.24,guard=1.1,clear_path=2.0,door_clear=(1.5,2.4),eye_sill_depth=0.6,
         lift_stops=[0.0,14.2,37.0,base],lift_cabin=(2.0,2.4),
         notes='P7 finishes the existing Crossing; no street, track, platform, clock-face or tower relocation')
+    kit['clock_mount']=dict(radius=8.0, collar_depth=0.3, rule='glass and lattice terminate at outer fixed bezel; opaque clock assembly spans to inner open eye; no glazing behind rotating rings')
+    kit['clock_markers']=dict(hour=dict(outline=[[-.62,3.12],[.62,3.12],[.62,4.0],[0,4.88],[-.62,4.0]],shape='broad rectangular base and triangular point'),minute=dict(outline=[[-.35,5.12],[.35,5.12],[0,6.88]],shape='slender triangle'),color='#d8143a')
     P=[]; J=[]
     def part(id,where,shape,semi,col,role='mass',**kw):
         row=dict(id=id,where=where,shape=shape,semi=semi,col=col,role=role)
@@ -82,8 +84,8 @@ def build_crossing_kit(crossing, escalators, platforms):
     part('bell_clapper','shared scheduled clapper, physical bronze object','egg',(0.12,1.3,0.12),'solid',eps=(3.0,3.0))
     part('clock_hour','four rotating hour rings, radii3 to5','profile',(5,5,0.08),'solid')
     part('clock_minute','four rotating minute rings, radii5 to7','profile',(7,7,0.08),'solid')
-    part('clock_bezel','four fixed bezels, radii7 to8','profile',(8,8,0.08),'solid')
-    part('clock_arrow','raised lit pictorial arrows, no lettering or numeral','profile',('arrowW/2','arrowH/2',0.05),'decorative')
+    part('clock_bezel','four fixed bezels, radii7 to8, plus outer-radius8 collar depth0.3 joining shell','profile',(8,8,0.08),'solid')
+    part('clock_arrow','two distinct magenta profiles from kit.clock_markers, broad shouldered hour and slender triangular minute; no lettering or numeral','profile',('arrowW/2','arrowH/2',0.05),'decorative')
     part('clock_tick','raised abstract ticks, not printed numerals','clipped',(0.06,0.2,0.04),'decorative','trim')
     part('rose','flush bronze compass pictogram under bell','decal',(3.6,0.002,3.6),'decorative')
     part('bench_seat','seating beside wells and along ring, clear of paths','egg',(1.1,0.09,0.3),'solid',eps=(3.0,3.0))
@@ -111,7 +113,7 @@ def build_crossing_kit(crossing, escalators, platforms):
     join('arrival_well','punched',['clock_floor','roof_structure','arrival_tread','arrival_soffit','arrival_handrail','well_guard','well_shoe','arrival_widening'],'existing arrivals.well and y37 to41.6','one cutter through roof and floor; runoff free, guard only three sides and open at discharge')
     join('grid_node','chain',['frame_member','frame_node','pane_seal'],'shared node IDs and incident edge tangent/section frames','trim to common node patch, weld closed topology, smooth/weighted normals; merge batching alone is not a welded joint')
     join('glass_seat','seated',['frame_member','frame_node','glass_pane','pane_seal'],'same pane boundaries, inset under frame seats','one shared grid for skin/frame; no independent radius formula or struts sunk through glass')
-    join('eye_cut','punched',['frame_member','frame_node','glass_pane','eye_sleeve','eye_sill','clock_hour'],'circle r2.85 at clock centre, clipped below sill47.7','subtract identical eye volume from all members/glass/collision; flat sill, no bars through eye')
+    join('eye_cut','punched',['frame_member','frame_node','glass_pane','eye_sleeve','eye_sill','clock_hour'],'outer bezel circle r8 for shell; inner clear eye r2.85 clipped below sill47.7','terminate members/glass at outer bezel; preserve inner eye through clock assembly; subtract identical inner eye volume from clock/collision; flat sill, no bars through eye')
     join('crown_join','chain',['frame_member','frame_node','crown_tie','crown_cap'],'last nonzero ring radius3 and cap top69.6','truncate before apex collapse; continuous crown tie, no zero-length bars or buried half shell')
     join('bell_bearing','seated',['crown_tie','bell_hanger','bell','bell_clapper'],'existing bell bottom/top and crown ring','four arms carry hanger; no floating bell, clocks never intersect the hanging assembly')
     join('clock_turn','placed',['clock_hour','clock_minute','clock_bezel','clock_arrow','clock_tick','eye_sleeve'],'four cardinal clock planes, centre50.1','rotation about common centre, shared game time, no seconds bead or printed numerals')
@@ -123,6 +125,10 @@ def build_crossing_kit(crossing, escalators, platforms):
         dx,dz=C['c'][0]-x['c'][0],C['c'][1]-x['c'][1];dist=math.hypot(dx,dz);u=(dx/dist,dz/dist)
         kit['lift_serving'].append(dict(tower=x['tower'],stops=x['stops'],c=x['c'],toward=u,
             call=(round(x['c'][0]+u[0]*3.0,4),round(x['c'][1]+u[1]*3.0,4)),apron=(1.3,3.8),width=2.4))
+    kit['garden_beds']=[dict(c=(sx*14.0,base,sz*6.0),size=(3.2,.6,1.4),plants='desert grasses and low flowering shrubs',canopy_height=1.0) for sx in (-1,1) for sz in (-1,1)]
+    # Beds stay away from diagonal arrival wells and central compass rose.
+    for bed in kit['garden_beds']:
+        x,y,z=bed['c'];assert abs(x)+bed['size'][0]/2<18 and abs(z)+bed['size'][2]/2<8
     kit['furniture']=[]
     for bearing in (45,135,225,315):
         a=math.radians(bearing)
@@ -214,7 +220,8 @@ def _grid(D):
             elif u<v:raw.append((a[i%na],a[(i+1)%na],b[j%nb]));i+=1
             else:raw.append((a[i%na],b[(j+1)%nb],b[j%nb]));j+=1
     ey=D['clocks']['eye'];ey_y=base+D['clocks']['centre'];sill=ey['sill_y']
-    hole=Point(0,ey_y).buffer(ey['r'],quad_segs=64).intersection(box(-ey['r']-1,sill,ey['r']+1,ey_y+ey['r']+1))
+    mount_r=8.0
+    hole=Point(0,ey_y).buffer(mount_r,quad_segs=64)
     panes=[];faces=[]
     def orient(ids):
         a,b,c=[nodes[i] for i in ids];ab=[b[i]-a[i] for i in range(3)];ac=[c[i]-a[i] for i in range(3)]
@@ -225,7 +232,7 @@ def _grid(D):
         xyz=[nodes[i] for i in tri];choice=None
         for angle in D['clocks']['bearings']:
             a=math.radians(angle);ux,uz=math.cos(a),math.sin(a)
-            if min(p[1] for p in xyz)>ey_y+ey['r'] or max(p[1] for p in xyz)<sill:continue
+            if min(p[1] for p in xyz)>ey_y+mount_r or max(p[1] for p in xyz)<ey_y-mount_r:continue
             if max(p[0]*ux+p[2]*uz for p in xyz)<R*.88:continue
             uv=[(-p[0]*uz+p[2]*ux,p[1]) for p in xyz];poly=Polygon(uv)
             if poly.area>1e-9 and poly.intersects(hole):choice=(ux,uz,uv,poly.difference(hole));break
@@ -255,8 +262,7 @@ def _grid(D):
         for angle in D['clocks']['bearings']:
             a=math.radians(angle);along=p[0]*math.cos(a)+p[2]*math.sin(a);u=-p[0]*math.sin(a)+p[2]*math.cos(a)
             if along<R*.88:continue
-            if abs(math.hypot(u,p[1]-ey_y)-ey['r'])<.006:return True
-            if abs(p[1]-sill)<.006 and abs(u)<ey['chord']/2+.006:return True
+            if abs(math.hypot(u,p[1]-ey_y)-mount_r)<.006:return True
         return False
     for a,b in boundary:
         mid=tuple((nodes[a][i]+nodes[b][i])/2 for i in range(3))
