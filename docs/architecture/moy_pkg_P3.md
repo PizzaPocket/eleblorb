@@ -896,6 +896,17 @@ provide076-specific GPU/physics evidence and a current owned local audit.
 One focused fix round is allocated; P4/P2 and full-area reruns stay excluded.
 Package P3 remains fix at its unchanged full L2 criteria.
 
+## Bounded boom-house first fix review — 2026-10-21: fix
+
+See `moy_p3_boom_milestone.md` for exact evidence, hashes and the final fix
+list. Credit the corrected canopy applicability, veranda/rail construction,
+party-plane measurements and readable076 GPU context views on the current
+260-pack bake. Both actual-controller access attempts still fail; two076
+guard findings remain. Most join-ledger passes compare each mesh with its
+own collider, rather than establish the scheduled joint between pieces.
+One FINAL focused fix is allocated. Review it, then pause regardless of
+outcome; package-wide P3 and P4 acceptance remain separate and unchanged.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

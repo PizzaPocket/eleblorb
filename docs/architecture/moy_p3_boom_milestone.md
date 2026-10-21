@@ -70,13 +70,13 @@ variant or P4. No model changes, new chats or archives.
 - Build chat: Luna Build Moy P3 and p4
 - Build thread: 01a153b7-0f75-7871-9324-bdd8efef7e6c (local).
 - Automation: moy-p3-p4-review-fix-loop (reuse existing heartbeat).
-- State: initial submission reviewed: fix. First focused fix authorized for dispatch after this review checkpoint.
-- Fix submissions allocated: 1 / 2 (first fix dispatch follows this checkpoint; do not duplicate).
-- Last reviewed submission: initial turn 01a15ba4-4b34-75d3-a186-2795b1592ca3; completed, stopped editing; result fix.
+- State: first focused fix reviewed: fix; meaningful construction progress. Final fix authorized for dispatch after this checkpoint.
+- Fix submissions allocated: 2 / 2 (FINAL fix dispatch follows this checkpoint; do not duplicate or send a third).
+- Last reviewed submission: first fix turn 01a15bcb-aeca-7800-9c6e-5c9ef9b16283; completed, stopped editing; result fix.
 - Prior baseline: final P3/P4 review commit 66c99f8, builder SHA-256
   5af1395374f6e414b90631d3cb0c05e813827e9cfc331dc07db754d8a268517b,
   bake manifest d28fd5d1ba31f4b6a101274f91b3832069e1b44ebf756c5caf90833f66b0a816.
-- Latest observed build cursor: 7a55a42b-a1c8-42f5-878b-cbca088e7147:5.
+- Latest observed build cursor: 7a55a42b-a1c8-42f5-878b-cbca088e7147:7.
 
 Update this state only on dispatch, submission review or a meaningful blocker;
 never commit status-only polling. Record reviewed source/evidence hashes and
@@ -145,3 +145,64 @@ in one short new diagnostic, then stop editing. If the scope drifts again or
 there is no substantive milestone progress, pause instead of spending the
 second fix allocation. A genuine capture/engine blocker should be reported
 with exact evidence and stopped, not turned into a new tooling project.
+
+## First focused fix review — 2026-10-21: fix; final fix allocated
+
+Reviewed stopped turn 01a15bcb-aeca-7800-9c6e-5c9ef9b16283, diagnostic
+`../diagnostics/2026-10-21-moy-house076-fix1.md`, focused saved check, route
+JSON, local audit and all eight current GPU images. Independently rechecked
+260-pack freshness, current source hashes, ledger logic and route loop.
+Builder `03e7005c8dcb7dd637f20feac21daba39dd67964d367c21c875e9253d25b294b`;
+manifest `7d564f967381411894e367a9f666b2703e49443bcf35cc6ca5c79629e8c8c6bc`;
+plan remains unchanged. Route and capture source hashes match actual files.
+
+Credit meaningful scoped construction: inapplicable canopy removed, veranda
+floors extended to parcel/facade bounds and front/return rail supports revised.
+Canopy applicability is now consistent. The saved check reports206 records,
+zero failures, with useful party-plane measurements and specific rail/tank/
+coping bounding checks. Front/roof GPU views now show076 beside neighbours;
+inside/outside near views show the punched window/veranda. Retain this visual
+progress without treating these four viewpoints as every join's proof.
+
+The local audit supplies actual owner paths:150 findings, including125
+blocking shared infrastructure findings and two nonblocking076 guard records.
+No blocking finding names076. This does not close its guard warnings or prove
+every non-owned blocker inherited. Raw audit JSON has no source-hash binding;
+tie its next focused results to exact builder/plan/bake provenance.
+
+Final fix list (no subsequent implementation round):
+
+1. Demonstrate actual hero and Xiao access plus stationary support on076's
+   deliberate elevated landings. Both first-fix attempts fail: hero reaches
+   the horizontal target but stays at street y=-59.97; Xiao stops short and
+   stays on street support. Their street holds are not elevated landings.
+   The harness currently breaks on horizontal arrival before requiring target
+   height/landing, even for this elevated route; diagnose that termination
+   and whether jump/traversal inputs reach the actual shared controllers.
+   Use a feasible existing parkour approach; do not lower the plan height,
+   invent a stair/interior, teleport to the landing as access proof, or weaken
+   support/arrival criteria. Separately distinguish isolated surface support
+   checks from continuous access. If current geometry/movement cannot meet
+   the brief, report the exact constraint and stop for reassessment.
+2. Inspect and resolve or technically explain both076 guard records:
+   (-493.5345,-43.6271,60.6034),29 edge samples; and
+   (-493.5,-40.1900,72.0),one sample. Measure actual edge/guard geometry and
+   collision with both bodies at the affected support surfaces. A finding
+   being nonblocking in P0 is not itself a clearance. Do not add rails to
+   every tank by reflex or change schedule semantics to suppress warnings.
+3. Correct join-ledger acceptance. In `_join_ledger`, `measured_pass` is
+   `count>0 && all_bounds_fit`, with a real schedule-plane gate only for
+   `party_cut`. Most `measured_saved_fit_pass` rows therefore establish a
+   part's visual/collider AABB agreement, not its joint with another part.
+   Retain those measurements under their accurate scope. Bind each applicable
+   joint result to the actual paired parts and scheduled planes/split/seat/
+   surface relationships; AABB overlap alone cannot show a continuous capped
+   seam or correct parent split. Existing split/topology checks can be reused
+   and referenced where they establish that exact joint. Report unresolved
+   relationships honestly, and fix actual construction they expose. No new
+   general testing framework. Supply focused close images where needed.
+
+Refresh only evidence dependent on changed source. Do not rerun unrelated
+routes, broad P0/P4/P2 or all capture views if unchanged. Submit one concise
+final-fix diagnostic, then stop editing. After its review, pause automation
+whether it passes or fails; do not automatically advance to replication/P4.
