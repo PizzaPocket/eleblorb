@@ -35,9 +35,10 @@ matters is in the files listed in section 6.
 
 ## 2. How we work
 
-**Current work,2026-10-22:** P3/P4 are checkpointed at the user-approved practical
-built milestone with named follow-ups. Proceed to P5 using `moy_p5_build_handoff.md`
-and the current direction in its brief; old review/fix automation stays paused.
+**Current work,2026-10-22:** P5 accepted at practical L2 after source/image
+sense-check and independent saved-pack civic checks. Latest main through
+`8a7eb8df` integrated; P6 authorized via `moy_p6_build_handoff.md`. P3/P4/P5
+remain protected local implementation; old review/fix automation stays paused.
 
 ## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
 
@@ -171,8 +172,8 @@ diagnostic replaces this column.
 | P2 | Bake and performance: the rendered probe, budgets, streaming | the whole city | owed | budgets met | **fix** (second review 2026-10-19, section 11: telemetry/lifetime evidence improved, node growth explained; Estate p95 ~60 ms, stalls and controlled-route proof still open; diagnostic `2026-10-19-moy-P2-fixes.md`) | `moy_pkg_P2.md` |
 | P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **built — practical milestone** (user approved moving on2026-10-22; source/bake/evidence recovery checkpoint saved; streaming/walkthrough/polish follow-ups retained; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P3.md` |
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **built — practical milestone** (user approved moving on2026-10-22;386-pack integrated bake current; remaining cold-start checks/polish carried forward, not certified all-green; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P4.md` |
-| P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | **build authorized** (2026-10-22 fresh North Estate chat; accepted section13 colour/model direction, practical village-level finish and fast batch workflow; `moy_p5_build_handoff.md`) | `moy_pkg_P5.md` |
-| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **ready** (revision 2: ten consolidated sites, separated shafts and substantial bases; 50 parts/17 joins; muted glass/metal mid-rise palette; old 23-tower handoff withdrawn) | `moy_pkg_P6.md` |
+| P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L2 | L2 | **accepted — practical L2** (sense-check2026-10-22; recognizable district and public circulation, independent12/12 civic/276 landing checks; cold activation remains follow-up; `moy_P5_review_2026-10-22.md`) | `moy_pkg_P5.md` |
+| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **build authorized** (2026-10-22; revision2 ten sites/three tower exteriors; practical model-matching quality and focused checks; `moy_p6_build_handoff.md`) | `moy_pkg_P6.md` |
 | P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 72-part/19-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
 | P8 | **The park**: the four quarters, the dry garden, the reed pond, the tea house and chess terrace, the lawn, the wind trees, walks, benches | park | L2 | L4 | planned (note: the park paving is wound face-down and cannot be seen; one line in `_park_ground_body`, P1 fixes 4) | |
 | P9 | **The giant playground**: climbing towers, nets, slides, perches, hoops, the pump track | park, south-east | L1 | L4 | planned | |

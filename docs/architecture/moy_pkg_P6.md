@@ -1,6 +1,6 @@
 # Package P6: Downtown's podiums and three tower exteriors
 
-2026-10-19. **Revision 2: ready; site/base checks passed; supersedes the original 23-tower handoff.**
+2026-10-19. **Revision 2: build authorized 2026-10-22; supersedes the original 23-tower handoff.**
 Read `moy_build_roadmap.md` first. This is a binding L2 brief, not another
 massing pass. The plan-data schedule and this brief supersede the scope draft.
 
@@ -18,6 +18,29 @@ massing pass. The plan-data schedule and this brief supersede the scope draft.
   or lift demonstration. Never copy its preview tessellation into production.
 - **Exclude:** BLOCK's tower/story (P17), Grand Hotel changes, office/flat
   interiors, new NPC schedules/dialogue and city-wide optimization.
+
+## Current implementation direction — 2026-10-22
+
+The user authorized starting P6 after the P5 sense-check and pulling latest
+main. Apply the same practical Ohio/Snowhio quality bar: an attractive playable
+district broadly matching the model. Done is better than perfect. Preserve
+revision-2 sites, silhouettes, proportions, muted mid-rise palette, major
+structural forms, usable authored public routes and sound collision. No
+conspicuous proxy buildings, major mesh defects or blocked passages.
+
+The detailed schedule remains a design reference, not a mandatory 50/17
+certification spreadsheet. Historical requirements below for every join image,
+matched broad audits, repeated performance/unload runs and extensive camera
+matrices are superseded for this practical L2 build. Keep relevant required
+repository checks, focused representative two-character route/lift checks,
+a few useful actual views and honest limitations. No all-surface reachability.
+Use fast local previews and coherent construction batches; bake at integration
+milestones/final verification. Do not rerun the known slow city-wide activation
+loop after small edits or expand into a P2/P16 optimization project.
+
+Read `moy_p6_build_handoff.md` for preservation, scope and the finish line.
+Do not reread old P3/P4 review histories. P7 planning revisions are pulled but
+P7 implementation, P17 and interiors remain separate packages. Stop after P6.
 
 ## 1. Read first
 

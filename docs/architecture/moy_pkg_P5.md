@@ -1,6 +1,6 @@
 # Package P5: the North Estate kit and public routes
 
-2026-10-22. **Build authorized: P3/P4 practical construction checkpoint saved; proceed with North Estate.**
+2026-10-22. **Accepted at practical L2 after sense-check 2026-10-22; P6 may proceed.**
 Read `moy_build_roadmap.md` first. Section 13 supersedes the initial palette and any numeral exceptions.
 
 - **Area:** the two North Estate precincts, nine housing blocks, their
@@ -456,3 +456,41 @@ passed at 246 packs. This verifies the design handoff, not P5 gameplay.
 The model is saved locally in the repository; artifact publication remains
 pending because this chat has no publication tool. No fresh HDB-photo
 research or completed P5 runtime build is claimed by this update.
+
+## 14. Construction milestone — 2026-10-22
+
+P5 is built locally for review. See `docs/diagnostics/2026-10-22-moy-P5.md`:
+nine housing identities, all gallery/roof stops, open void decks, the twins'
+bridge/sky edges, five linkways, shared courts/garden and both civic shells.
+Both real controllers passed focused saved-geometry circulation and lift
+checks, plus the representative roof and hawker cross-aisle checks.
+Full-city runtime validation stopped at cold pack activation (62/400), before
+gameplay. Streaming/unload, swing and performance limits are recorded honestly.
+Inherited P3/P4 source/bake remain preserved and uncommitted. Stop for review;
+no automatic P6 advancement.
+
+## Sense-check — 2026-10-22
+
+Accepted as a practical L2 construction milestone under the current user
+criteria. Source/result and all six saved-image hashes match the handoff.
+Inspected the housing/void-deck, twin bridge and hawker images, estate builder,
+shared-lift extension/landing controls and focused test implementation. The
+architecture reads as the planned district; isolated saved-pack views establish
+construction, not streamed-city gameplay. The civic image is obstructed and is
+not evidence of the centre garden route.
+
+Independently reran the saved-pack civic check before pulling upstream:
+12 checks, zero failures; Hero and Xiao walk Square through hawker to Park
+Ring, and all 276 landing clearance/support probes pass. Reviewed, rather than
+reran, the matching 110-check main and 18-check roof records. Those are real
+controllers in headless physics; lift destination/recall callbacks are invoked
+by the harness, not a separate human UI walkthrough. Current pre-pull bake
+freshness passed at 400 packs. Shared pose/parity/design checks pass.
+
+Known follow-ups remain: full runtime activation times out at 62/400 before
+gameplay; remote streaming/unload, rendered frame budgets and a live user
+walkthrough are unverified. Minor seams/planting/stall/private-room dressing
+are later polish. No all-green runtime or L4 acceptance is claimed. These
+limits do not block the user-authorized move to P6.
+
+Recovery and upstream integration: `moy_P5_review_2026-10-22.md`.
