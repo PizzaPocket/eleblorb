@@ -922,6 +922,19 @@ unaccepted. Automation pauses after the agreed two fixes; no further build
 round or P4 rollout is dispatched. Settle existing-traversal approach feasibility
 before replication or any proposed design revision. Full L2 criteria stand.
 
+## Traversal investigation review — 2026-10-21: fix; paused
+
+See `moy_p3_traversal_investigation.md` for the reviewed turn, exact evidence
+and qualified diagnosis. GPU/input evidence demonstrates Xiao reaching and
+holding house076's first veranda using a debug full Plant suit/Leaf Hat.
+Hero attaches and rises but misses the landing under the same fixed input;
+neither demonstrates repeated floor-to-floor climbing. Existing vine code
+already has upward pulling and re-grip behavior. The report's proposal for
+a new shared column-climb mode is not accepted as a proven necessary fix.
+Resolve intended equipment and existing-mode landing/handoff feasibility
+before implementation or geometry changes. Full P3 remains fix; the one
+investigation is reviewed and monitoring pauses without another dispatch.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
