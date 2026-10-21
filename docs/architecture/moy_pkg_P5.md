@@ -1,6 +1,6 @@
 # Package P5: the North Estate kit and public routes
 
-2026-10-19. **Ready: colour model and facade schedule updated. Build after P3/P4 fixes.**
+2026-10-22. **Build authorized: P3/P4 practical construction checkpoint saved; proceed with North Estate.**
 Read `moy_build_roadmap.md` first. Section 13 supersedes the initial palette and any numeral exceptions.
 
 - **Area:** the two North Estate precincts, nine housing blocks, their
@@ -13,6 +13,37 @@ Read `moy_build_roadmap.md` first. Section 13 supersedes the initial palette and
   kit beside the exported hero. Local model; artifact publication pending.
 - **Binding data:** `CityPlan.ESTATE.kit`, including `parts` and `joins`.
   The data wins. Never edit `scripts/city_plan.gd` by hand.
+
+## Current build direction — 2026-10-22
+
+Apply the user's practical goal: a nice playable district broadly matching
+the supplied model, about as sophisticated as Ohio/Snowhio. Done is better
+than perfect. P3/P4 are checkpointed with named streaming/polish follow-ups;
+no further P3/P4 precision review is a prerequisite to starting P5.
+
+Keep this brief's actual North Estate design and intended public functions:
+all nine identities, real open void decks, public galleries/lifts, twins'
+level26 connection, courts/linkways, neighbourhood centre and hawker shell.
+Section13's accepted colour/model direction supersedes older redesign requests.
+No lettering/numbers, private-flat interiors or new resident simulations.
+
+Use the parts/joins schedule as a design reference, not an exhaustive39/12
+certificate. Minor decorative simplifications and normal-camera seams may
+remain. Major visual defects, blocked public circulation, lift/support faults
+and unintended holes still matter. Not every surface needs access. Test the
+intentional public circulation/lifts/bridge with both bodies and representative
+stops; do not build a separate all-floor/all-surface test matrix.
+
+Use existing builders/systems and fast representative previews during edits.
+Integrate coherent batches; bake and take a few ordinary-resolution useful
+views when ready. Run relevant required checks and focused walkthroughs.
+No repeated city-wide activation/capture cycles per change, giant audit history,
+new test/geometry/controller framework or P2 optimization project. Older
+before/after performance/capture/ledger demands are proportionate observations,
+not blockers requiring a fresh expensive certification cycle on every batch.
+
+Current concise handoff: `moy_p5_build_handoff.md`. Stop after P5 for a useful
+district-level review; no automatic cross-chat fix loop or P6 advancement.
 
 ## 1. Read first
 
