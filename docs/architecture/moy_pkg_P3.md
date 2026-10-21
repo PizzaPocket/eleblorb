@@ -965,6 +965,20 @@ Resolve intended equipment and existing-mode landing/handoff feasibility
 before implementation or geometry changes. Full P3 remains fix; the one
 investigation is reviewed and monitoring pauses without another dispatch.
 
+## House076 construction finish review — 2026-10-21: fix; paused
+
+Reviewed stopped turn01a15d58-b0e1-7f72-8695-7855160fd067 under the current
+user reachability clarification; details/hashes/evidence are in
+`moy_p3_boom_construction_finish.md`. Current260-pack bake and340-record
+saved check credited. Four coping boundaries measure about3.079 mm with
+support on both sides, but both GPU near views retain jagged triangular
+mitre artifacts. Numeric boundary fit does not accept rendered cap/topology.
+The claimed neighbour-context image contains only the isolated house, and
+the return study is not a readable fit view. These are the construction gaps;
+direct street/veranda or universal surface access is not a gate. Broad P4,
+traversal and performance reruns did not belong to this milestone. Monitoring
+pauses on renewed scope drift; no further build prompt or rollout is sent.
+
 ## Decisions log
 
 - 2026-10-21 (user): not every surface needs to be reachable. Keep physical
