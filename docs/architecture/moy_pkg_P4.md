@@ -14,6 +14,34 @@
     both packages can share it.
 - **Model:** `docs/drawings/moy_old_moy_3d.html`. Match it.
 
+## Current acceptance clarification — user decision, 2026-10-21
+
+Not every surface must be reachable. This overrides blanket reachability
+requirements in earlier checks, milestone briefs and dated review fix lists.
+It changes the review scope, not the recorded results of past trials.
+
+- Substantial architecture retains correct physical collision and support
+  where encountered. A `landing` collision role does not require a route to
+  every instance, nor a direct jump from the street.
+- Street doors, entered shops, court passages and intentional connecting
+  roof links remain usable; collision defects, blocked circulation and traps
+  in playable circulation remain actionable.
+- Test explicitly authored parkour routes on representative geometry with
+  both characters and their intended powers. Do not extrapolate those route
+  examples into a climb/access requirement for every house or surface.
+- Evaluate reach/audit findings against the actual route and owner. Preserve
+  raw findings; classify irrelevant blanket reach findings with reasons.
+  Do not weaken collision, ignore actual route defects or disable checks to
+  obtain a pass.
+- A construction milestone may pass its part/join/collision/visual scope
+  while package-level authored route work remains open and separately named.
+  Report construction and route acceptance separately.
+
+House076's failed direct approach or incomplete floor-to-floor investigation
+is not a blocker to completing its architecture representative. No new
+climbing mode, movement retuning or equipment policy is authorized here.
+Immediate work: `moy_p3_boom_construction_finish.md`.
+
 ## 1. Read first
 
 1. `AGENTS.md`, `CLAUDE.md`, `moy_build_roadmap.md`.
@@ -243,9 +271,11 @@ seems missing or wrong, say so in the diagnostic; do not invent one.
 2. **The check suite** (P0) on Old Moy's bounds, `x −790 to −637`:
    - `overlap`, `buried`, `underside`, `solid`, `guard`;
    - `trap`: no court, pocket, yard or roof you can get into and not out of;
-   - `reach`: every street door, every passage end and every roof ramp foot.
+   - `reach`: street doors, passage ends and the endpoints of intentional
+     roof-ramp connections. This does not require street access to every roof.
    If P0 is not yet built, say so and list what you checked by hand.
-3. **Parkour**, with both characters:
+3. **Authored parkour routes**, on representative geometry with both characters
+   and intended powers (separate from individual construction milestones):
    - up a stone-based house by its holds, from the street to the parapet;
    - up an earth base by its rounded corner;
    - along the Old High Street by vine from Arcade Street to Clinic Lane;
@@ -766,6 +796,11 @@ acceptance remain deferred. The implementation working tree is preserved;
 this checkpoint commits review documents only.
 
 ## Decisions log
+
+- 2026-10-21 (user): not every surface needs to be reachable. Keep physical
+  collision, usable circulation and authored routes; remove blanket access
+  requirements from construction acceptance. See the current clarification.
+
 
 - 2026-10-18 (user): a house door is one leaf on one hinge, and every door
   leaf, shutter and doorway is cut flat at the floor, as Ohio's and Snowhio's

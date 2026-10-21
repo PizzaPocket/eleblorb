@@ -1,5 +1,11 @@
 # P3 house076 traversal investigation — one submission
 
+> Superseded acceptance interpretation, 2026-10-21: the user clarified that
+> not every surface must be reachable. Blanket house076 access blockers below
+> are historical and no longer gate its construction milestone. Raw trial
+> outcomes remain valid. Current work is `moy_p3_boom_construction_finish.md`;
+> retain physical collision, usable circulation and explicit authored routes.
+
 2026-10-21. User authorized this investigation after the bounded build loop
 paused. This is a diagnostic task, not a third construction-fix round.
 

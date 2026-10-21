@@ -12,6 +12,34 @@ Read `moy_build_roadmap.md` first.
   https://claude.ai/artifact/B4d92cjYsy6TMBUCar7gRT). The lanes from the
   data, and a kit sheet of the six kinds of house beside the hero. Match it.
 
+## Current acceptance clarification — user decision, 2026-10-21
+
+Not every surface must be reachable. This overrides blanket reachability
+requirements in earlier checks, milestone briefs and dated review fix lists.
+It changes the review scope, not the recorded results of past trials.
+
+- Substantial architecture retains correct physical collision and support
+  where encountered. A `landing` collision role does not require a route to
+  every instance, nor a direct jump from the street.
+- Street doors, entered shops, court passages and intentional connecting
+  roof links remain usable; collision defects, blocked circulation and traps
+  in playable circulation remain actionable.
+- Test explicitly authored parkour routes on representative geometry with
+  both characters and their intended powers. Do not extrapolate those route
+  examples into a climb/access requirement for every house or surface.
+- Evaluate reach/audit findings against the actual route and owner. Preserve
+  raw findings; classify irrelevant blanket reach findings with reasons.
+  Do not weaken collision, ignore actual route defects or disable checks to
+  obtain a pass.
+- A construction milestone may pass its part/join/collision/visual scope
+  while package-level authored route work remains open and separately named.
+  Report construction and route acceptance separately.
+
+House076's failed direct approach or incomplete floor-to-floor investigation
+is not a blocker to completing its architecture representative. No new
+climbing mode, movement retuning or equipment policy is authorized here.
+Immediate work: `moy_p3_boom_construction_finish.md`.
+
 ## 1. Read first
 
 1. `AGENTS.md`, `CLAUDE.md`, `moy_build_roadmap.md`.
@@ -259,11 +287,13 @@ tower house's (`moy_pkg_P4.md` 2.7), with one more shape.
    the pairs' fronts, the courts' ways in, the arcade roof and Lamp Lane).
 2. **The check suite** (P0) on the area's bounds passes:
    - `overlap`, `buried`, `trap`, `underside`, `solid` and `guard`;
-   - `reach`: every street door is reachable at its threshold, every veranda
-     from the street, every passage end;
+   - `reach`: street doors at their thresholds, entered shops, passage ends
+     and the connections used by explicitly authored routes. No blanket
+     street-to-veranda or every-surface access requirement;
    - `trap`: no court you can get into and not out of.
    If P0 is not yet built, say so and list what you checked by hand instead.
-3. **Parkour**, with both characters:
+3. **Authored parkour routes**, on representative geometry with both characters
+   and intended powers (separate from individual construction milestones):
    - climb a boom house's veranda columns floor to floor;
    - balcony rail to rail up a tile house;
    - a blorb bounce onto a canopy;
@@ -936,6 +966,11 @@ before implementation or geometry changes. Full P3 remains fix; the one
 investigation is reviewed and monitoring pauses without another dispatch.
 
 ## Decisions log
+
+- 2026-10-21 (user): not every surface needs to be reachable. Keep physical
+  collision, usable circulation and authored routes; remove blanket access
+  requirements from construction acceptance. See the current clarification.
+
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
   deep; no core or flat is built.

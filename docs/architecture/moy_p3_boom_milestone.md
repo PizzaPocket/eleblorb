@@ -1,5 +1,11 @@
 # P3 boom-house milestone: bounded build and review
 
+> Superseded acceptance interpretation, 2026-10-21: the user clarified that
+> not every surface must be reachable. Blanket house076 access blockers below
+> are historical and no longer gate its construction milestone. Raw trial
+> outcomes remain valid. Current work is `moy_p3_boom_construction_finish.md`;
+> retain physical collision, usable circulation and explicit authored routes.
+
 2026-10-21. Authorized by the user to automate the milestone workflow between
 this review chat and the existing build chat. This replaces the open-ended
 P3/P4 loop. The package briefs and their full L2 criteria remain binding.
