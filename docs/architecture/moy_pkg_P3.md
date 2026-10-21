@@ -907,6 +907,21 @@ own collider, rather than establish the scheduled joint between pieces.
 One FINAL focused fix is allocated. Review it, then pause regardless of
 outcome; package-wide P3 and P4 acceptance remain separate and unchanged.
 
+## Bounded boom-house final review — 2026-10-21: fix; paused
+
+Final turn01a15bf0-06fe-7a91-9332-9eb5208c8dfe and its house076 diagnostic
+are reviewed in `moy_p3_boom_milestone.md`. The260-pack bake is current.
+Credit corrected veranda guard construction, current paired joint evidence
+and isolated hero/Xiao landing support plus the selected guard-edge probes.
+Neither character completes the tested continuous street-to-veranda approach.
+The coping's scheduled mitre remains unproven, and the noon close-up misses
+its subject. The347-record sample's zero assertion failures do not close its
+explicit unproven join or access failures. Headless isolated support is not
+continuous access or GPU gameplay proof. The milestone and full P3 remain
+unaccepted. Automation pauses after the agreed two fixes; no further build
+round or P4 rollout is dispatched. Settle existing-traversal approach feasibility
+before replication or any proposed design revision. Full L2 criteria stand.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m

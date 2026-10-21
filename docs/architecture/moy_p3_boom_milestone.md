@@ -70,13 +70,13 @@ variant or P4. No model changes, new chats or archives.
 - Build chat: Luna Build Moy P3 and p4
 - Build thread: 01a153b7-0f75-7871-9324-bdd8efef7e6c (local).
 - Automation: moy-p3-p4-review-fix-loop (reuse existing heartbeat).
-- State: first focused fix reviewed: fix; meaningful construction progress. Final fix authorized for dispatch after this checkpoint.
-- Fix submissions allocated: 2 / 2 (FINAL fix dispatch follows this checkpoint; do not duplicate or send a third).
-- Last reviewed submission: first fix turn 01a15bcb-aeca-7800-9c6e-5c9ef9b16283; completed, stopped editing; result fix.
+- State: FINAL fix reviewed: milestone not accepted; automated process PAUSED for reassessment. No implementation continuation authorized.
+- Fix submissions allocated and reviewed: 2 / 2. Budget exhausted; no third fix.
+- Last reviewed submission: final fix turn 01a15bf0-06fe-7a91-9332-9eb5208c8dfe; completed, stopped editing; result fix.
 - Prior baseline: final P3/P4 review commit 66c99f8, builder SHA-256
   5af1395374f6e414b90631d3cb0c05e813827e9cfc331dc07db754d8a268517b,
   bake manifest d28fd5d1ba31f4b6a101274f91b3832069e1b44ebf756c5caf90833f66b0a816.
-- Latest observed build cursor: 7a55a42b-a1c8-42f5-878b-cbca088e7147:7.
+- Latest observed build cursor: 7a55a42b-a1c8-42f5-878b-cbca088e7147:9.
 
 Update this state only on dispatch, submission review or a meaningful blocker;
 never commit status-only polling. Record reviewed source/evidence hashes and
@@ -206,3 +206,73 @@ Refresh only evidence dependent on changed source. Do not rerun unrelated
 routes, broad P0/P4/P2 or all capture views if unchanged. Submit one concise
 final-fix diagnostic, then stop editing. After its review, pause automation
 whether it passes or fails; do not automatically advance to replication/P4.
+
+## Final milestone review — 2026-10-21: not accepted; PAUSED
+
+Reviewed stable final turn01a15bf0-06fe-7a91-9332-9eb5208c8dfe once.
+Submission: `../diagnostics/2026-10-21-moy-house076-fix2.md`; its focused
+saved-check JSON, controller routes and hash-bound guard audit; and all four
+actual images in `../diagnostics/images/2026-10-21-house076-fix2b-P3-P3/`.
+Independently verified 260-pack bake freshness, current builder/plan/manifest
+hashes, route and capture provenance, trace outcomes, relevant source gates
+and recorded joint relations. No repeated broad suite or further build prompt.
+
+- Builder: `61f0c6b3f55db0471856db95a8b8da191ed45819505600685a65ee9e168038bf`.
+- Plan: `5705a10f92e26fc2d51227aec025cbccf41c4095fd93a6b48e9587b4f50c4938`.
+- Manifest: `e23fbd7fe58cd4a2462cfe40d4720c5015cd5055de895717b62e6bd780f1bcf5`.
+- Saved check: `../diagnostics/raw/2026-10-21-moy-P3-house076-fix2-check.json`.
+- Routes: `../diagnostics/raw/2026-10-21-moy-P3-house076-fix2-controller-routes.json`.
+- Audit: `../diagnostics/checks/moy-house076-fix2-2026-10-21.json`.
+
+Credit construction: scheduled balusters now continue over the structural
+column interruptions in the veranda guard; earlier corrected canopy,
+party-plane floors and rail-return work remain. Joint reporting now separates
+own visual/collider bounds from paired/scheduled relationships. The347-record
+saved sample reports zero assertion failures; ten applicable relations report
+passes, four variant exclusions are explicit, and `band_chain` is honestly
+unproven. Source gates no longer promote own AABB agreement to joint acceptance.
+Selected split/floor-plane, rail/post and tank-seat relations carry paired
+paths and measured errors. This is progress, not a completed kit certificate.
+
+**Continuous access remains unaccepted for both characters.** The updated
+route runs beyond horizontal arrival and requires elevated height, named
+support and a stationary hold. Both fail the tested street-to-first-veranda
+approach. The diagnostic reports maximum rises1.45 m and1.66 m versus a3.375 m
+street-to-floor rise; sampled trace rises independently confirm the shortfall
+(about1.40 m and1.66 m). These are results for that attempted direct approach,
+not proof that every existing traversal power or alternate approach is
+infeasible. No valid continuous alternative was submitted. Isolated first
+veranda and tank support probes pass for both but begin by placement and do
+not establish access. All are headless physics results, not rendered gameplay.
+
+Credit the selected fifth-floor guard-edge probe: both bodies stop short of
+the outward destination and retain named veranda support for30 frames. The
+repaired geometry and this local result address the reported opening for
+that tested path. The tank-apex probe likewise holds30 frames on the scheduled
+landing collider. The guard-only scan still reports25 warnings, including
+the same two076 records; inspection confirms `_edge_has_guard` excludes the whole
+source body RID, so same-owner child guards are not seen by that ray. Record
+this as targeted behavioral evidence plus a known scan limitation, not a
+zero-warning or whole-perimeter acceptance claim. The guard scan now includes
+source/bake provenance. It does not refresh other area checks.
+
+GPU front views show076 and neighbours; the dusk outside close view shows
+the guard/window construction. **The corresponding noon outside close-up
+misses the subject**, despite subject-cell-loaded metadata. Do not accept it
+as a matched near-view pair. Remaining coping mitre/45-degree plane relations
+have neither measured acceptance nor sufficient dedicated close proof.
+
+**Reassessment required, no third automated fix:** identify and demonstrate
+a feasible continuous approach using the existing shared traversal system,
+or bring a concrete movement/architecture conflict to the user before any
+design change. Finish the coping's scheduled mitre and readable joint proof;
+repair the misdirected close view. Keep current scoped support/guard credit
+and recognize full P3 owner/variant/parkour/audit work remains open. P4/P2 and
+other owners were not advanced. No acceptance criterion is relaxed.
+
+The bounded workflow delivered actual guard/floor construction and clearer
+joint evidence rather than indefinite broad reruns. It also exposed an access
+feasibility question that should be settled before replication. Automation is
+PAUSED after the agreed initial submission plus two fix submissions. Builder
+implementation/evidence remains preserved in the working tree; this review
+checkpoint commits review-owned documents only.
