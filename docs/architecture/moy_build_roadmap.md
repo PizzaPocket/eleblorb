@@ -173,7 +173,7 @@ diagnostic replaces this column.
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **built — practical milestone** (user approved moving on2026-10-22;386-pack integrated bake current; remaining cold-start checks/polish carried forward, not certified all-green; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | **build authorized** (2026-10-22 fresh North Estate chat; accepted section13 colour/model direction, practical village-level finish and fast batch workflow; `moy_p5_build_handoff.md`) | `moy_pkg_P5.md` |
 | P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **ready** (revision 2: ten consolidated sites, separated shafts and substantial bases; 50 parts/17 joins; muted glass/metal mid-rise palette; old 23-tower handoff withdrawn) | `moy_pkg_P6.md` |
-| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 70-part/18-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
+| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 72-part/19-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
 | P8 | **The park**: the four quarters, the dry garden, the reed pond, the tea house and chess terrace, the lawn, the wind trees, walks, benches | park | L2 | L4 | planned (note: the park paving is wound face-down and cannot be seen; one line in `_park_ground_body`, P1 fixes 4) | |
 | P9 | **The giant playground**: climbing towers, nets, slides, perches, hoops, the pump track | park, south-east | L1 | L4 | planned | |
 | P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L4 | planned | |
@@ -290,3 +290,7 @@ At the end of a planning session, update:
 Keep this file short. Detail belongs in the briefs and the design docs.
 
 P7 revision (2026-10-22): outer-bezel shell fittings, distinct magenta hour/minute markers and planned interior beds; ready for implementation.
+
+P7 garden refinement (2026-10-22): roughly53% green interior grounds with
+paved circulation, lighter muted magenta markers, and explicit rooted climbing
+vines with pendant tips. Model includes garden-plan and vine close-up views.

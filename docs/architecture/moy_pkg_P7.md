@@ -183,7 +183,7 @@ and no numerals. Preserve common centres and shared game-time orientation
 on all four faces. Show that rings turn around the hollow eye and never
 sweep a bar across it. The model's sample time is illustrative only.
 
-Both markers use the original model's magenta-toned `#d8143a` with restrained
+Both markers use the midpoint rose-magenta `#cf4a6b` with restrained
 emission. The hour marker has a short broad rectangular base, parallel sides
 and a triangular point; the minute marker is a narrower simple triangle.
 Use the exact two outlines in `kit.clock_markers`, including their radial
@@ -239,20 +239,40 @@ for movement proof. Show source bounds/settings and failures as well as passes.
 
 ## 7. Finish, props and landscaping
 
-All70 part templates are in scope. Account for each, including the small
+All72 part templates are in scope. Account for each, including the small
 items, rather than treating the dome as the only scheduled kit. Follow
 `kit.furniture` for the representative benches, Clock Room planters, public
-desk, closed kiosk shells and fountain. `kit.garden_beds` adds four planned
-Clock Room beds at local(±14,±6), each3.2 ×1.4 m with0.6 m raised edges,
-soil and layered desert grasses/low flowering shrubs. They continue the park
-inside the dome rather than leaving it as a bare hall. Keep planting below
-1 m above soil, the central compass rose open, and at least2 m clear walking
-routes; preserve diagonal arrival wells, lift aprons and access to all benches.
-Show physical bed edges, soil and varied foliage in the interior view.
+desk, closed kiosk shells and fountain. `kit.interior_garden` is a park-ground plan, not four ornamental boxes.
+About52.7 percent of the usable floor (693 m² of1,317 m², excluding openings)
+is green: broad flush lawns with low planted borders. The remaining area is
+a connected network of pale paved walks, arrival/lift aprons, seating pockets
+and the central compass-rose meeting space. Use the checked polygon edges
+and holes directly; do not scatter substitute planters across a bare hall.
+Main cross walks are2.8 m wide, the garden loop2.2 m, lift approaches2.6 m.
+All actual arrival wells and lift shafts stay open with their guards; paving
+connects the discharge landings and cabin doors to the common path network.
+Keep grass walkable over the existing physical floor. Bed foliage is decorative,
+low and outside path clearances. Keep the existing floor datum and roof depth:
+coordinate shallow0.18 m substrate, waterproofing, drainage and root barrier
+within the existing roof/floor build-up, not floating above it or piercing it.
+No deep-rooted trees in this shallow roof garden. Existing trees stay in their
+specified deep planters. Show lawn, garden borders and paving as distinct
+materials, with no printed signs, and supply the garden-plan camera view.
+
+The tower green is **coral vine and bougainvillea**, rooted in gallery planters
+and trained upward on the stainless support mesh. Add irregular branching
+stems, small leaves, occasional muted flowers and pendant tips descending up
+to1.4 m from planter rims. `kit.vines` records scale and spacing. Keep visible
+gaps between stems/leaves so ribs and mesh remain legible. The source climber
+bands retain the intended door/landing gaps. They are planting envelopes,
+never solid green panels, hanging fabric, floating blobs or collidable walls.
+Root every run in soil or connect it visibly to an established climbing stem.
+Show a close-up of one planted gallery and its hanging tips in the diagnostic.
+
 Complete ring beds, shared ghafs,
 tower climbers, gallery planters, roof grasses, rain-garden edges and draining
 trunks using the existing landscape data and shared NatureProps kit. No new
-species or park redesign. Add the scheduled waste bins and restrained warm
+species or change to the surrounding park layout. Add the scheduled waste bins and restrained warm
 fixtures beside the seating/service areas, outside circulation clearances.
 
 Furniture standing surfaces are physical; leaf tips and recessed seals/rose
@@ -263,7 +283,7 @@ mission or invented interaction is required to call the station dressed.
 
 ## 8. Binding parts and joins
 
-The plan contains70 part templates and 18 joins. Every visible P7 component
+The plan contains72 part templates and 19 joins. Every visible P7 component
 has a shape, symbolic/numeric half-size, exponent where relevant and collision
 class. The implementation diagnostic maps every ID to its builder, owner(s),
 collision and evidence. Explicitly list blocked or incomplete components;
@@ -276,7 +296,7 @@ never count a generic massing proxy or an invisible collider as completion.
 | Lifts and platforms | `lift_guide`, `lift_car`, `lift_landing`, `lift_door`, `call_control`, `lantern_glass`, `platform_floor`, `platform_edge`, `platform_canopy` |
 | Roof and arrivals | `roof_structure`, `roof_louvre`, `roof_glass`, `roof_rim`, `gutter`, `clock_floor`, `arrival_widening`, `arrival_tread`, `arrival_soffit`, `arrival_handrail`, `well_guard`, `well_shoe` |
 | Dome and clocks | `frame_member`, `frame_node`, `glass_pane`, `pane_seal`, `eye_sleeve`, `eye_sill`, `crown_tie`, `crown_cap`, `bell_hanger`, `bell`, `bell_clapper`, `clock_hour`, `clock_minute`, `clock_bezel`, `clock_arrow`, `clock_tick`, `rose` |
-| Furniture and landscape | `bench_seat`, `bench_leg`, `planter`, `soil`, `tree_trunk`, `plant_canopy`, `rain_basin`, `desk`, `kiosk_shell`, `kiosk_counter`, `fountain`, `waste_bin`, `light_fixture` |
+| Furniture and landscape | `bench_seat`, `bench_leg`, `planter`, `soil`, `tree_trunk`, `plant_canopy`, `lawn_surface`, `vine_stem`, `rain_basin`, `desk`, `kiosk_shell`, `kiosk_counter`, `fountain`, `waste_bin`, `light_fixture` |
 
 | Join | Shared planes/geometry |
 |---|---|
@@ -297,6 +317,7 @@ never count a generic massing proxy or an invisible collider as completion.
 | `bell_bearing` (seated) | existing bell bottom/top and crown ring |
 | `clock_turn` (placed) | four cardinal clock planes, centre50.1 |
 | `furniture_bearing` (seated) | actual floor/terrain top |
+| `vine_training` (chain) | tower mesh and gallery planter rims; stems rooted in soil, clear access gaps |
 | `kiosk_opening` (punched) | rounded shop opening over counter |
 
 Symbolic dimensions: supportW/D = surveyed support base; run/L/span = actual
@@ -348,7 +369,7 @@ underside bowls or unclosed surface edges.
 ## 10. Diagnostic and acceptance images
 
 Write `docs/diagnostics/<date>-moy-P7.md`, separate from the planning note.
-Include all 70 part IDs and 18 joins, actual geometry/collision builders,
+Include all 72 part IDs and 19 joins, actual geometry/collision builders,
 route evidence for both rigs, clock/bell functional results, before/after
 P0 classifications, matched performance samples and unload cycles. Distinguish
 implemented, verified, failed and unrun. A partial implementation stays partial.
@@ -369,24 +390,28 @@ must show no rounded-bead pattern, pinched ends, faceted-cylinder joints,
 floating bars, clipping seals or panes crossing their supporting frame.
 
 Planning verification: `docs/diagnostics/2026-10-20-moy-P7-planning.md` and
-`docs/diagnostics/2026-10-22-moy-P7-planning-revision.md` (latest fitting and planting revision).
+`docs/diagnostics/2026-10-22-moy-P7-planning-revision.md` (clock fitting revision), plus
+`docs/diagnostics/2026-10-22-moy-P7-garden-revision.md` (latest garden/colour revision).
 
 ## 11. Handoff and decisions
 
 - 2026-10-20: user picked P7 and called out the dome's segmented framing,
   naming the Great Court, Cloud Forest and Flower Dome as references.
 - User explicitly required the SuperEgg schedule for everything in P7.
-  Bound 70 parts/18 joins and a checked shared grid, plus node/section views.
+  Bound 72 parts/19 joins and a checked shared grid, plus node/section views.
 - Stop list follows the existing Clock Room plan; unserved Deck calls are
   removed. No alteration to streets, tracks or station arrangement.
 - Local model and reference images are checked in; external artifact
   publication remains pending because this chat has no publisher.
 
 Build prompt: Pull latest main. Implement P7 from this brief and its model,
-covering all 70 parts and 18 joins. Replace the dome's independent-cylinder
+covering all 72 parts and 19 joins. Replace the dome's independent-cylinder
 lattice with the checked shared grid and continuous welded junctions. Complete
 all routes, inherited fixes and L4 checks; write the implementation diagnostic,
 commit and push. Report any failed/unverified gate explicitly.
 
 - 2026-10-22 revision: outer-bezel glazing fit, distinct magenta marker
   silhouettes and four planned interior garden beds requested by the user.
+
+- 2026-10-22 garden revision: midpoint rose-magenta marker #cf4a6b; majority-green
+  interior grounds and explicit rooted/trailing vine construction. Schedule72/19.

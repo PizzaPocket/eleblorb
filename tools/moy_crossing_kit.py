@@ -5,15 +5,15 @@ planning data; it does not replace the runtime builder or certify engineering.
 """
 import math
 from collections import Counter
-from shapely.geometry import Polygon, Point, box
-from shapely.ops import triangulate
+from shapely.geometry import Polygon, Point, box, LineString
+from shapely.ops import triangulate, unary_union
 
 
 def build_crossing_kit(crossing, escalators, platforms):
     C=crossing; D=C['dome']; L=D['lattice']; base=D['base']; R=D['drum']['half']; n=D['drum']['n']; dh=D['drum']['h']; ch=D['cupola']['h']
     kit=dict(version=2,datum=-60.0,printed_marks=False,
-        palette=dict(marker='#d8143a',steel='#eeeae1',bronze='#927349',glass='#b8d9dc',timber='#c5b691',
-                     stone='#c9c7bc',rail='#687b7e',soil='#77715b',leaf='#748a55',flower='#b86c87',ground='#b6b29b'),
+        palette=dict(marker='#cf4a6b',steel='#eeeae1',bronze='#927349',glass='#b8d9dc',timber='#c5b691',
+                     stone='#c9c7bc',rail='#687b7e',soil='#77715b',leaf='#748a55',flower='#b88c9d',lawn='#9aaa7b',garden='#87976a',ground='#b6b29b'),
         frame=dict(width=L['member'],depth=0.18,n=5.5,fillet=0.006,glass_setback=0.035,
             rule='continuous constant-section profiles, welded flush common-node patches; no six-sided cylinders, capsule ends, ball hubs or overlapping loose struts'),
         references=[dict(name='Queen Elizabeth II Great Court',use='primary: triangulated white steel gridshell and coordinated glass/node geometry'),
@@ -22,7 +22,7 @@ def build_crossing_kit(crossing, escalators, platforms):
         lift_stops=[0.0,14.2,37.0,base],lift_cabin=(2.0,2.4),
         notes='P7 finishes the existing Crossing; no street, track, platform, clock-face or tower relocation')
     kit['clock_mount']=dict(radius=8.0, collar_depth=0.3, rule='glass and lattice terminate at outer fixed bezel; opaque clock assembly spans to inner open eye; no glazing behind rotating rings')
-    kit['clock_markers']=dict(hour=dict(outline=[[-.62,3.12],[.62,3.12],[.62,4.0],[0,4.88],[-.62,4.0]],shape='broad rectangular base and triangular point'),minute=dict(outline=[[-.35,5.12],[.35,5.12],[0,6.88]],shape='slender triangle'),color='#d8143a')
+    kit['clock_markers']=dict(hour=dict(outline=[[-.62,3.12],[.62,3.12],[.62,4.0],[0,4.88],[-.62,4.0]],shape='broad rectangular base and triangular point'),minute=dict(outline=[[-.35,5.12],[.35,5.12],[0,6.88]],shape='slender triangle'),color='#cf4a6b')
     P=[]; J=[]
     def part(id,where,shape,semi,col,role='mass',**kw):
         row=dict(id=id,where=where,shape=shape,semi=semi,col=col,role=role)
@@ -91,6 +91,8 @@ def build_crossing_kit(crossing, escalators, platforms):
     part('bench_seat','seating beside wells and along ring, clear of paths','egg',(1.1,0.09,0.3),'solid',eps=(3.0,3.0))
     part('bench_leg','flat-capped supports to bench underside','clipped',(0.1,0.195,0.22),'solid','post',join='furniture_bearing')
     part('planter','physical planters at recorded gallery, ring and room locations','egg',('W/2','H/2','D/2'),'solid')
+    part('lawn_surface','flush polygonal lawn/garden ground from kit.interior_garden, no rounded gaps at path edges','profile',('patchW/2',0.01,'patchD/2'),'decorative',n=2.0)
+    part('vine_stem','thin branching climbing and pendant stems on actual support mesh; no green sheet','profile',(0.018,0.018,'run/2'),'decorative',n=2.0)
     part('soil','soil seated inside planter rim','profile',('W/2',0.03,'D/2'),'solid')
     part('tree_trunk','shared NatureProps ghaf, substantial trunk physical','profile',('sharedR','sharedH/2','sharedR'),'solid')
     part('plant_canopy','shared desert planting/vines, tips explicitly decorative','egg',('R','H/2','R'),'decorative',eps=(3.0,3.0))
@@ -119,16 +121,14 @@ def build_crossing_kit(crossing, escalators, platforms):
     join('clock_turn','placed',['clock_hour','clock_minute','clock_bezel','clock_arrow','clock_tick','eye_sleeve'],'four cardinal clock planes, centre50.1','rotation about common centre, shared game time, no seconds bead or printed numerals')
     join('furniture_bearing','seated',['bench_seat','bench_leg','planter','soil','tree_trunk','desk','fountain','waste_bin'],'actual floor/terrain top','supports meet physical ground; maintain2 m public route and landing clearance')
     join('kiosk_opening','punched',['kiosk_shell','kiosk_counter'],'rounded shop opening over counter','sealed service shell at L4, no unstaffed mechanic or invented sign text')
+    join('vine_training','chain',['vine_stem','plant_canopy','mesh_sleeve','planter','soil'],'tower mesh and gallery planter rims, source climber bands','root stems in planters, train upward on mesh; pendant tips descend from rims; maintain openings; foliage never a solid green wall')
     kit['parts']=P; kit['joins']=J
     kit['lift_serving']=[]
     for x in D['room']['lifts']:
         dx,dz=C['c'][0]-x['c'][0],C['c'][1]-x['c'][1];dist=math.hypot(dx,dz);u=(dx/dist,dz/dist)
         kit['lift_serving'].append(dict(tower=x['tower'],stops=x['stops'],c=x['c'],toward=u,
             call=(round(x['c'][0]+u[0]*3.0,4),round(x['c'][1]+u[1]*3.0,4)),apron=(1.3,3.8),width=2.4))
-    kit['garden_beds']=[dict(c=(sx*14.0,base,sz*6.0),size=(3.2,.6,1.4),plants='desert grasses and low flowering shrubs',canopy_height=1.0) for sx in (-1,1) for sz in (-1,1)]
-    # Beds stay away from diagonal arrival wells and central compass rose.
-    for bed in kit['garden_beds']:
-        x,y,z=bed['c'];assert abs(x)+bed['size'][0]/2<18 and abs(z)+bed['size'][2]/2<8
+    kit['garden_beds']=[] # Superseded by the continuous park-ground plan below.
     kit['furniture']=[]
     for bearing in (45,135,225,315):
         a=math.radians(bearing)
@@ -171,6 +171,32 @@ def build_crossing_kit(crossing, escalators, platforms):
     for bearing in (45,135,225,315):
         a=math.radians(bearing);ids=[i for i in kit['grid']['rows'][1] if i>=0];i=min(ids,key=lambda i:abs(math.atan2(math.sin(math.atan2(kit['grid']['nodes'][i][2],kit['grid']['nodes'][i][0])-a),math.cos(math.atan2(kit['grid']['nodes'][i][2],kit['grid']['nodes'][i][0])-a))))
         x,y,z=kit['grid']['nodes'][i];r=math.hypot(x,z);kit['furniture'].append(dict(kind='light',c=(x*(r-.12)/r,y,z*(r-.12)/r),bearing=bearing))
+    # Garden first: subtract a connected circulation network and real openings.
+    floor=Polygon([(R*math.copysign(abs(math.cos(a))**(2/n),math.cos(a)),R*math.copysign(abs(math.sin(a))**(2/n),math.sin(a))) for a in [i*math.tau/128 for i in range(128)]]).buffer(-.24)
+    voids=[]; routes=[Point(0,0).buffer(4.6,quad_segs=32),Point(0,0).buffer(18.3,quad_segs=64).boundary.buffer(1.1),LineString([(-19,0),(19,0)]).buffer(1.4),LineString([(0,-19),(0,19)]).buffer(1.4)]
+    for arrival in D['room']['arrivals']:
+        w=arrival['well'];voids.append(box(w[0]-C['c'][0],w[1]-C['c'][1],w[2]-C['c'][0],w[3]-C['c'][1]))
+        r=arrival['arrive'];landing=box(r[0]-C['c'][0],r[1]-C['c'][1],r[2]-C['c'][0],r[3]-C['c'][1]);routes.append(landing.buffer(.35))
+        x=(r[0]+r[2])/2-C['c'][0];z=(r[1]+r[3])/2-C['c'][1];routes.append(LineString([(x,z),(0,z)]).buffer(1.1))
+    for lift in kit['lift_serving']:
+        x,z=lift['c'][0]-C['c'][0],lift['c'][1]-C['c'][1];voids.append(Point(x,z).buffer(2.05))
+        length=math.hypot(x,z);routes.append(LineString([(0,0),(x*18.3/length,z*18.3/length)]).buffer(1.3))
+    for item in kit['furniture']:
+        if item['c'][1]!=base:continue
+        x,y,z=item['c'];routes.append(Point(x,z).buffer(1.8))
+    void=unary_union(voids);usable=floor.difference(void);path=unary_union(routes).intersection(usable);green=usable.difference(path)
+    assert path.geom_type=='Polygon','paved routes disconnected'
+    assert green.intersection(path).area<1e-6
+    assert green.area/usable.area>.4,('too little interior garden',green.area/usable.area)
+    def patches(shape):
+        return [dict(outer=list(p.exterior.coords)[:-1],holes=[list(h.coords)[:-1] for h in p.interiors]) for p in ([shape] if shape.geom_type=='Polygon' else shape.geoms) if p.area>.01]
+    lawn=green.buffer(-.65);beds=green.difference(lawn)
+    shrubs=[]
+    for x in range(-18,19,2):
+        for z in range(-18,19,2):
+            if beds.buffer(-.22).contains(Point(x,z)):shrubs.append((x,base,z))
+    kit['interior_garden']=dict(lawn=patches(lawn),beds=patches(beds),paths=patches(path),green_fraction=round(green.area/usable.area,4),green_area=round(green.area,2),usable_area=round(usable.area,2),shrubs=shrubs,path_min_width=2.2,soil_depth=.18,rule='park grounds with flush lawn, planted borders and connected paved walks; root/drainage build-up inside existing roof depth; preserve all openings, landings and headroom')
+    kit['vines']=dict(species=['coral vine','bougainvillea'],stem_radius=.018,leaf_length=.22,cluster_spacing=.65,pendant_length=1.4,rule='rooted climbers trained up stainless mesh; loose branching pendant tips from gallery planters; irregular leaves with visible gaps, never opaque panels or floating green ribbons')
     kit['checks']=dict(parts=len(P),joins=len(J),grid=kit['grid']['counts'],boundary_loops=6,euler=-4,public_ring_clear=True)
     return kit
 

@@ -379,7 +379,7 @@ the user's Great Court, Cloud Forest and Flower Dome reference direction.
   welded flush node patches, one pane/node graph for glass and steel. Visible
   dome frame width0.07, radial depth0.18,6 mm weld fillet. Natural circular
   outlines remain circles; the profile exponent describes the member section.
-  P7 binds 70 part templates and 18 joins, including props and landscaping.
+  P7 binds 72 part templates and 19 joins, including props and landscaping.
 - **Hierarchy:** four garden towers carry the station; the clear dome crowns
   it; ring clocks and the bell give the Clock Room its identity. Furniture
   stays secondary and outside the public route/arrival clearances.
@@ -395,6 +395,10 @@ solids: the incident profiles become one continuous surface with small
 fillets and flush boundaries. Batching disconnected meshes does not satisfy it.
 
 P7 refinement (2026-10-22): glass/frame meet the outer clock bezel; the inner
-eye stays open. Magenta `#d8143a` markers use a broad shouldered hour silhouette
-and a slender minute triangle. Four planned interior garden beds extend the
-park into the Clock Room while preserving the central and arrival routes.
+eye stays open. Magenta `#cf4a6b` markers use a broad shouldered hour silhouette
+and a slender minute triangle. A majority-green interior garden with paved circulation extends the park
+into the Clock Room while preserving the central and arrival routes.
+
+P7 garden refinement (2026-10-22): roughly53% green interior grounds with
+paved circulation, midpoint rose-magenta markers, and explicit rooted climbing
+vines with pendant tips. Model includes garden-plan and vine close-up views.
