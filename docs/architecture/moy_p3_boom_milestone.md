@@ -70,13 +70,13 @@ variant or P4. No model changes, new chats or archives.
 - Build chat: Luna Build Moy P3 and p4
 - Build thread: 01a153b7-0f75-7871-9324-bdd8efef7e6c (local).
 - Automation: moy-p3-p4-review-fix-loop (reuse existing heartbeat).
-- State: initial submission authorized; dispatch after this checkpoint.
-- Fix submissions dispatched: 0 / 2.
-- Last reviewed submission: none for this milestone.
+- State: initial submission reviewed: fix. First focused fix authorized for dispatch after this review checkpoint.
+- Fix submissions allocated: 1 / 2 (first fix dispatch follows this checkpoint; do not duplicate).
+- Last reviewed submission: initial turn 01a15ba4-4b34-75d3-a186-2795b1592ca3; completed, stopped editing; result fix.
 - Prior baseline: final P3/P4 review commit 66c99f8, builder SHA-256
   5af1395374f6e414b90631d3cb0c05e813827e9cfc331dc07db754d8a268517b,
   bake manifest d28fd5d1ba31f4b6a101274f91b3832069e1b44ebf756c5caf90833f66b0a816.
-- Latest observed build cursor: 7a55a42b-a1c8-42f5-878b-cbca088e7147:2.
+- Latest observed build cursor: 7a55a42b-a1c8-42f5-878b-cbca088e7147:5.
 
 Update this state only on dispatch, submission review or a meaningful blocker;
 never commit status-only polling. Record reviewed source/evidence hashes and
@@ -91,3 +91,57 @@ new handoff or resolve a real blocker. Keep prompts specific and refer to this
 file; do not resend the full history. One evidence bundle and one review per
 submission. These are operational bounds, not a guaranteed token saving or a
 hard account-token cap.
+
+## Initial milestone review — 2026-10-21: fix
+
+Reviewed stable turn 01a15ba4-4b34-75d3-a186-2795b1592ca3. Submission:
+`../diagnostics/2026-10-21-moy-P3-second-third-review-fixes.md`, its P3
+boom76 JSON/CSV, route JSON, audit, capture manifest and four noon GPU images. Scope drifted back
+to broad P3/P4/P2 work; that is not evidence of completing this milestone.
+No P4 acceptance review or additional implementation scope is opened here.
+
+Independently verified the current 260-pack bake and matching sample/route
+hashes. Builder: `eb946665d73b2ae5183ed6507c9acc58e130ac8a3b895c2c69fef18f112b2fb3`.
+Manifest: `1105225cecff972e110937257aded41405576e3d58dbb01852f39c27e1496c04`.
+Plan remains `5705a10f92e26fc2d51227aec025cbccf41c4095fd93a6b48e9587b4f50c4938`.
+Saved sample contains the v5 grammar and MarketHouse_076. Source and saved
+ledger contain facade, veranda, tank and coping pieces; presence is credited
+without claiming their fit is accepted. Sample reports 213 records, zero
+failures; its assertion names add no new representative fit criterion over
+the prior evidence. The diagnostic confusingly describes this boom76 sample
+as a Market Flats check; correct the scope in the next focused diagnostic.
+
+Acceptance gaps and first-fix instructions:
+
+1. Reconcile the applicable part/join ledger with the actual variant and saved
+   geometry. The parts CSV excludes `canopy`, but source/saved scene contain
+   `ShopCanopy` and the `party_cut` join row cites it. Resolve applicability
+   from the binding plan/brief, then fix construction or ledger accordingly.
+   Replace all 11 `geometry_present_check_fit_separately` join statuses with
+   measured fit results and actual geometry/collision paths. N/A needs a
+   concrete plan-field reason; do not convert missing work to exclusions.
+2. Finish and verify physical construction revealed by those measurements,
+   including band/corner fit, return guards, door/window/shutter clearances,
+   seats and supporting surfaces. Counts and names alone cannot pass it.
+   Reuse current tools; no new general validation framework.
+3. Provide readable GPU views specifically of house076 with immediate city
+   neighbours, front/roof and both sides of relevant joins. Actual overview
+   images remain obstructed and the other cameras target arcade/Lamp Lane,
+   not this representative. Their exact-cell metadata does not establish
+   subject/neighbor construction or fit. Capture provenance must include
+   builder, plan and bake hashes, not just runner/generator hashes.
+4. Verify hero/Xiao access and stationary support on this representative's
+   changed deliberate landings. The 12 recorded P3 routes visit LOT34/71 and
+   the shop, not076. Do not rerun those or P4's 72 routes. Supply a scoped
+   owner/neighbor audit with source/bake provenance and explain remaining
+   relevant findings. The broad P3 audit has 146 blocking findings and three
+   nonblocking guard findings naming076; neither proves matched local
+   closure. Inspect those three guard locations rather than clearing them
+   because the suite marks them nonblocking.
+
+No full P0, P4, P2, other-owner work or broad named-view capture batch in the
+fix round. Deliver changed construction and the four scoped evidence items
+in one short new diagnostic, then stop editing. If the scope drifts again or
+there is no substantive milestone progress, pause instead of spending the
+second fix allocation. A genuine capture/engine blocker should be reported
+with exact evidence and stopped, not turned into a new tooling project.

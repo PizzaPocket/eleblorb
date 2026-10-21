@@ -884,6 +884,18 @@ broad validation round. City-wide P2 optimization and final performance
 acceptance remain deferred. The implementation working tree is preserved;
 this checkpoint commits review documents only.
 
+## Bounded boom-house initial review — 2026-10-21: fix
+
+The initial milestone handoff (turn 01a15ba4-4b34-75d3-a186-2795b1592ca3)
+is reviewed in `moy_p3_boom_milestone.md`. Fresh 260-pack bake and matching
+sample/route hashes are credited. The 213-record sample, 12 unrelated local
+routes and obstructed district images do not accept MarketHouse_076's fits,
+landings or city-context appearance. Reconcile the canopy applicability
+contradiction, replace geometry-presence join rows with measured fits,
+provide076-specific GPU/physics evidence and a current owned local audit.
+One focused fix round is allocated; P4/P2 and full-area reruns stay excluded.
+Package P3 remains fix at its unchanged full L2 criteria.
+
 ## Decisions log
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
