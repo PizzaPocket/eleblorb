@@ -42,6 +42,9 @@ main is a planning integration base, not a replacement for that working tree.
 P5 has an accepted practical L2 review. The user reports P6 built; its local
 completion source/report must be recorded at handoff (not found on published
 main during the planner check). Old review/fix automation stays paused.
+P6 local report is available at `docs/diagnostics/2026-10-22-moy-P6.md`;
+its known hotel-side ingress blocker remains open. The latest local415-pack
+bake and final superellipse-deck correction are preserved in a verified snapshot.
 
 ## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
 
@@ -176,7 +179,7 @@ diagnostic replaces this column.
 | P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **built — practical milestone** (user approved moving on2026-10-22; source/bake/evidence recovery checkpoint saved; streaming/walkthrough/polish follow-ups retained; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P3.md` |
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **built — practical milestone** (user approved moving on2026-10-22;386-pack integrated bake current; remaining cold-start checks/polish carried forward, not certified all-green; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L2 | L2 | **accepted — practical L2** (sense-check2026-10-22; recognizable district and public circulation, independent12/12 civic/276 landing checks; cold activation remains follow-up; `moy_P5_review_2026-10-22.md`) | `moy_pkg_P5.md` |
-| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | user reports built | L2 | **user-reported built; checkpoint pending** (2026-10-22: preserve current implementation checkout; published main has no P6 completion report yet) | `moy_pkg_P6.md` |
+| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L2 | L2 | **built — review; hotel connection blocked** (2026-10-22; ten sites/three tower exteriors; unchanged hotel wing obstructs ingress; `docs/diagnostics/2026-10-22-moy-P6.md`) | `moy_pkg_P6.md` |
 | P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L3 build; L4 final | **ready — first in P7–P9 handoff** (72 parts/19 joins; detailed scene shared by both models; focused practical construction checks) | `moy_pkg_P7.md` |
 | P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready after P7, with P9** (2026-10-22: one integrated build;41 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
 | P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **ready after P7, with P8** (2026-10-22:30 parts/12 joins; shared park entry and model; practical play build) | `moy_pkg_P9.md` |
@@ -312,3 +315,9 @@ separate park handoff. The complete P7 scene is shared by the standalone and
 integrated models via `docs/drawings/moy_crossing_scene.js`; no simplified
 station alternative remains. The dry garden has curved footprints and a worn
 trail. Keep the live P5/P6 working tree when opening the fresh builder chat.
+
+P7–P9 pull/sense-check2026-10-22: latest planner main `fdbd6545` integrated
+without replacing the newer local P3–P6 packs. Combined browser model loads,
+canonical Crossing parity and merged plan validation pass. Ready for sequential
+P7 then P8/P9 implementation; no construction acceptance or new builder launch
+claimed. Recovery and checks: `moy_p7_p8_p9_pull_review_2026-10-22.md`.
