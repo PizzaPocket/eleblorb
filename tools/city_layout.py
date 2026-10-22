@@ -499,7 +499,7 @@ STOREY={'fabric':3.25,'midrise':3.6}
 ## (revised 2026-10-16) The park is shared: the Crossing, the city's station, at
 ## its centre where the two lines cross; the giant playground moved whole to the
 ## south-east quarter at 0.55 scale; the dry garden, the pond, the green and the
-## tea house's parasols round them; the four wind trees stand round the station.
+## tea house's parasols round them; the approved real shade trees serve the park.
 PG_C=(-515,31); PG_K=0.55
 def _pg(x,z): return (round(PG_C[0]+(x+560)*PG_K,2),round(PG_C[1]+z*PG_K,2))
 PARK={
@@ -4146,7 +4146,12 @@ _p6_site_checks()
 
 # P7: complete Crossing kit and exact shared dome topology (planning only).
 from moy_crossing_kit import build_crossing_kit
+from moy_park_kit import build_park_kit, build_playground_kit
 CROSSING['kit']=build_crossing_kit(CROSSING,ESCALATORS,PLATFORMS)
+PARK['kit']=build_park_kit(PARK,CROSSING,B)
+PARK['playground']['kit']=build_playground_kit(PARK,CROSSING)
+parts_checks('Park',PARK['kit']['parts'],PARK['kit']['joins'])
+parts_checks('Playground',PARK['playground']['kit']['parts'],PARK['playground']['kit']['joins'])
 parts_checks('Crossing',CROSSING['kit']['parts'],CROSSING['kit']['joins'])
 if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
     problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))

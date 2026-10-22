@@ -402,3 +402,28 @@ into the Clock Room while preserving the central and arrival routes.
 P7 garden refinement (2026-10-22): roughly53% green interior grounds with
 paved circulation, midpoint rose-magenta markers, and explicit rooted climbing
 vines with pendant tips. Model includes garden-plan and vine close-up views.
+
+## Moy park and giant playground — P8/P9
+
+2026-10-22. Consolidates the existing approved city.md7a/7b program; one
+integrated park construction pass requested by the user.
+
+- Primary,75%: the Persian four-quarter civic garden translated to desert
+  shade and walking axes: dry gravel/rock/agave, working reed water, tea/chess
+  shade and the one picnic lawn. Fixed sites,23 real shared-kit trees.
+- Secondary,20%: tropical civic timber parasols and low boardwalks; the
+  existing Singapore planted-infrastructure context belongs to P7.
+- Accent,5%: one sculpted ochre/terracotta canyon playground, muted teal net
+  and rose slides. Monstrum/Hakone inform play composition and knitted-net
+  detail; no imported dragon/castle sculpture or extra thematic building kit.
+- Shapes: structural profile5.5, soft furniture/terrain3, natural/circular2–3.
+  Constant-section sweeps with shared planar bearings; no pointed stretched
+  eggs, capsule-chain beams, capped slide mouths or solid hoop centres.
+- Palette: pale stone, sand/gravel, sun-aged timber, ghaf foliage and muted
+  flame-tree flowers, translucent shared pond water; warm play shells and
+  restrained nets/slides. No printed words, letters, numerals or mechanic signs.
+- Coverage: P8 40 parts/12 joins, P9 30/12 in checked plan data. Practical
+  reusable village geometry is preferred over new procedural frameworks.
+- Exclusions: steel wind trees (superseded), new lawns in the dry garden,
+  opulent fountains, opaque water, floating reeds, unsupported roofs/slides,
+  net-shaped solid walls, traffic barriers across the shared park entrance.
