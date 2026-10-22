@@ -32,8 +32,11 @@ def build_park_kit(park,crossing,buildings):
     P=park;pg=P['playground'];cx,cz=pg['c'];pr=box(*P['rect']);pond=P['pond'];water=scale(Point(pond['c']).buffer(1,quad_segs=48),*pond['r']);bank=scale(Point(pond['c']).buffer(1,quad_segs=48),pond['r'][0]*pond['bank_top'],pond['r'][1]*pond['bank_top'])
     byid={b['n']:b for b in buildings};houses={str(n):dict(rect=byid[n]['r'],height=4.,door=(byid[n]['r'][2],(byid[n]['r'][1]+byid[n]['r'][3])/2),private='rear keeper/service room; existing upper-flat program remains reserved, no new storey in this pass') for n in (9,10)}
     # Public walking comes from the civic axes, not a separate playground island.
-    route_lines=[dict(id='tea_loop',pts=[(-592,0),(-592,42),(-604,42),(-604,30),(-600,30)],w=2.4),dict(id='tea_door',pts=[(-604,30),(-592,30)],w=2.4),dict(id='dry_approach',pts=[(-608,0),(-608,-8)],w=2.4),dict(id='pond_west',pts=[(-541,0),(-541,-7),(-536,-20)],w=2.4),dict(id='pond_east',pts=[(-496,-20),(-496,0)],w=2.4),dict(id='lawn_lodge',pts=[(-533,0),(-533,20),(-553,20),(-553,40),(-540,40),(-540,45),(-542,45)],w=2.4),dict(id='play_entry',pts=[(-533,20),(-533,31),(-525.8,31)],w=2.4)]
-    boardwalk=dict(id='pond_walk',pts=[(-536,-20),(-496,-20)],width=2.4,y=.18,depth=.18,rail=1.1,bay=4.,rule='continuous low bridge, open abutments and guarded long edges; no pier through a walking line')
+    route_lines=[dict(id='tea_loop',pts=[(-592,0),(-592,42),(-604,42),(-604,30),(-600,30)],w=2.4),dict(id='tea_door',pts=[(-604,30),(-592,30)],w=2.4),dict(id='dry_approach',pts=[(-608,0),(-608,-8)],w=2.4),dict(id='pond_west',pts=[(-541,0),(-541,-7),(-534,-20)],w=2.4),dict(id='pond_east',pts=[(-498,-20),(-496.5,-18),(-496.5,0)],w=2.4),dict(id='lawn_lodge',pts=[(-533,0),(-533,20),(-553,20),(-553,40),(-540,40),(-540,45),(-542,45)],w=2.4),dict(id='play_entry',pts=[(-533,20),(-533,31),(-525.8,31)],w=2.4)]
+    boardwalk=dict(id='pond_arch',pts=[(-534,-20),(-498,-20)],width=2.4,structural_width=2.8,y=.08,rise=1.6,depth=.26,rail=1.1,bays=3,arch_drop=1.1,arch_rise=.3,pier_width=.7,reference='scripts/chinese_village_plan_builder.gd: bridge_height and _build_stone_arch_bridge',rule='three visible stone arch barrels and two bed-founded piers carry a gently humped deck; sin-squared rise gives level ends; stone balustrade follows deck, no stairs or roof')
+    assert pr.buffer(-2).covers(bank),'pond outer bank breaches2m park buffer'
+    bank_clearance=pr.boundary.distance(bank)
+    assert pr.covers(LineString(boardwalk['pts']).buffer(1.7,cap_style=3)),'bridge/abutments leave park'
     paths=unary_union([box(*r) for r in P['walks']]+[LineString(r['pts']).buffer(r['w']/2,cap_style=2,join_style=1) for r in route_lines])
     footprints=[box(*byid[n]['r']) for n in (9,10)];towerholes=unary_union([Point(t['c']).buffer(crossing['tower']['drum']) for t in crossing['towers']])
     paths=paths.intersection(pr).difference(bank).difference(towerholes).difference(unary_union(footprints))
@@ -51,12 +54,16 @@ def build_park_kit(park,crossing,buildings):
     land=pr.difference(bank).difference(towerholes).difference(unary_union(footprints))
     track=Point(pg['c']).buffer(pg['track'][1],quad_segs=64)
     soil=land.difference(paths).difference(box(*P['lawn'])).difference(track)
+    green=land.difference(paths).difference(box(*P['dry_garden'])).difference(track)
+    rain=unary_union([Point(g['c']).buffer(g['r']) for g in crossing.get('rain_gardens',[])])
+    green=green.difference(rain)
+    dry_ground=soil.difference(green)
     A,J,p,j=_schedule()
     for args in [
         ('ground','earth and terrain excluding pond basin and built sockets','facet',('patchW/2',.1,'patchD/2'),'landing','floor'),
         ('path','connected pale paving, flat top +0.08','profile',('patchW/2',.04,'patchD/2'),'landing','floor'),
         ('gravel','dry garden and unwatered soil grounds','profile',('patchW/2',.02,'patchD/2'),'decorative','mass'),
-        ('lawn','existing single irrigated picnic lawn, flush edging','profile',(8,.02,8),'decorative','mass'),
+        ('lawn','broad connected park lawn patches from kit.lawns, flush paths; retains original picnic lawn','profile',('patchW/2',.02,'patchD/2'),'decorative','mass'),
         ('bed_edge','low rounded garden edging, no kerb across paths','profile',(.08,.12,'run/2'),'solid','rail'),
         ('soil','planted soil surface inside bed edge','profile',('W/2',.03,'D/2'),'decorative','mass'),
         ('rock','existing boulder and bank-stone extents from PARK.rocks','egg',('rx','ry','rz'),'solid','mass'),
@@ -66,12 +73,13 @@ def build_park_kit(park,crossing,buildings):
         ('reed','shared reed clumps rooted at actual shelf heights','profile',(.035,'H/2',.035),'decorative','mass'),
         ('agave','shared thick natural blades, no pinched tips','egg',(.12,.75,.2),'decorative','mass'),
         ('pond_bed','continuous shared source radial shelves; no invisible paving cap','facet',('rx',1.05,'rz'),'landing','floor'),
-        ('water','shared translucent VillageWorks water at -0.3','profile',(19,.001,13),'open','mass'),
-        ('board_deck','2.4m clear pond boardwalk, top+0.18','profile',(1.2,.09,'bay/2'),'landing','floor'),
-        ('board_pier','low bridge supports to actual bed, no unsupported deck','clipped',(.13,'H/2',.13),'solid','post'),
-        ('board_girder','continuous twin timber beams under deck','clipped',(.12,.16,'run/2'),'solid','beam'),
+        ('water','shared translucent VillageWorks water at -0.3','profile',(16.5,.001,13),'open','mass'),
+        ('board_deck','2.4m clear arched stone deck, ends+0.08 and crest+1.68','profile',(1.4,.13,'stripL/2'),'landing','floor'),
+        ('board_pier','two stone arch piers embedded into actual pond bed','clipped',(.35,'H/2',1.4),'solid','post'),
+        ('bridge_arch','three continuous stone arch barrels, shared extrados/intrados cuts','profile',('bay/2','archH/2',1.4),'solid','beam'),
+        ('bridge_abutment','two bank-founded stone abutments, level entry through centres','clipped',(1.2,.4,1.7),'solid','post'),
         ('guard_post','1.1m guards at pond bridge edges','clipped',(.045,.55,.045),'solid','post'),
-        ('guard_rail','continuous rounded-square timber rails','profile',(.045,.045,'run/2'),'solid','rail'),
+        ('guard_rail','continuous stone coping over open balustrade','profile',(.045,.045,'run/2'),'solid','rail'),
         ('parasol_stem','six fixed timber parasol columns to canopy bearing','clipped',(.18,2.1,.18),'solid','post'),
         ('parasol_arm','radial timber branches under roof','clipped',(.1,.12,'L/2'),'solid','beam'),
         ('parasol_roof','broad shallow rounded canopy, radii4.2 and height0.65','egg',(4.2,.325,4.2),'solid','mass'),
@@ -98,7 +106,7 @@ def build_park_kit(park,crossing,buildings):
     j('ground_cut','punched',['ground','pond_bed','path','tea_plinth'],'pond bed, tower drums and building sockets','one physical standing surface per location; clockwise up-facing fronts')
     j('path_seam','meet',['path','gravel','lawn','bed_edge'],'same ground datum and exact patch boundaries','flush edges, no grass/paving overlaps or path kerbs')
     j('pond_bank','chain',['pond_bed','water','reed','rock'],'source bed and waterline','bed/ground meet at bank_top1.15; water -0.3; water hazard uses actual depth queries')
-    j('bridge_bearing','seated',['board_deck','board_girder','board_pier'],'deck underside and actual bed','piers reach embed below bed; girder tops meet deck underside')
+    j('bridge_bearing','seated',['board_deck','bridge_arch','board_pier','bridge_abutment'],'curved deck underside, arch extrados and actual bed/bank','three stone barrels meet deck; two piers embedded below bed; abutments anchored inside park; no floating arch decoration')
     j('bridge_guard','chain',['board_deck','guard_post','guard_rail'],'bridge sides only','guards continuous1.1 above deck, openings at both landings')
     j('parasol_bearing','seated',['parasol_stem','parasol_arm','parasol_roof'],'canopy underside+4.2','arms seated at common stem; shared roof curve, no loose caps')
     j('furniture','seated',['bench_seat','bench_leg','chess_top','chess_base','chess_stool','bin'],'actual floor/ground','legs meet seats and ground; maintain route clearances')
@@ -107,7 +115,7 @@ def build_park_kit(park,crossing,buildings):
     j('tea_opening','punched',['tea_wall','door_trim','tea_counter'],'east public threshold, rear service partition','one real2 by2.5 opening, clearance2m both sides, no hidden wall collider')
     j('lodge_opening','punched',['lodge_shell','lodge_door'],'locked building10 east service threshold','guard private service, no speculative interior or sign text')
     j('drainage','meet',['drain','pond_bed','path'],'pond shelf and path margins','no open trench across route; splash recirculation separate from pond swimming water')
-    return dict(version=1,datum=-60,parts=A,joins=J,palette=dict(stone='#d2c7ac',sand='#cbb790',gravel='#aa9c81',lawn='#94a575',leaf='#788c63',bloom='#b7868d',timber='#b39c75',steel='#78878a',water='#8ab6b2',ochre='#d6b275',terracotta='#b97f68',net='#688f92',slide='#bc8b9c',rubber='#b5b39a',soil='#8e836b'),routes=route_lines,paths=_polys(paths),dry_ground=_polys(soil),boardwalk=boardwalk,benches=benches,chess=chess,houses=houses,parasol=dict(radius=4.2,underside=4.2,height=.65),excluded_shrubs=[q for q in P['shrubs'] if paths.distance(Point(q))<1.2],checks=dict(paths_connected=True,tree_trunks_clear=True,parts=len(A),joins=len(J)),ownership='P8 park grounds, boardwalk, parasols, furniture and simple public tea house; P9 playground inside pump-track rim; P7 structures unchanged')
+    return dict(version=1,datum=-60,parts=A,joins=J,palette=dict(bridge_stone='#aaa99c',stone='#d2c7ac',sand='#cbb790',gravel='#aa9c81',lawn='#94a575',leaf='#788c63',bloom='#b7868d',timber='#b39c75',steel='#78878a',water='#8ab6b2',ochre='#d6b275',terracotta='#b97f68',net='#688f92',slide='#bc8b9c',rubber='#b5b39a',soil='#8e836b'),routes=route_lines,paths=_polys(paths),dry_ground=_polys(dry_ground),lawns=_polys(green),green_area=round(green.area,2),boardwalk=boardwalk,benches=benches,chess=chess,houses=houses,parasol=dict(radius=4.2,underside=4.2,height=.65),excluded_shrubs=[q for q in P['shrubs'] if paths.distance(Point(q))<1.2],checks=dict(paths_connected=True,tree_trunks_clear=True,pond_bank_clearance=round(bank_clearance,3),bridge_max_grade=round(math.degrees(math.atan(math.pi*boardwalk['rise']/36)),2),parts=len(A),joins=len(J)),ownership='P8 park grounds, boardwalk, parasols, furniture and simple public tea house; P9 playground inside pump-track rim; P7 structures unchanged')
 
 
 def build_playground_kit(park,crossing):

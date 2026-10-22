@@ -10,7 +10,7 @@
   tracked in the roadmap. Do not turn this into a precision-certification loop.
 - Model: `docs/drawings/moy_park_playground_3d.html`, shared with P9. Local
   checked-in model and references; external publication pending.
-- Design source: `CityPlan.PARK.kit`,40 part templates/12 joins, plus original
+- Design source: `CityPlan.PARK.kit`,41 part templates/12 joins, plus original
   PARK positions, pond profile and NatureProps proportions. Never hand-edit
   `scripts/city_plan.gd`.
 
@@ -38,7 +38,8 @@ existing people/interactions working; no new NPC simulation, chess UI or dialogu
 
 Use the existing desert palette: dry gravel, agave/boulders and date palms,
 ghaf shade trees, flame trees by the tea terrace, the single banyan by the
-working reed pond, and the existing small irrigated lawn. Existing source trees
+working reed pond, broad maintained grass between activity areas and the
+existing picnic lawn. The northwest dry quarter remains dry. Existing source trees
 replaced the obsolete steel wind trees; do not restore wind-tree sculptures.
 Use shared NatureProps, with layered planting in purposeful clumps and shade
 where people sit. Existing tree/trunk positions and the23-tree schedule stay.
@@ -75,23 +76,49 @@ it with a second full-area slab. Godot clockwise front normals use
 park ground, building floors and pond bed to one physical owner per surface.
 No invisible flat ground cap across the pond, no duplicated raised turf collider,
 no holes around station landings. Grass/gravel dressing rides the one ground.
+User revision2026-10-22: lawns are the dominant ground outside the dry garden,
+pond banks, play surfaces, paths and station rain gardens. Use `kit.lawns`
+for the new green patches; `kit.dry_ground` now preserves only the genuinely
+dry ground. Keep grass flush with paths and the original picnic lawn.
 Use exact land/water/footprint cuts; do not copy the old coarse-grid stair edge.
 
 ## Pond section and boardwalk
 
-The source ellipse is centred(-516,-28), radii19/13. Water stays0.3 m below
-park datum; bank top is1.15 times those radii. Follow the full source bed:
-(1.15,0),(1.0,-0.3),(.86,-.65),(.6,-1.5),(.3,-2.0),(0,-2.1).
-Use VillageWorks' shared two-sided translucent water, hazard metadata, actual
-surface/depth and existing liquid-query integration. Do not create a new water
-shader or collision plane that makes swimming impossible. Keep a usable shallow
-exit; swimming is an optional existing-power use, not a new movement system.
+The revised source ellipse stays centred(-516,-28), with water radii16.5/13
+(previously19/13). Water stays0.3 m below datum and the outer bank remains1.15
+times the radii. The old outer east shore reached-494.15,0.85 m beyond the
+park edge-495. The new east bank stops at-497.025, leaving2.025 m inside.
+`kit.checks.pond_bank_clearance` checks the entire outer bank against a2 m
+inset of the park, not just the water ellipse. Bank, bed, reeds, bank stones,
+water/depth queries and path cuts all derive from this same revised source.
 
-The low boardwalk runs(-536,-20) to(-496,-20),2.4 m clear, top+0.18, deck0.18
-thick, with timber girders and paired piers at4 m bays to the sampled bed.
-Guards1.1 m above the deck along both long edges, open at both level landings.
-No guard across a public entrance, no suspended unsupported bridge and no
-floating reeds or stones. Water must be visible below and through the banks.
+Follow the source bed fractions/heights:
+(1.15,0),(1.0,-0.3),(.86,-0.65),(.6,-1.5),(.3,-2.0),(0,-2.1).
+Use VillageWorks' shared two-sided translucent water, hazard metadata and
+actual surface/depth. No invisible ground cap, custom opaque shader or false
+swimming collision plane. Preserve a shallow physical route out of the water.
+
+Replace the flat timber crossing with a **Chinese-garden stone arch bridge**,
+referencing `bridge_height` and `_build_stone_arch_bridge` in
+`scripts/chinese_village_plan_builder.gd`: graceful camber, visible structural
+arch masonry, restrained stone balustrades and shared cut-to-cut blocks.
+No pagoda roof, ornamental theme kit or stairs. It complements the park's
+existing timber parasols without turning the whole park into a Chinese village.
+
+The36 m crossing runs(-534,-20) to(-498,-20),2.4 m clear within a2.8 m deck.
+Top profile is `0.08 + 1.6*sin(pi*t)^2`: level-ended approaches and crest+1.68,
+maximum grade7.95 degrees. The rails follow the same curve1.1 m above deck.
+Three12 m stone arch barrels carry the deck on two bed-founded piers and
+bank-founded end abutments. The checked source records the intrados profile,
+deck0.26, pier0.7 thickness and actual bed embed. Build real structural stone
+between the intrados and deck underside, not an arch-shaped trim on sticks.
+Close side/underside faces, use exact shared bearings and leave arch voids
+open. End abutment tops are flush+0.08 with the land paths, with no curb
+blocking either entrance. Update terrain sockets for footings; guards only
+along sides. Use shared village shapes and reasonable collision simplification.
+
+Both paths now meet the revised bridge ends and stay inside the park. Keep
+all stonework/rails/abutments inside the park as well as the water and bank.
 Model water is indicative; actual game depth/shoreline is the verification.
 
 ## Tea, chess, parasols and lodge
@@ -123,10 +150,10 @@ interior sealed this pass. Its footprint must not consume the lawn-side path.
 
 ## Shape and construction schedule
 
-Use the full40/12 source schedule below as design guidance. It specifies
+Use the full41/12 source schedule below as design guidance. It specifies
 SuperEgg/profile/clip shape, half-sizes, exponents and collision for every
 piece class. Use existing builders and reasonable simplification; no exhaustive
-40-row manufacturing certificate is needed. Major forms, joins, openings and
+41-row manufacturing certificate is needed. Major forms, joins, openings and
 physical support must match. Structural members use exponent5.5, furniture and
 soft ground3, round natural forms2–3. Never use exponents below2 or copy pointed
 browser sampling artifacts. Constant-section beams have flat seated/shared cuts.
@@ -164,6 +191,9 @@ Do not mark runtime L4 solely from a browser model or planning checks.
 
 ## Decisions and handoff
 
+2026-10-22 revision: user requested a Chinese-garden arched bridge and checked
+pond containment; broad lawns supersede the earlier sparse-grass layout.
+
 2026-10-22: user explicitly requested P8/P9 together because the park is
 integrated. This authorizes one combined construction pass within this area;
 retain separate package IDs and schedules for review. No new lore introduced.
@@ -174,17 +204,18 @@ connected park at practical village quality, run focused checks, report and push
 
 Planning evidence: `docs/diagnostics/2026-10-22-moy-P8-P9-planning.md`.
 
+Latest revision evidence: `docs/diagnostics/2026-10-22-moy-P8-arched-bridge.md`.
+
 ## Source parts reference
 
-Half-sizes in metres; symbolic sizes resolve from the named owner/path.
-Shapes use the listed exponents; no cap or rounding may close an opening.
+Half-sizes in metres; symbolic sizes resolve from the checked patch/path.
 
 | ID | Shape and half-sizes | Exponent | Collision | Use |
 |---|---|---|---|---|
 | `ground` | facet · patchW/2 × 0.1 × patchD/2 | cut/facet | landing | earth and terrain excluding pond basin and built sockets |
 | `path` | profile · patchW/2 × 0.04 × patchD/2 | 5.5 | landing | connected pale paving, flat top +0.08 |
 | `gravel` | profile · patchW/2 × 0.02 × patchD/2 | 5.5 | decorative | dry garden and unwatered soil grounds |
-| `lawn` | profile · 8 × 0.02 × 8 | 5.5 | decorative | existing single irrigated picnic lawn, flush edging |
+| `lawn` | profile · patchW/2 × 0.02 × patchD/2 | 5.5 | decorative | broad connected park lawn patches from kit.lawns, flush paths; retains original picnic lawn |
 | `bed_edge` | profile · 0.08 × 0.12 × run/2 | 5.5 | solid | low rounded garden edging, no kerb across paths |
 | `soil` | profile · W/2 × 0.03 × D/2 | 5.5 | decorative | planted soil surface inside bed edge |
 | `rock` | egg · rx × ry × rz | [3.0, 3.0] | solid | existing boulder and bank-stone extents from PARK.rocks |
@@ -194,12 +225,13 @@ Shapes use the listed exponents; no cap or rounding may close an opening.
 | `reed` | profile · 0.035 × H/2 × 0.035 | 2.0 | decorative | shared reed clumps rooted at actual shelf heights |
 | `agave` | egg · 0.12 × 0.75 × 0.2 | [3.0, 3.0] | decorative | shared thick natural blades, no pinched tips |
 | `pond_bed` | facet · rx × 1.05 × rz | cut/facet | landing | continuous shared source radial shelves; no invisible paving cap |
-| `water` | profile · 19 × 0.001 × 13 | 2.0 | open | shared translucent VillageWorks water at -0.3 |
-| `board_deck` | profile · 1.2 × 0.09 × bay/2 | 5.5 | landing | 2.4m clear pond boardwalk, top+0.18 |
-| `board_pier` | clipped · 0.13 × H/2 × 0.13 | [5.5, 5.5] | solid | low bridge supports to actual bed, no unsupported deck |
-| `board_girder` | clipped · 0.12 × 0.16 × run/2 | [5.5, 5.5] | solid | continuous twin timber beams under deck |
+| `water` | profile · 16.5 × 0.001 × 13 | 2.0 | open | shared translucent VillageWorks water at -0.3 |
+| `board_deck` | profile · 1.4 × 0.13 × stripL/2 | 5.5 | landing | 2.4m clear arched stone deck, ends+0.08 and crest+1.68 |
+| `board_pier` | clipped · 0.35 × H/2 × 1.4 | [5.5, 5.5] | solid | two stone arch piers embedded into actual pond bed |
+| `bridge_arch` | profile · bay/2 × archH/2 × 1.4 | 5.5 | solid | three continuous stone arch barrels, shared extrados/intrados cuts |
+| `bridge_abutment` | clipped · 1.2 × 0.4 × 1.7 | [5.5, 5.5] | solid | two bank-founded stone abutments, level entry through centres |
 | `guard_post` | clipped · 0.045 × 0.55 × 0.045 | [5.5, 5.5] | solid | 1.1m guards at pond bridge edges |
-| `guard_rail` | profile · 0.045 × 0.045 × run/2 | 5.5 | solid | continuous rounded-square timber rails |
+| `guard_rail` | profile · 0.045 × 0.045 × run/2 | 5.5 | solid | continuous stone coping over open balustrade |
 | `parasol_stem` | clipped · 0.18 × 2.1 × 0.18 | [5.5, 5.5] | solid | six fixed timber parasol columns to canopy bearing |
 | `parasol_arm` | clipped · 0.1 × 0.12 × L/2 | [5.5, 5.5] | solid | radial timber branches under roof |
 | `parasol_roof` | egg · 4.2 × 0.325 × 4.2 | [3.0, 3.0] | solid | broad shallow rounded canopy, radii4.2 and height0.65 |
@@ -229,7 +261,7 @@ Shapes use the listed exponents; no cap or rounding may close an opening.
 | `ground_cut` | punched | pond bed, tower drums and building sockets | one physical standing surface per location; clockwise up-facing fronts |
 | `path_seam` | meet | same ground datum and exact patch boundaries | flush edges, no grass/paving overlaps or path kerbs |
 | `pond_bank` | chain | source bed and waterline | bed/ground meet at bank_top1.15; water -0.3; water hazard uses actual depth queries |
-| `bridge_bearing` | seated | deck underside and actual bed | piers reach embed below bed; girder tops meet deck underside |
+| `bridge_bearing` | seated | curved deck underside, arch extrados and actual bed/bank | three stone barrels meet deck; two piers embedded below bed; abutments anchored inside park; no floating arch decoration |
 | `bridge_guard` | chain | bridge sides only | guards continuous1.1 above deck, openings at both landings |
 | `parasol_bearing` | seated | canopy underside+4.2 | arms seated at common stem; shared roof curve, no loose caps |
 | `furniture` | seated | actual floor/ground | legs meet seats and ground; maintain route clearances |

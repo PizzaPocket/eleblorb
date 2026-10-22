@@ -175,7 +175,7 @@ diagnostic replaces this column.
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L2 | L2 | **accepted — practical L2** (sense-check2026-10-22; recognizable district and public circulation, independent12/12 civic/276 landing checks; cold activation remains follow-up; `moy_P5_review_2026-10-22.md`) | `moy_pkg_P5.md` |
 | P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **build authorized** (2026-10-22; revision2 ten sites/three tower exteriors; practical model-matching quality and focused checks; `moy_p6_build_handoff.md`) | `moy_pkg_P6.md` |
 | P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 72-part/19-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
-| P8 | **The park**: four quarters, dry garden, reed pond/boardwalk, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready with P9** (2026-10-22: one integrated build;40 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
+| P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready with P9** (2026-10-22: one integrated build;41 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
 | P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **ready with P8** (2026-10-22:30 parts/12 joins; shared park entry and model; practical play build) | `moy_pkg_P9.md` |
 | P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L4 | planned | |
 | P11 | The wall and the gates: the Wall Line, the East Gate (City Hall's arch) and the West Gate, watch posts, the Rim Corridor, the Rim Walk | edge | L2 | L3 | planned (note: the arch legs' east wall band is open for the outer platform, P1 fixes 4) | |
@@ -300,3 +300,6 @@ P8/P9 combined handoff (2026-10-22): `moy_p8_p9_build_handoff.md`. The user
 requested one integrated park pass. Shared model: `docs/drawings/moy_park_playground_3d.html`
 (local; external publication pending). Practical L2/L3 construction is the
 first milestone; final L4/polish and whole-city budgets remain tracked.
+
+P8 revision2026-10-22: broad lawn patches, a gently humped Chinese-garden
+stone bridge, and a checked2m buffer around the full revised pond bank.

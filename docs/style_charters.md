@@ -410,7 +410,7 @@ integrated park construction pass requested by the user.
 
 - Primary,75%: the Persian four-quarter civic garden translated to desert
   shade and walking axes: dry gravel/rock/agave, working reed water, tea/chess
-  shade and the one picnic lawn. Fixed sites,23 real shared-kit trees.
+  shade and the picnic lawn and broad grass between activity areas. Fixed sites,23 real shared-kit trees.
 - Secondary,20%: tropical civic timber parasols and low boardwalks; the
   existing Singapore planted-infrastructure context belongs to P7.
 - Accent,5%: one sculpted ochre/terracotta canyon playground, muted teal net
@@ -422,8 +422,14 @@ integrated park construction pass requested by the user.
 - Palette: pale stone, sand/gravel, sun-aged timber, ghaf foliage and muted
   flame-tree flowers, translucent shared pond water; warm play shells and
   restrained nets/slides. No printed words, letters, numerals or mechanic signs.
-- Coverage: P8 40 parts/12 joins, P9 30/12 in checked plan data. Practical
+- Coverage: P8 41 parts/12 joins, P9 30/12 in checked plan data. Practical
   reusable village geometry is preferred over new procedural frameworks.
 - Exclusions: steel wind trees (superseded), new lawns in the dry garden,
   opulent fountains, opaque water, floating reeds, unsupported roofs/slides,
   net-shaped solid walls, traffic barriers across the shared park entrance.
+
+P8 user revision2026-10-22: the stone garden bridge references the Chinese
+village's shallow arch construction and curved rails, limited to this one
+crossing. No roof/pagoda ornament. Maintained lawns now join the shaded
+park spaces; the northwest dry garden and wet reed banks retain their roles.
+The full outer pond shore has a checked2m park-edge buffer.

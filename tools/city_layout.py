@@ -513,7 +513,7 @@ PARK={
  # middle (bed: [fraction of r, height over the park's ground], from the bank's top to the middle). Built with the
  # world's one water: VillageWorks.water_material() (two-sided, translucent, the same as every village pond), marked a
  # hazard, its surface and depth on the liquid queries; the paving stops at the bank's top.
- 'pond':{'c':(-516,-28),'r':(19,13),'surface':-0.3,'bank_top':1.15,
+ 'pond':{'c':(-516,-28),'r':(16.5,13),'surface':-0.3,'bank_top':1.15,
          'bed':[[1.15,0.0],[1.0,-0.3],[0.86,-0.65],[0.6,-1.5],[0.3,-2.0],[0.0,-2.1]],
          'water':'VillageWorks.water_material(): the shared two-sided translucent water; CollisionPolicy hazard; meta water_surface_y and water_depth; terrain liquid queries from this surface and bed',
          'bank':'shelving earth under reeds and flat stones, no wall; the paving and the lawn stop at the bank\'s top'},

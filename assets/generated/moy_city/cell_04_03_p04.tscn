@@ -795,56 +795,56 @@ _surfaces = [{
 albedo_color = Color(0.02, 0.48, 0.32, 1)
 roughness = 0.6
 
-[node name="MoyCell_04_03_Part_04" type="Node3D" unique_id=2080397009]
+[node name="MoyCell_04_03_Part_04" type="Node3D" unique_id=616321466]
 
-[node name="CrossingRainReeds_-541_48_8_37" type="Node3D" parent="." unique_id=521009803]
+[node name="CrossingRainReeds_-541_48_8_37" type="Node3D" parent="." unique_id=478109727]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -541.48, -60, 8.37)
 
-[node name="@MeshInstance3D@22899" type="MeshInstance3D" parent="CrossingRainReeds_-541_48_8_37" unique_id=1396248765]
+[node name="@MeshInstance3D@22896" type="MeshInstance3D" parent="CrossingRainReeds_-541_48_8_37" unique_id=746466426]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_4i474")
 mesh = SubResource("BoxMesh_60ut1")
 
-[node name="@MeshInstance3D@22900" type="MeshInstance3D" parent="CrossingRainReeds_-541_48_8_37" unique_id=1568748969]
+[node name="@MeshInstance3D@22897" type="MeshInstance3D" parent="CrossingRainReeds_-541_48_8_37" unique_id=1254193476]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_iif8u")
 mesh = SubResource("BoxMesh_bq8g3")
 
-[node name="@MeshInstance3D@22901" type="MeshInstance3D" parent="CrossingRainReeds_-541_48_8_37" unique_id=1245393320]
+[node name="@MeshInstance3D@22898" type="MeshInstance3D" parent="CrossingRainReeds_-541_48_8_37" unique_id=1137575590]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_88wmy")
 mesh = SubResource("BoxMesh_gl0b6")
 
-[node name="CrossingRainReeds_-539_34_11_05" type="Node3D" parent="." unique_id=211615948]
+[node name="CrossingRainReeds_-539_34_11_05" type="Node3D" parent="." unique_id=818030311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -539.34, -60, 11.05)
 
-[node name="@MeshInstance3D@22902" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_11_05" unique_id=764801389]
+[node name="@MeshInstance3D@22899" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_11_05" unique_id=1379477132]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_3fnve")
 mesh = SubResource("BoxMesh_ic8si")
 
-[node name="@MeshInstance3D@22903" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_11_05" unique_id=1493227723]
+[node name="@MeshInstance3D@22900" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_11_05" unique_id=883086442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_1q57e")
 mesh = SubResource("BoxMesh_q7emx")
 
-[node name="@MeshInstance3D@22904" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_11_05" unique_id=1292306613]
+[node name="@MeshInstance3D@22901" type="MeshInstance3D" parent="CrossingRainReeds_-539_34_11_05" unique_id=433529523]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_olqtr")
 mesh = SubResource("BoxMesh_kdm1x")
 
-[node name="MoyReedPond" type="Node3D" parent="." unique_id=556572785]
+[node name="MoyReedPond" type="Node3D" parent="." unique_id=1264409334]
 metadata/water_surface_y = -60.3
 metadata/water_depth = 1.8
 metadata/collision_policy = &"hazard"
 
-[node name="MoyReedPondSurface" type="MeshInstance3D" parent="MoyReedPond" unique_id=192860756]
-transform = Transform3D(19, 0, 0, 0, 1, 0, 0, 0, 13, -516, -60.3, -28)
+[node name="MoyReedPondSurface" type="MeshInstance3D" parent="MoyReedPond" unique_id=1550833027]
+transform = Transform3D(16.5, 0, 0, 0, 1, 0, 0, 0, 13, -516, -60.3, -28)
 material_override = SubResource("ShaderMaterial_7w66k")
 cast_shadow = 0
 mesh = SubResource("CylinderMesh_ix6ie")
 
-[node name="ParkTree_00_banyan" type="StaticBody3D" parent="." unique_id=1881706249]
+[node name="ParkTree_00_banyan" type="StaticBody3D" parent="." unique_id=1515169788]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -530, -60, -40)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -867,86 +867,86 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(4.425845, 2.6555073, 4.425845)
 }]
 
-[node name="_MeshInstance3D_23064" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=68142553]
+[node name="_MeshInstance3D_23061" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=382893609]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.73, 0)
 mesh = SubResource("ArrayMesh_tejff")
 surface_material_override/0 = SubResource("StandardMaterial3D_l60lt")
 
-[node name="_MeshInstance3D_23065" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1110692395]
+[node name="_MeshInstance3D_23062" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=396254035]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.63, 0)
 mesh = SubResource("ArrayMesh_rf4he")
 surface_material_override/0 = SubResource("StandardMaterial3D_who80")
 
-[node name="_MeshInstance3D_23066" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1296063696]
+[node name="_MeshInstance3D_23063" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=395601758]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6961803, 6.63, 0)
 mesh = SubResource("ArrayMesh_ha0yr")
 surface_material_override/0 = SubResource("StandardMaterial3D_tkrao")
 
-[node name="_MeshInstance3D_23067" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1330005348]
+[node name="_MeshInstance3D_23064" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=2022418046]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.0463026, 2.6660175, 0.6310772)
 mesh = SubResource("ArrayMesh_oj7uq")
 surface_material_override/0 = SubResource("StandardMaterial3D_5mspx")
 
-[node name="_MeshInstance3D_23068" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=112931093]
+[node name="_MeshInstance3D_23065" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=542456270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.144877, 2.4214284, 1.6271696)
 mesh = SubResource("ArrayMesh_djiep")
 surface_material_override/0 = SubResource("StandardMaterial3D_qr0a0")
 
-[node name="_MeshInstance3D_23069" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=115899611]
+[node name="_MeshInstance3D_23066" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1575246032]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1937633, 6.63, 3.6740255)
 mesh = SubResource("ArrayMesh_ngpp7")
 surface_material_override/0 = SubResource("StandardMaterial3D_0fjrn")
 
-[node name="_MeshInstance3D_23070" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1323922293]
+[node name="_MeshInstance3D_23067" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=709807797]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0528848, 2.0840838, 5.130617)
 mesh = SubResource("ArrayMesh_i12pu")
 surface_material_override/0 = SubResource("StandardMaterial3D_o1lvq")
 
-[node name="_MeshInstance3D_23071" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1094758981]
+[node name="_MeshInstance3D_23068" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=153551172]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9506202, 6.63, 2.1437511)
 mesh = SubResource("ArrayMesh_7tqyh")
 surface_material_override/0 = SubResource("StandardMaterial3D_nmeuk")
 
-[node name="_MeshInstance3D_23072" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=2000388844]
+[node name="_MeshInstance3D_23069" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1339036360]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.7493272, 2.9725711, 3.1577609)
 mesh = SubResource("ArrayMesh_wdaf8")
 surface_material_override/0 = SubResource("StandardMaterial3D_hdvmx")
 
-[node name="_MeshInstance3D_23073" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=664024983]
+[node name="_MeshInstance3D_23070" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=224524347]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3533385, 2.8813045, 1.3810912)
 mesh = SubResource("ArrayMesh_053cf")
 surface_material_override/0 = SubResource("StandardMaterial3D_4siic")
 
-[node name="_MeshInstance3D_23074" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=743297001]
+[node name="_MeshInstance3D_23071" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=804330870]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.138584, 6.63, -2.2803147)
 mesh = SubResource("ArrayMesh_sw3nq")
 surface_material_override/0 = SubResource("StandardMaterial3D_fpuml")
 
-[node name="_MeshInstance3D_23075" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1661391082]
+[node name="_MeshInstance3D_23072" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=213769368]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7268451, 2.7810242, -1.7719986)
 mesh = SubResource("ArrayMesh_vgs45")
 surface_material_override/0 = SubResource("StandardMaterial3D_vxd1t")
 
-[node name="_MeshInstance3D_23076" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=995197139]
+[node name="_MeshInstance3D_23073" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1161959538]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8595697, 6.63, -2.6454837)
 mesh = SubResource("ArrayMesh_otxau")
 surface_material_override/0 = SubResource("StandardMaterial3D_uus6w")
 
-[node name="_MeshInstance3D_23077" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1469959923]
+[node name="_MeshInstance3D_23074" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=648696715]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5616358, 2.1943898, -2.1722004)
 mesh = SubResource("ArrayMesh_wc5ec")
 surface_material_override/0 = SubResource("StandardMaterial3D_1plli")
 
-[node name="_MeshInstance3D_23078" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1586123595]
+[node name="_MeshInstance3D_23075" type="MeshInstance3D" parent="ParkTree_00_banyan" unique_id=1503483315]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3357473, 2.776433, -2.393231)
 mesh = SubResource("ArrayMesh_tghws")
 surface_material_override/0 = SubResource("StandardMaterial3D_oynwd")
 
-[node name="_CollisionShape3D_23079" type="CollisionShape3D" parent="ParkTree_00_banyan" unique_id=720692825]
+[node name="_CollisionShape3D_23076" type="CollisionShape3D" parent="ParkTree_00_banyan" unique_id=878669327]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.73, 0)
 shape = SubResource("CylinderShape3D_rr2fx")
 
-[node name="ParkTree_01_round" type="StaticBody3D" parent="." unique_id=1509203365]
+[node name="ParkTree_01_round" type="StaticBody3D" parent="." unique_id=1561496983]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -507, -60, -14)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -960,31 +960,31 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(2.16, 1.9008, 2.16)
 }]
 
-[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=498721603]
+[node name="_MeshInstance3D_23077" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=2145999085]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 mesh = SubResource("ArrayMesh_qyhy8")
 surface_material_override/0 = SubResource("StandardMaterial3D_k7knt")
 
-[node name="_MeshInstance3D_23081" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=558181297]
+[node name="_MeshInstance3D_23078" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=120821798]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 0)
 mesh = SubResource("ArrayMesh_s4qx2")
 surface_material_override/0 = SubResource("StandardMaterial3D_aka48")
 
-[node name="_MeshInstance3D_23082" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=1370896283]
+[node name="_MeshInstance3D_23079" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=767153259]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.98, 7.2000003, 0.36)
 mesh = SubResource("ArrayMesh_lsyif")
 surface_material_override/0 = SubResource("StandardMaterial3D_vf8ih")
 
-[node name="_MeshInstance3D_23083" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=254409972]
+[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_01_round" unique_id=400823824]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62, 6.84, -1.26)
 mesh = SubResource("ArrayMesh_p3hpp")
 surface_material_override/0 = SubResource("StandardMaterial3D_o25c8")
 
-[node name="_CollisionShape3D_23084" type="CollisionShape3D" parent="ParkTree_01_round" unique_id=1398364994]
+[node name="_CollisionShape3D_23081" type="CollisionShape3D" parent="ParkTree_01_round" unique_id=346415420]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 shape = SubResource("CylinderShape3D_tnndk")
 
-[node name="ParkTree_02_round" type="StaticBody3D" parent="." unique_id=1739934412]
+[node name="ParkTree_02_round" type="StaticBody3D" parent="." unique_id=1926291225]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -512, -60, -9)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -998,31 +998,31 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(1.92, 1.6896, 1.92)
 }]
 
-[node name="_MeshInstance3D_23085" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=1396506762]
+[node name="_MeshInstance3D_23082" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=634128786]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 mesh = SubResource("ArrayMesh_3v01m")
 surface_material_override/0 = SubResource("StandardMaterial3D_rofoc")
 
-[node name="_MeshInstance3D_23086" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=1594679362]
+[node name="_MeshInstance3D_23083" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=675379160]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.6, 0)
 mesh = SubResource("ArrayMesh_hh6gs")
 surface_material_override/0 = SubResource("StandardMaterial3D_62lf2")
 
-[node name="_MeshInstance3D_23087" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=1966452073]
+[node name="_MeshInstance3D_23084" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=738262192]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.76, 6.4, 0.32)
 mesh = SubResource("ArrayMesh_elmg4")
 surface_material_override/0 = SubResource("StandardMaterial3D_wpgoh")
 
-[node name="_MeshInstance3D_23088" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=681795949]
+[node name="_MeshInstance3D_23085" type="MeshInstance3D" parent="ParkTree_02_round" unique_id=921926772]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.44, 6.08, -1.12)
 mesh = SubResource("ArrayMesh_rp0of")
 surface_material_override/0 = SubResource("StandardMaterial3D_jsap1")
 
-[node name="_CollisionShape3D_23089" type="CollisionShape3D" parent="ParkTree_02_round" unique_id=876072377]
+[node name="_CollisionShape3D_23086" type="CollisionShape3D" parent="ParkTree_02_round" unique_id=1527648737]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 shape = SubResource("CylinderShape3D_sn7vm")
 
-[node name="ParkTree_03_round" type="StaticBody3D" parent="." unique_id=266470441]
+[node name="ParkTree_03_round" type="StaticBody3D" parent="." unique_id=2119115000]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -502, -60, -44)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -1036,31 +1036,31 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(2.16, 1.9008, 2.16)
 }]
 
-[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=284550796]
+[node name="_MeshInstance3D_23077" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=634044026]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 mesh = SubResource("ArrayMesh_qyhy8")
 surface_material_override/0 = SubResource("StandardMaterial3D_k7knt")
 
-[node name="_MeshInstance3D_23081" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=1762920655]
+[node name="_MeshInstance3D_23078" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=737290255]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 0)
 mesh = SubResource("ArrayMesh_s4qx2")
 surface_material_override/0 = SubResource("StandardMaterial3D_aka48")
 
-[node name="_MeshInstance3D_23082" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=2094002968]
+[node name="_MeshInstance3D_23079" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=273687429]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.98, 7.2000003, 0.36)
 mesh = SubResource("ArrayMesh_lsyif")
 surface_material_override/0 = SubResource("StandardMaterial3D_vf8ih")
 
-[node name="_MeshInstance3D_23083" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=968119651]
+[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_03_round" unique_id=2080978472]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62, 6.84, -1.26)
 mesh = SubResource("ArrayMesh_p3hpp")
 surface_material_override/0 = SubResource("StandardMaterial3D_o25c8")
 
-[node name="_CollisionShape3D_23084" type="CollisionShape3D" parent="ParkTree_03_round" unique_id=668424573]
+[node name="_CollisionShape3D_23081" type="CollisionShape3D" parent="ParkTree_03_round" unique_id=1318887152]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 shape = SubResource("CylinderShape3D_tnndk")
 
-[node name="ParkTree_05_round" type="StaticBody3D" parent="." unique_id=1259274520]
+[node name="ParkTree_05_round" type="StaticBody3D" parent="." unique_id=273189165]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -501, -60, 13)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -1074,31 +1074,31 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(2.16, 1.9008, 2.16)
 }]
 
-[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=2072857169]
+[node name="_MeshInstance3D_23077" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=1256870122]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 mesh = SubResource("ArrayMesh_qyhy8")
 surface_material_override/0 = SubResource("StandardMaterial3D_k7knt")
 
-[node name="_MeshInstance3D_23081" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=494053247]
+[node name="_MeshInstance3D_23078" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=1306321100]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 0)
 mesh = SubResource("ArrayMesh_s4qx2")
 surface_material_override/0 = SubResource("StandardMaterial3D_aka48")
 
-[node name="_MeshInstance3D_23082" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=1742195611]
+[node name="_MeshInstance3D_23079" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=252118432]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.98, 7.2000003, 0.36)
 mesh = SubResource("ArrayMesh_lsyif")
 surface_material_override/0 = SubResource("StandardMaterial3D_vf8ih")
 
-[node name="_MeshInstance3D_23083" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=1113389979]
+[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_05_round" unique_id=5715344]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62, 6.84, -1.26)
 mesh = SubResource("ArrayMesh_p3hpp")
 surface_material_override/0 = SubResource("StandardMaterial3D_o25c8")
 
-[node name="_CollisionShape3D_23084" type="CollisionShape3D" parent="ParkTree_05_round" unique_id=883862833]
+[node name="_CollisionShape3D_23081" type="CollisionShape3D" parent="ParkTree_05_round" unique_id=772619329]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 shape = SubResource("CylinderShape3D_tnndk")
 
-[node name="ParkTree_06_round" type="StaticBody3D" parent="." unique_id=1377769492]
+[node name="ParkTree_06_round" type="StaticBody3D" parent="." unique_id=1279622626]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -524, -60, 13)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -1112,31 +1112,31 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(2.16, 1.9008, 2.16)
 }]
 
-[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=1353761487]
+[node name="_MeshInstance3D_23077" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=1732746767]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 mesh = SubResource("ArrayMesh_qyhy8")
 surface_material_override/0 = SubResource("StandardMaterial3D_k7knt")
 
-[node name="_MeshInstance3D_23081" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=643824287]
+[node name="_MeshInstance3D_23078" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=1020535745]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.3, 0)
 mesh = SubResource("ArrayMesh_s4qx2")
 surface_material_override/0 = SubResource("StandardMaterial3D_aka48")
 
-[node name="_MeshInstance3D_23082" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=27460717]
+[node name="_MeshInstance3D_23079" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=861916556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.98, 7.2000003, 0.36)
 mesh = SubResource("ArrayMesh_lsyif")
 surface_material_override/0 = SubResource("StandardMaterial3D_vf8ih")
 
-[node name="_MeshInstance3D_23083" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=871702205]
+[node name="_MeshInstance3D_23080" type="MeshInstance3D" parent="ParkTree_06_round" unique_id=1607976840]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62, 6.84, -1.26)
 mesh = SubResource("ArrayMesh_p3hpp")
 surface_material_override/0 = SubResource("StandardMaterial3D_o25c8")
 
-[node name="_CollisionShape3D_23084" type="CollisionShape3D" parent="ParkTree_06_round" unique_id=935724771]
+[node name="_CollisionShape3D_23081" type="CollisionShape3D" parent="ParkTree_06_round" unique_id=1105947962]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8, 0)
 shape = SubResource("CylinderShape3D_tnndk")
 
-[node name="ParkTree_19_palm" type="StaticBody3D" parent="." unique_id=372531243]
+[node name="ParkTree_19_palm" type="StaticBody3D" parent="." unique_id=1988729221]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -520, -60, -6.5)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -1144,329 +1144,329 @@ metadata/canopy_blobs = [{
 "semi_axes": Vector3(2.64, 1.08, 2.64)
 }]
 
-[node name="_MeshInstance3D_23114" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1199921585]
+[node name="_MeshInstance3D_23111" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=887546699]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
 mesh = SubResource("ArrayMesh_ai3sh")
 surface_material_override/0 = SubResource("StandardMaterial3D_kknii")
 
-[node name="_CollisionShape3D_23115" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=1912046545]
+[node name="_CollisionShape3D_23112" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=1478922886]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.72, 0)
 shape = SubResource("CylinderShape3D_ss1d1")
 
-[node name="_MeshInstance3D_23116" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1713942367]
+[node name="_MeshInstance3D_23113" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1537647663]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.16, 0)
 mesh = SubResource("ArrayMesh_y8obp")
 surface_material_override/0 = SubResource("StandardMaterial3D_c0u4b")
 
-[node name="_CollisionShape3D_23117" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=1383205264]
+[node name="_CollisionShape3D_23114" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=681795580]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.16, 0)
 shape = SubResource("CylinderShape3D_qgo1h")
 
-[node name="_MeshInstance3D_23118" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1605722147]
+[node name="_MeshInstance3D_23115" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1570736973]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6000001, 0)
 mesh = SubResource("ArrayMesh_smw77")
 surface_material_override/0 = SubResource("StandardMaterial3D_jcbug")
 
-[node name="_CollisionShape3D_23119" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=1048306121]
+[node name="_CollisionShape3D_23116" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=989630873]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.6000001, 0)
 shape = SubResource("CylinderShape3D_eqe1q")
 
-[node name="_MeshInstance3D_23120" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=719345826]
+[node name="_MeshInstance3D_23117" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1698900904]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.04, 0)
 mesh = SubResource("ArrayMesh_58gr8")
 surface_material_override/0 = SubResource("StandardMaterial3D_urhqp")
 
-[node name="_CollisionShape3D_23121" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=1882838025]
+[node name="_CollisionShape3D_23118" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=979603917]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.04, 0)
 shape = SubResource("CylinderShape3D_2eiia")
 
-[node name="_MeshInstance3D_23122" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1017503634]
+[node name="_MeshInstance3D_23119" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=745086208]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.48, 0)
 mesh = SubResource("ArrayMesh_mog0p")
 surface_material_override/0 = SubResource("StandardMaterial3D_libfh")
 
-[node name="_CollisionShape3D_23123" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=1176696767]
+[node name="_CollisionShape3D_23120" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=255295757]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.48, 0)
 shape = SubResource("CylinderShape3D_krdtv")
 
-[node name="_MeshInstance3D_23124" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=1584726312]
+[node name="_MeshInstance3D_23121" type="MeshInstance3D" parent="ParkTree_19_palm" unique_id=10041620]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.92, 0)
 mesh = SubResource("ArrayMesh_awg2m")
 surface_material_override/0 = SubResource("StandardMaterial3D_uqmih")
 
-[node name="_CollisionShape3D_23125" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=664940967]
+[node name="_CollisionShape3D_23122" type="CollisionShape3D" parent="ParkTree_19_palm" unique_id=65466144]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.92, 0)
 shape = SubResource("CylinderShape3D_2dgai")
 
-[node name="_Node3D_23126" type="Node3D" parent="ParkTree_19_palm" unique_id=986909570]
+[node name="_Node3D_23123" type="Node3D" parent="ParkTree_19_palm" unique_id=1502938877]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23127" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126" unique_id=1530646682]
+[node name="_Node3D_23124" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123" unique_id=1537465184]
 transform = Transform3D(0.9996327, 0.013702357, -0.023381734, 0, 0.8627652, 0.5056048, 0.027100924, -0.5054191, 0.86244833, 0, 0, 0)
 
-[node name="_Node3D_23128" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127" unique_id=1924328849]
+[node name="_Node3D_23125" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124" unique_id=751621362]
 transform = Transform3D(1, 0, 0, 0, 0.9939216, 0.110090666, 0, -0.110090666, 0.9939216, 0, 0, 0)
 
-[node name="_MeshInstance3D_23129" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128" unique_id=1729196523]
+[node name="_MeshInstance3D_23126" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125" unique_id=2051937486]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7390269, 0)
 mesh = SubResource("ArrayMesh_a5ikp")
 surface_material_override/0 = SubResource("StandardMaterial3D_xhjrj")
 
-[node name="_Node3D_23130" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128" unique_id=1392789142]
+[node name="_Node3D_23127" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125" unique_id=2128693237]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4780538, 0)
 
-[node name="_Node3D_23131" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128/_Node3D_23130" unique_id=1892388816]
+[node name="_Node3D_23128" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125/_Node3D_23127" unique_id=1763379444]
 transform = Transform3D(1, 0, 0, 0, 0.9457364, 0.3249348, 0, -0.3249348, 0.9457364, 0, 0, 0)
 
-[node name="_MeshInstance3D_23132" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131" unique_id=570343123]
+[node name="_MeshInstance3D_23129" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125/_Node3D_23127/_Node3D_23128" unique_id=1435423932]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7390269, 0)
 mesh = SubResource("ArrayMesh_0mdfa")
 surface_material_override/0 = SubResource("StandardMaterial3D_vi0pt")
 
-[node name="_Node3D_23133" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131" unique_id=1756461830]
+[node name="_Node3D_23130" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125/_Node3D_23127/_Node3D_23128" unique_id=1626574682]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4780538, 0)
 
-[node name="_Node3D_23134" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131/_Node3D_23133" unique_id=1152676134]
+[node name="_Node3D_23131" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125/_Node3D_23127/_Node3D_23128/_Node3D_23130" unique_id=2086256500]
 transform = Transform3D(1, 0, 0, 0, 0.85170215, 0.5240262, 0, -0.5240262, 0.85170215, 0, 0, 0)
 
-[node name="_MeshInstance3D_23135" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131/_Node3D_23133/_Node3D_23134" unique_id=1543682382]
+[node name="_MeshInstance3D_23132" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131" unique_id=1270952099]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7390269, 0)
 mesh = SubResource("ArrayMesh_miv7p")
 surface_material_override/0 = SubResource("StandardMaterial3D_yf6lf")
 
-[node name="_Node3D_23136" type="Node3D" parent="ParkTree_19_palm/_Node3D_23126/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131/_Node3D_23133/_Node3D_23134" unique_id=3426497]
+[node name="_Node3D_23133" type="Node3D" parent="ParkTree_19_palm/_Node3D_23123/_Node3D_23124/_Node3D_23125/_Node3D_23127/_Node3D_23128/_Node3D_23130/_Node3D_23131" unique_id=625675123]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4780538, 0)
 
-[node name="_Node3D_23137" type="Node3D" parent="ParkTree_19_palm" unique_id=1805982396]
+[node name="_Node3D_23134" type="Node3D" parent="ParkTree_19_palm" unique_id=13474710]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23138" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137" unique_id=1292742430]
+[node name="_Node3D_23135" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134" unique_id=1069884250]
 transform = Transform3D(0.628759, -0.5188971, 0.5791441, 0, 0.7447839, 0.66730577, -0.7776002, -0.41957453, 0.46828958, 0, 0, 0)
 
-[node name="_Node3D_23139" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138" unique_id=361456440]
+[node name="_Node3D_23136" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135" unique_id=796035345]
 transform = Transform3D(1, 0, 0, 0, 0.99063003, 0.13657267, 0, -0.13657267, 0.99063003, 0, 0, 0)
 
-[node name="_MeshInstance3D_23140" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139" unique_id=1022586663]
+[node name="_MeshInstance3D_23137" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136" unique_id=1566552847]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8463511, 0)
 mesh = SubResource("ArrayMesh_4c263")
 surface_material_override/0 = SubResource("StandardMaterial3D_aoqet")
 
-[node name="_Node3D_23141" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139" unique_id=1975449657]
+[node name="_Node3D_23138" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136" unique_id=1581296808]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6927022, 0)
 
-[node name="_Node3D_23142" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139/_Node3D_23141" unique_id=2103947522]
+[node name="_Node3D_23139" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136/_Node3D_23138" unique_id=963289180]
 transform = Transform3D(1, 0, 0, 0, 0.91672075, 0.3995286, 0, -0.3995286, 0.91672075, 0, 0, 0)
 
-[node name="_MeshInstance3D_23143" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142" unique_id=1091958753]
+[node name="_MeshInstance3D_23140" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136/_Node3D_23138/_Node3D_23139" unique_id=1813634551]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8463511, 0)
 mesh = SubResource("ArrayMesh_uu2fk")
 surface_material_override/0 = SubResource("StandardMaterial3D_wlugp")
 
-[node name="_Node3D_23144" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142" unique_id=1664872462]
+[node name="_Node3D_23141" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136/_Node3D_23138/_Node3D_23139" unique_id=1831251314]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6927022, 0)
 
-[node name="_Node3D_23145" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142/_Node3D_23144" unique_id=87863072]
+[node name="_Node3D_23142" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136/_Node3D_23138/_Node3D_23139/_Node3D_23141" unique_id=2134991756]
 transform = Transform3D(1, 0, 0, 0, 0.7744164, 0.6326763, 0, -0.6326763, 0.7744164, 0, 0, 0)
 
-[node name="_MeshInstance3D_23146" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142/_Node3D_23144/_Node3D_23145" unique_id=1983893419]
+[node name="_MeshInstance3D_23143" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142" unique_id=2000244817]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8463511, 0)
 mesh = SubResource("ArrayMesh_wpaka")
 surface_material_override/0 = SubResource("StandardMaterial3D_c3yym")
 
-[node name="_Node3D_23147" type="Node3D" parent="ParkTree_19_palm/_Node3D_23137/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142/_Node3D_23144/_Node3D_23145" unique_id=1820445432]
+[node name="_Node3D_23144" type="Node3D" parent="ParkTree_19_palm/_Node3D_23134/_Node3D_23135/_Node3D_23136/_Node3D_23138/_Node3D_23139/_Node3D_23141/_Node3D_23142" unique_id=116802611]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6927022, 0)
 
-[node name="_Node3D_23148" type="Node3D" parent="ParkTree_19_palm" unique_id=7076407]
+[node name="_Node3D_23145" type="Node3D" parent="ParkTree_19_palm" unique_id=1597571954]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23149" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148" unique_id=681603662]
+[node name="_Node3D_23146" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145" unique_id=493902634]
 transform = Transform3D(-0.23590286, -0.5627563, 0.792247, 0, 0.81525624, 0.57910043, -0.97177666, 0.13661145, -0.19232129, 0, 0, 0)
 
-[node name="_Node3D_23150" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149" unique_id=1239991332]
+[node name="_Node3D_23147" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146" unique_id=479858827]
 transform = Transform3D(1, 0, 0, 0, 0.9901665, 0.13989396, 0, -0.13989396, 0.9901665, 0, 0, 0)
 
-[node name="_MeshInstance3D_23151" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150" unique_id=864456977]
+[node name="_MeshInstance3D_23148" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147" unique_id=950660029]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7417466, 0)
 mesh = SubResource("ArrayMesh_xsohy")
 surface_material_override/0 = SubResource("StandardMaterial3D_itex8")
 
-[node name="_Node3D_23152" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150" unique_id=720154369]
+[node name="_Node3D_23149" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147" unique_id=461057089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4834932, 0)
 
-[node name="_Node3D_23153" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150/_Node3D_23152" unique_id=1400204980]
+[node name="_Node3D_23150" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147/_Node3D_23149" unique_id=953806317]
 transform = Transform3D(1, 0, 0, 0, 0.912655, 0.40873078, 0, -0.40873078, 0.912655, 0, 0, 0)
 
-[node name="_MeshInstance3D_23154" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153" unique_id=1650159992]
+[node name="_MeshInstance3D_23151" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147/_Node3D_23149/_Node3D_23150" unique_id=1966361342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7417466, 0)
 mesh = SubResource("ArrayMesh_6p608")
 surface_material_override/0 = SubResource("StandardMaterial3D_ifc73")
 
-[node name="_Node3D_23155" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153" unique_id=54392503]
+[node name="_Node3D_23152" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147/_Node3D_23149/_Node3D_23150" unique_id=1599695373]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4834932, 0)
 
-[node name="_Node3D_23156" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153/_Node3D_23155" unique_id=941698906]
+[node name="_Node3D_23153" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147/_Node3D_23149/_Node3D_23150/_Node3D_23152" unique_id=115799329]
 transform = Transform3D(1, 0, 0, 0, 0.7636997, 0.64557165, 0, -0.64557165, 0.7636997, 0, 0, 0)
 
-[node name="_MeshInstance3D_23157" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153/_Node3D_23155/_Node3D_23156" unique_id=1473853240]
+[node name="_MeshInstance3D_23154" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153" unique_id=762814299]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7417466, 0)
 mesh = SubResource("ArrayMesh_7a4t5")
 surface_material_override/0 = SubResource("StandardMaterial3D_uegsn")
 
-[node name="_Node3D_23158" type="Node3D" parent="ParkTree_19_palm/_Node3D_23148/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153/_Node3D_23155/_Node3D_23156" unique_id=980799543]
+[node name="_Node3D_23155" type="Node3D" parent="ParkTree_19_palm/_Node3D_23145/_Node3D_23146/_Node3D_23147/_Node3D_23149/_Node3D_23150/_Node3D_23152/_Node3D_23153" unique_id=908137988]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4834932, 0)
 
-[node name="_Node3D_23159" type="Node3D" parent="ParkTree_19_palm" unique_id=1279847822]
+[node name="_Node3D_23156" type="Node3D" parent="ParkTree_19_palm" unique_id=1126783334]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23160" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159" unique_id=1326924949]
+[node name="_Node3D_23157" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156" unique_id=968085124]
 transform = Transform3D(-0.93125784, -0.19953083, 0.30487096, 0, 0.83672804, 0.5476187, -0.36436087, 0.5099742, -0.77920955, 0, 0, 0)
 
-[node name="_Node3D_23161" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160" unique_id=1781542494]
+[node name="_Node3D_23158" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157" unique_id=1752195456]
 transform = Transform3D(1, 0, 0, 0, 0.9919371, 0.1267313, 0, -0.1267313, 0.9919371, 0, 0, 0)
 
-[node name="_MeshInstance3D_23162" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161" unique_id=1782720834]
+[node name="_MeshInstance3D_23159" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158" unique_id=146467662]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.83258736, 0)
 mesh = SubResource("ArrayMesh_7bvfd")
 surface_material_override/0 = SubResource("StandardMaterial3D_xct73")
 
-[node name="_Node3D_23163" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161" unique_id=99433269]
+[node name="_Node3D_23160" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158" unique_id=2133627861]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6651747, 0)
 
-[node name="_Node3D_23164" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161/_Node3D_23163" unique_id=1739623609]
+[node name="_Node3D_23161" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158/_Node3D_23160" unique_id=1340196031]
 transform = Transform3D(1, 0, 0, 0, 0.9282118, 0.37205225, 0, -0.37205225, 0.9282118, 0, 0, 0)
 
-[node name="_MeshInstance3D_23165" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164" unique_id=1712357516]
+[node name="_MeshInstance3D_23162" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158/_Node3D_23160/_Node3D_23161" unique_id=319326684]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.83258736, 0)
 mesh = SubResource("ArrayMesh_ngg38")
 surface_material_override/0 = SubResource("StandardMaterial3D_dbnxv")
 
-[node name="_Node3D_23166" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164" unique_id=1736046414]
+[node name="_Node3D_23163" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158/_Node3D_23160/_Node3D_23161" unique_id=1505266827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6651747, 0)
 
-[node name="_Node3D_23167" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164/_Node3D_23166" unique_id=897207307]
+[node name="_Node3D_23164" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158/_Node3D_23160/_Node3D_23161/_Node3D_23163" unique_id=1731519511]
 transform = Transform3D(1, 0, 0, 0, 0.8048551, 0.5934714, 0, -0.5934714, 0.8048551, 0, 0, 0)
 
-[node name="_MeshInstance3D_23168" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164/_Node3D_23166/_Node3D_23167" unique_id=59917059]
+[node name="_MeshInstance3D_23165" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164" unique_id=1191885757]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.83258736, 0)
 mesh = SubResource("ArrayMesh_llaog")
 surface_material_override/0 = SubResource("StandardMaterial3D_jrm6m")
 
-[node name="_Node3D_23169" type="Node3D" parent="ParkTree_19_palm/_Node3D_23159/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164/_Node3D_23166/_Node3D_23167" unique_id=91577380]
+[node name="_Node3D_23166" type="Node3D" parent="ParkTree_19_palm/_Node3D_23156/_Node3D_23157/_Node3D_23158/_Node3D_23160/_Node3D_23161/_Node3D_23163/_Node3D_23164" unique_id=2029097052]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6651747, 0)
 
-[node name="_Node3D_23170" type="Node3D" parent="ParkTree_19_palm" unique_id=194821652]
+[node name="_Node3D_23167" type="Node3D" parent="ParkTree_19_palm" unique_id=35142317]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23171" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170" unique_id=554881368]
+[node name="_Node3D_23168" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167" unique_id=1760461364]
 transform = Transform3D(-0.941738, 0.24643785, -0.22890593, 0, 0.6805641, 0.73268855, 0.33634734, 0.69000065, -0.64091307, 0, 0, 0)
 
-[node name="_Node3D_23172" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171" unique_id=207674878]
+[node name="_Node3D_23169" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168" unique_id=1400099760]
 transform = Transform3D(1, 0, 0, 0, 0.98990434, 0.1417369, 0, -0.1417369, 0.98990434, 0, 0, 0)
 
-[node name="_MeshInstance3D_23173" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172" unique_id=881208113]
+[node name="_MeshInstance3D_23170" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169" unique_id=687191153]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7066428, 0)
 mesh = SubResource("ArrayMesh_fdign")
 surface_material_override/0 = SubResource("StandardMaterial3D_8g4ik")
 
-[node name="_Node3D_23174" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172" unique_id=1708159815]
+[node name="_Node3D_23171" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169" unique_id=79519792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4132856, 0)
 
-[node name="_Node3D_23175" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172/_Node3D_23174" unique_id=1226192333]
+[node name="_Node3D_23172" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169/_Node3D_23171" unique_id=973969954]
 transform = Transform3D(1, 0, 0, 0, 0.91035825, 0.4138211, 0, -0.4138211, 0.91035825, 0, 0, 0)
 
-[node name="_MeshInstance3D_23176" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175" unique_id=2008596867]
+[node name="_MeshInstance3D_23173" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169/_Node3D_23171/_Node3D_23172" unique_id=475225544]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7066428, 0)
 mesh = SubResource("ArrayMesh_teqwj")
 surface_material_override/0 = SubResource("StandardMaterial3D_fnwt8")
 
-[node name="_Node3D_23177" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175" unique_id=745507219]
+[node name="_Node3D_23174" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169/_Node3D_23171/_Node3D_23172" unique_id=1999480463]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4132856, 0)
 
-[node name="_Node3D_23178" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175/_Node3D_23177" unique_id=265897705]
+[node name="_Node3D_23175" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169/_Node3D_23171/_Node3D_23172/_Node3D_23174" unique_id=666997666]
 transform = Transform3D(1, 0, 0, 0, 0.7576581, 0.65265167, 0, -0.65265167, 0.7576581, 0, 0, 0)
 
-[node name="_MeshInstance3D_23179" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175/_Node3D_23177/_Node3D_23178" unique_id=1230602827]
+[node name="_MeshInstance3D_23176" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175" unique_id=1532737356]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7066428, 0)
 mesh = SubResource("ArrayMesh_c5eaa")
 surface_material_override/0 = SubResource("StandardMaterial3D_yu01j")
 
-[node name="_Node3D_23180" type="Node3D" parent="ParkTree_19_palm/_Node3D_23170/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175/_Node3D_23177/_Node3D_23178" unique_id=374853406]
+[node name="_Node3D_23177" type="Node3D" parent="ParkTree_19_palm/_Node3D_23167/_Node3D_23168/_Node3D_23169/_Node3D_23171/_Node3D_23172/_Node3D_23174/_Node3D_23175" unique_id=195950602]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4132856, 0)
 
-[node name="_Node3D_23181" type="Node3D" parent="ParkTree_19_palm" unique_id=1987871335]
+[node name="_Node3D_23178" type="Node3D" parent="ParkTree_19_palm" unique_id=1448317460]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23182" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181" unique_id=2631995]
+[node name="_Node3D_23179" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178" unique_id=351833794]
 transform = Transform3D(-0.30014744, 0.7023586, -0.6454486, 0, 0.6766469, 0.7363077, 0.9538928, 0.22100087, -0.20309383, 0, 0, 0)
 
-[node name="_Node3D_23183" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182" unique_id=1534500408]
+[node name="_Node3D_23180" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179" unique_id=1031010977]
 transform = Transform3D(1, 0, 0, 0, 0.9929391, 0.11862497, 0, -0.11862497, 0.9929391, 0, 0, 0)
 
-[node name="_MeshInstance3D_23184" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183" unique_id=1196358731]
+[node name="_MeshInstance3D_23181" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180" unique_id=2036001400]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8233349, 0)
 mesh = SubResource("ArrayMesh_qetmh")
 surface_material_override/0 = SubResource("StandardMaterial3D_2n0nu")
 
-[node name="_Node3D_23185" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183" unique_id=1896379861]
+[node name="_Node3D_23182" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180" unique_id=679701270]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6466697, 0)
 
-[node name="_Node3D_23186" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183/_Node3D_23185" unique_id=335932598]
+[node name="_Node3D_23183" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180/_Node3D_23182" unique_id=1217466939]
 transform = Transform3D(1, 0, 0, 0, 0.93704903, 0.34919783, 0, -0.34919783, 0.93704903, 0, 0, 0)
 
-[node name="_MeshInstance3D_23187" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186" unique_id=34729360]
+[node name="_MeshInstance3D_23184" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180/_Node3D_23182/_Node3D_23183" unique_id=594425231]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8233349, 0)
 mesh = SubResource("ArrayMesh_ukixe")
 surface_material_override/0 = SubResource("StandardMaterial3D_2vude")
 
-[node name="_Node3D_23188" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186" unique_id=178973203]
+[node name="_Node3D_23185" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180/_Node3D_23182/_Node3D_23183" unique_id=2104189630]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6466697, 0)
 
-[node name="_Node3D_23189" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186/_Node3D_23188" unique_id=1118455849]
+[node name="_Node3D_23186" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180/_Node3D_23182/_Node3D_23183/_Node3D_23185" unique_id=9933515]
 transform = Transform3D(1, 0, 0, 0, 0.82841474, 0.56011516, 0, -0.56011516, 0.82841474, 0, 0, 0)
 
-[node name="_MeshInstance3D_23190" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186/_Node3D_23188/_Node3D_23189" unique_id=1797694508]
+[node name="_MeshInstance3D_23187" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186" unique_id=103626581]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8233349, 0)
 mesh = SubResource("ArrayMesh_0oflo")
 surface_material_override/0 = SubResource("StandardMaterial3D_ury0w")
 
-[node name="_Node3D_23191" type="Node3D" parent="ParkTree_19_palm/_Node3D_23181/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186/_Node3D_23188/_Node3D_23189" unique_id=1589767010]
+[node name="_Node3D_23188" type="Node3D" parent="ParkTree_19_palm/_Node3D_23178/_Node3D_23179/_Node3D_23180/_Node3D_23182/_Node3D_23183/_Node3D_23185/_Node3D_23186" unique_id=669825410]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6466697, 0)
 
-[node name="_Node3D_23192" type="Node3D" parent="ParkTree_19_palm" unique_id=1465453429]
+[node name="_Node3D_23189" type="Node3D" parent="ParkTree_19_palm" unique_id=975939137]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.64, 0)
 
-[node name="_Node3D_23193" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192" unique_id=1903758865]
+[node name="_Node3D_23190" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189" unique_id=287729441]
 transform = Transform3D(0.6763728, 0.43598402, -0.59366465, 0, 0.80599695, 0.59191966, 0.73655945, -0.40035838, 0.54515445, 0, 0, 0)
 
-[node name="_Node3D_23194" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193" unique_id=952147652]
+[node name="_Node3D_23191" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190" unique_id=677802458]
 transform = Transform3D(1, 0, 0, 0, 0.99359685, 0.11298376, 0, -0.11298376, 0.99359685, 0, 0, 0)
 
-[node name="_MeshInstance3D_23195" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194" unique_id=684603465]
+[node name="_MeshInstance3D_23192" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191" unique_id=811306664]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6918062, 0)
 mesh = SubResource("ArrayMesh_srrdx")
 surface_material_override/0 = SubResource("StandardMaterial3D_cvv4l")
 
-[node name="_Node3D_23196" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194" unique_id=1750553694]
+[node name="_Node3D_23193" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191" unique_id=1352017601]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3836124, 0)
 
-[node name="_Node3D_23197" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194/_Node3D_23196" unique_id=2008840831]
+[node name="_Node3D_23194" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191/_Node3D_23193" unique_id=2062370712]
 transform = Transform3D(1, 0, 0, 0, 0.94286245, 0.33318222, 0, -0.33318222, 0.94286245, 0, 0, 0)
 
-[node name="_MeshInstance3D_23198" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197" unique_id=2144564336]
+[node name="_MeshInstance3D_23195" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191/_Node3D_23193/_Node3D_23194" unique_id=176827111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6918062, 0)
 mesh = SubResource("ArrayMesh_3wy8i")
 surface_material_override/0 = SubResource("StandardMaterial3D_ri2gj")
 
-[node name="_Node3D_23199" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197" unique_id=328757868]
+[node name="_Node3D_23196" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191/_Node3D_23193/_Node3D_23194" unique_id=310656080]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3836124, 0)
 
-[node name="_Node3D_23200" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197/_Node3D_23199" unique_id=809622089]
+[node name="_Node3D_23197" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191/_Node3D_23193/_Node3D_23194/_Node3D_23196" unique_id=816087814]
 transform = Transform3D(1, 0, 0, 0, 0.8439843, 0.5363679, 0, -0.5363679, 0.8439843, 0, 0, 0)
 
-[node name="_MeshInstance3D_23201" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197/_Node3D_23199/_Node3D_23200" unique_id=53314223]
+[node name="_MeshInstance3D_23198" type="MeshInstance3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197" unique_id=1893449144]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6918062, 0)
 mesh = SubResource("ArrayMesh_emwbh")
 surface_material_override/0 = SubResource("StandardMaterial3D_312eg")
 
-[node name="_Node3D_23202" type="Node3D" parent="ParkTree_19_palm/_Node3D_23192/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197/_Node3D_23199/_Node3D_23200" unique_id=821975589]
+[node name="_Node3D_23199" type="Node3D" parent="ParkTree_19_palm/_Node3D_23189/_Node3D_23190/_Node3D_23191/_Node3D_23193/_Node3D_23194/_Node3D_23196/_Node3D_23197" unique_id=680865948]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3836124, 0)

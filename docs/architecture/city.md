@@ -1700,9 +1700,11 @@ beams, the ring's spans, the roof over the trains and over the platforms and
 towers, and everything off the park's walks, pond, playground and buildings.
 
 The giant playground moved whole to the south-east quarter (7b), beside a
-smaller green and the park lodge. In a desert it has to earn every drop of
-water, so most of it is shade and dry garden, and the one green lawn and the
-one pond each have a job.
+smaller green and the park lodge. User revision2026-10-22: broad lawns connect the park activity and shade
+areas, with paving limited to circulation and gathering pockets. The northwest
+dry garden remains arid and the working reed pond retains its purpose. The
+pond crossing is a gently arched stone garden bridge, referencing the Chinese
+village; the whole outer shoreline stays at least2m inside the park boundary.
 
 **References:**
 - **The Persian four-part garden (chahar bagh):** a garden quartered by two

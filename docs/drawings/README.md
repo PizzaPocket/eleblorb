@@ -73,7 +73,7 @@ vines with pendant tips. Model includes garden-plan and vine close-up views.
 ## P8 + P9 — The park and giant playground
 
 `moy_park_playground_3d.html` is one integrated model for both packages, drawn
-from `PARK.kit` (40 parts/12 joins) and `PARK.playground.kit` (30/12).
+from `PARK.kit` (41 parts/12 joins) and `PARK.playground.kit` (30/12).
 Views: overview, ground plan, pond, dry garden, tea terrace, tea-house section,
 playground, pump track, lawn/lodge and net bearings. A net/hoop detail sits
 beside the game-exported hero. Station/neighbours are context toggles.
@@ -82,3 +82,6 @@ Local model and `references/moy_park_playground_*.png` are checked in;
 external artifact publication pending. Preview geometry is design evidence,
 not a runtime collision/route certificate. Briefs: `moy_pkg_P8.md` and
 `moy_pkg_P9.md`; one `moy_p8_p9_build_handoff.md` guides implementation.
+
+P8 revision2026-10-22: broad lawn patches, a gently humped Chinese-garden
+stone bridge, and a checked2m buffer around the full revised pond bank.
