@@ -35,10 +35,13 @@ matters is in the files listed in section 6.
 
 ## 2. How we work
 
-**Current work,2026-10-22:** P5 accepted at practical L2 after source/image
-sense-check and independent saved-pack civic checks. Latest main through
-`8a7eb8df` integrated; P6 authorized via `moy_p6_build_handoff.md`. P3/P4/P5
-remain protected local implementation; old review/fix automation stays paused.
+**Current handoff,2026-10-22:** a fresh builder conversation in the same
+P5/P6 implementation checkout handles P7 first, then P8/P9 together. Use
+`moy_p7_p8_p9_build_handoff.md`. Preserve the local built P3–P6 source/bake;
+main is a planning integration base, not a replacement for that working tree.
+P5 has an accepted practical L2 review. The user reports P6 built; its local
+completion source/report must be recorded at handoff (not found on published
+main during the planner check). Old review/fix automation stays paused.
 
 ## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
 
@@ -173,10 +176,10 @@ diagnostic replaces this column.
 | P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **built — practical milestone** (user approved moving on2026-10-22; source/bake/evidence recovery checkpoint saved; streaming/walkthrough/polish follow-ups retained; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P3.md` |
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **built — practical milestone** (user approved moving on2026-10-22;386-pack integrated bake current; remaining cold-start checks/polish carried forward, not certified all-green; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L2 | L2 | **accepted — practical L2** (sense-check2026-10-22; recognizable district and public circulation, independent12/12 civic/276 landing checks; cold activation remains follow-up; `moy_P5_review_2026-10-22.md`) | `moy_pkg_P5.md` |
-| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | **build authorized** (2026-10-22; revision2 ten sites/three tower exteriors; practical model-matching quality and focused checks; `moy_p6_build_handoff.md`) | `moy_pkg_P6.md` |
-| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | **ready** (2026-10-20: 72-part/19-join station schedule; shared pane/frame grid and welded-node detail; Clock Room/roof/lift carry fixes; runtime L4 checks owed) | `moy_pkg_P7.md` |
-| P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready with P9** (2026-10-22: one integrated build;41 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
-| P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **ready with P8** (2026-10-22:30 parts/12 joins; shared park entry and model; practical play build) | `moy_pkg_P9.md` |
+| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | user reports built | L2 | **user-reported built; checkpoint pending** (2026-10-22: preserve current implementation checkout; published main has no P6 completion report yet) | `moy_pkg_P6.md` |
+| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L3 build; L4 final | **ready — first in P7–P9 handoff** (72 parts/19 joins; detailed scene shared by both models; focused practical construction checks) | `moy_pkg_P7.md` |
+| P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready after P7, with P9** (2026-10-22: one integrated build;41 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
+| P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **ready after P7, with P8** (2026-10-22:30 parts/12 joins; shared park entry and model; practical play build) | `moy_pkg_P9.md` |
 | P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L4 | planned | |
 | P11 | The wall and the gates: the Wall Line, the East Gate (City Hall's arch) and the West Gate, watch posts, the Rim Corridor, the Rim Walk | edge | L2 | L3 | planned (note: the arch legs' east wall band is open for the outer platform, P1 fixes 4) | |
 | P12 | Streets and the Deck: paving, street furniture, picture signs, lighting, the Deck's gardens | everywhere | L1 to L2 | L3 | planned | |
@@ -303,3 +306,9 @@ first milestone; final L4/polish and whole-city budgets remain tracked.
 
 P8 revision2026-10-22: broad lawn patches, a gently humped Chinese-garden
 stone bridge, and a checked2m buffer around the full revised pond bank.
+
+P7–P9 integration2026-10-22: `moy_p7_p8_p9_build_handoff.md` supersedes the
+separate park handoff. The complete P7 scene is shared by the standalone and
+integrated models via `docs/drawings/moy_crossing_scene.js`; no simplified
+station alternative remains. The dry garden has curved footprints and a worn
+trail. Keep the live P5/P6 working tree when opening the fresh builder chat.

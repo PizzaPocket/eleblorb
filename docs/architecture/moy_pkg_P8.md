@@ -1,10 +1,10 @@
 # P8 — The park, built together with P9
 
-2026-10-22. **Ready for one combined P8/P9 implementation pass.**
+2026-10-22. **Ready: park stage of the sequential P7–P9 handoff.**
 
 - Area: the locked park rect world(-625,-50) to(-495,50), its four quarters,
   public grounds, pond, six parasols, tea-house public room and park lodge shell.
-- Companion: `moy_pkg_P9.md`; one implementation owner and one integrated bake.
+- Companion: `moy_pkg_P9.md`; one implementation owner; finish P7 first, then the integrated park.
 - Build goal: a coherent, playable and dressed park at practical Ohio/Snowhio
   sophistication. Reach L2/L3 in this pass; final L4 performance/polish remains
   tracked in the roadmap. Do not turn this into a precision-certification loop.
@@ -17,7 +17,7 @@
 ## Read first and ownership
 
 Read AGENTS.md, CLAUDE.md, current roadmap direction, this brief, P9 and the
-combined `moy_p8_p9_build_handoff.md`. Then city.md7a/7b and the park paragraphs
+combined `moy_p7_p8_p9_build_handoff.md`. Then city.md7a/7b and the park paragraphs
 only, `tools/moy_park_kit.py`, relevant city_layout.py data, architecture and
 landscaping skills, `nature_props.gd`, `village_works.gd`, collision policy,
 and `_park_ground_body`/`_add_park` in the Moy bake builder.
@@ -39,7 +39,7 @@ existing people/interactions working; no new NPC simulation, chess UI or dialogu
 Use the existing desert palette: dry gravel, agave/boulders and date palms,
 ghaf shade trees, flame trees by the tea terrace, the single banyan by the
 working reed pond, broad maintained grass between activity areas and the
-existing picnic lawn. The northwest dry quarter remains dry. Existing source trees
+existing picnic lawn. The northwest gravel beds remain dry; grass belongs to their surrounding park. Existing source trees
 replaced the obsolete steel wind trees; do not restore wind-tree sculptures.
 Use shared NatureProps, with layered planting in purposeful clumps and shade
 where people sit. Existing tree/trunk positions and the23-tree schedule stay.
@@ -60,8 +60,11 @@ connect the tea terrace, public east door, dry-garden approach, both boardwalk
 abutments, lawn/lodge and the playground's west entry. The route points in
 `kit.routes` explain the construction; use the final polygons around sockets.
 
-- Northwest: the existing dry garden is walkable gravel between real boulders,
-  palms and agave. Give it a worn approach; do not irrigate it into a second lawn.
+- Northwest: build `kit.dry_garden.footprint`, an irregular gravel landscape
+  with planted drifts and grass fingers, a checked1.8m winding worn trail and
+  a shaded seat. Keep existing palms/boulders. The legacy `PARK.dry_garden`
+  rectangle is allocation metadata, never the visible material edge. Replace
+  the old rectangular gravel box. Keep gravel walkable and its edges flush.
 - Northeast: preserve the working reed pond, with visible sloping earth/stone
   shelves, reed clumps rooted at shelf level and quiet open water.
 - Southwest: six broad timber parasols shade tea and chess, with paths between
@@ -138,7 +141,7 @@ No tipped stretched eggs, disconnected beams or multiple rounded caps. Keep
 comfortable clearance below each roof. Canopies and substantial furniture are
 physical; roof drainage goes to planting, not into doorways.
 
-Three chess groups and six shade/overlook benches follow `kit.chess` and
+Three chess groups and seven shade/overlook benches follow `kit.chess` and
 `kit.benches`; use physical pedestals/legs/stools. Chess is scenery and the
 existing social activity, without new game rules or printed board markings.
 Carved abstract grid/pieces are fine. Put bins beside seating, not in routes.
@@ -147,6 +150,17 @@ Warm low lighting is restrained, shared with existing village fixtures.
 Building10 retains(-552,41) to(-542,49),4 m high, with a clear east-facing
 service threshold and an obvious simple lodge shell. Keep its private/service
 interior sealed this pass. Its footprint must not consume the lawn-side path.
+
+## Crossing authority and integration
+
+The integrated model now uses the complete P7 renderer, including its dome,
+clocks, indoor gardens, structure and circulation. `kit.crossing_authority`
+records ownership and ground datums. P7 is authoritative for every station
+component. P8 finishes the surrounding ground after P7, with flush transitions
+between its+0.08 paths and P7's+0.04 ground surface. Preserve real landing,
+lift and rain-garden openings; do not replace a station piece to make a path fit.
+The ground-plan view can hide the P7 layer; that is a camera aid, not an alternate
+simplified design. Read the combined handoff before editing a shared builder.
 
 ## Shape and construction schedule
 
@@ -184,7 +198,7 @@ major holes/blockers and remaining defects. Minor seams and decorative polish
 are follow-ups, not automatic rebuild gates. Observe performance proportionately
 and flag meaningful regressions; final whole-city budgets remain P2/P16.
 
-One combined diagnostic `docs/diagnostics/<date>-moy-P8-P9.md` covers both
+One combined P7/P8/P9 diagnostic `docs/diagnostics/<date>-moy-P7-P8-P9.md` covers both
 packages: concise implementation/coverage by major groups, actual checks and
 walkthrough results, useful images, and explicit incomplete or unverified work.
 Do not mark runtime L4 solely from a browser model or planning checks.
@@ -198,9 +212,9 @@ pond containment; broad lawns supersede the earlier sparse-grass layout.
 integrated. This authorizes one combined construction pass within this area;
 retain separate package IDs and schedules for review. No new lore introduced.
 
-Build prompt: Pull latest main and build P8/P9 together from
-`moy_p8_p9_build_handoff.md`, both briefs and their shared model. Finish the
-connected park at practical village quality, run focused checks, report and push.
+Build prompt: In the existing P5/P6 implementation checkout, follow
+`moy_p7_p8_p9_build_handoff.md`: preserve local work, integrate planning source,
+build P7 first and then P8/P9 together, check and report.
 
 Planning evidence: `docs/diagnostics/2026-10-22-moy-P8-P9-planning.md`.
 
@@ -270,3 +284,5 @@ Half-sizes in metres; symbolic sizes resolve from the checked patch/path.
 | `tea_opening` | punched | east public threshold, rear service partition | one real2 by2.5 opening, clearance2m both sides, no hidden wall collider |
 | `lodge_opening` | punched | locked building10 east service threshold | guard private service, no speculative interior or sign text |
 | `drainage` | meet | pond shelf and path margins | no open trench across route; splash recirculation separate from pond swimming water |
+
+Current integrated planning verification: `docs/diagnostics/2026-10-22-moy-P7-P8-P9-handoff-planning.md`.

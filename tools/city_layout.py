@@ -505,6 +505,7 @@ def _pg(x,z): return (round(PG_C[0]+(x+560)*PG_K,2),round(PG_C[1]+z*PG_K,2))
 PARK={
  'rect':(-625,-50,-495,50),
  'walks':[(-625,-3,-495,3),(-563,-50,-557,50)],
+ # Allocation/search envelope only; visible curved outline and trail are PARK.kit.dry_garden.
  'dry_garden':(-620,-45,-583,-6),
  # the reed pond (revised 2026-10-18, at the user's direction: in the third pass its water stood 0.4 m above the park's
  # ground, on a bespoke near-opaque shader, so it hovered over its banks and could not be seen into). Water lies below

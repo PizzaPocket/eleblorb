@@ -5,9 +5,24 @@ Read `moy_build_roadmap.md` first. P7 completes the existing station, not a new
 station layout. User explicitly requires a parts-and-joins schedule for every
 P7 element, including the dome's smooth geometric steel-and-glass construction.
 
+## Current P7–P9 build direction — 2026-10-22
+
+Use `moy_p7_p8_p9_build_handoff.md` in a fresh conversation in the existing
+P5/P6 implementation checkout. P7 is first, then P8/P9 together. The integrated
+park model now uses the exact same canonical P7 scene as this package's detail
+page (`moy_crossing_scene.js`), not a separate low-fidelity station.
+
+Aim for a complete practical L2/L3 built-and-dressed milestone. Preserve all
+specified architecture, public circulation, clocks/bell and real close-up frame
+quality. The72/19 schedule is design guidance, not an exhaustive certificate.
+Focused real-game checks and required repository checks replace the older
+per-part/P0/per-view performance and unload matrices as construction gates.
+Final L4 remains tracked; never claim an unmeasured performance gate passed.
+This direction supersedes older workflow/gate wording below, not the geometry.
+
 - **Area:** the Crossing, its four garden towers, helices, concourse ring,
   cross-bridges, two platform levels, roof, dome, clocks and Clock Room.
-- **Target:** L4 locally: correct architecture/collision, finished materials,
+- **Long-term target:** L4 locally: correct architecture/collision, finished materials,
   planting/furniture, functioning routes/lifts/clocks/bell, reviewed evidence
   and a measured performance result. A planning-model pass is not game L4.
 - **Depends on:** P0 audit suite, accepted P1 work and its P7 carry list;
@@ -335,63 +350,30 @@ infill use boxes only with the recorded flush-join reason; Boolean node
 patches and punched walls are deliberate exceptions. No tapering sphere poles,
 underside bowls or unclosed surface edges.
 
-## 9. Collision, audit and performance gates
+## 9. Focused construction checks for the current combined pass
 
-- Survey base and route landings; terrain/ground must not leave a lip under
-  a helix or lift. One collision owner per walkable surface; no masks, skirts
-  or duplicate slab/roof layers hiding an inconsistent section.
-- Default-cull steel, floors, soffits, glass-support members and walls.
-  Verify Godot clockwise fronts `(c−a).cross(b−a)` point up/out as appropriate;
-  test CW/CCW and concave inputs, then actual baked roof/well/helix meshes.
-  Two-sided glass is optical treatment, not a winding repair.
-- P0 before/after on exactly matched Crossing bounds (start with
-  `--area=-600,-40,-520,40`), reference starts/settings and collider owners.
-  Reconcile the P1 carry list. No unexplained new overlap, solid, headroom,
-  trap, reach or underside findings. Fix the geometry/call ownership; do not
-  exempt the whole station or raise thresholds. Intentional flying-eye
-  exposure must be identified precisely, not confused with a public fall.
-- Run the required checks, bake/freshness and city validator. Cover every
-  landing, moving car, well guard, lower soffit and route exit with the actual
-  controller. Protect working P1 fixes and adjacent packages.
-- Rendered per-view/per-route p95<=33.3 ms on a named reference machine at
-  stated resolution/settings, using the existing probe. Whole-city P16 is
-  deferred; do not claim local L4 if this local gate is unmeasured or missed.
-  Report p50/p95/p99/worst, draws/triangles, physical geometry density,
-  activation and settled resource counts. No removal of required collision.
-- Batch/stream coherently: no node or collider per tiny lattice segment.
-  Merging surfaces for draw calls is separate from welding nodes. Keep exact
-  visible glass/sill/landing support where parkour depends on it; use one
-  coherent shell collider with actual apertures, not thousands of loose bars.
-- Two leave/unload/re-enter cycles with settled active/pending tile requests,
-  no unexplained retained request/owner/resource growth. No larger timeout
-  used to hide cancellation/ownership failure.
+Run relevant required checks, plan validation and a genuine current bake.
+Walk the intended ground/ring/platform/Clock Room route, representative lift
+stops and arrival wells with real controllers; check the hero and a small rig
+at representative clearances. Show the actual frame junction, outer bezel and
+open eye up close in Godot, including a useful reverse/inside view. Verify
+clock time and bell audio. All substantial geometry needs sensible collision;
+all advertised public openings must be open in the actual contact geometry.
 
-## 10. Diagnostic and acceptance images
+Observe meaningful performance/activation regressions and report them. Full
+P0 before/after matrices, exhaustive part ledgers and per-view33.3ms/unload
+certification are not blockers for this practical construction milestone.
+Unverified final L4 remains explicit P2/P16/local follow-up work. No removal
+of collision or fake pass through coordinate teleports to improve a report.
 
-Write `docs/diagnostics/<date>-moy-P7.md`, separate from the planning note.
-Include all 72 part IDs and 19 joins, actual geometry/collision builders,
-route evidence for both rigs, clock/bell functional results, before/after
-P0 classifications, matched performance samples and unload cycles. Distinguish
-implemented, verified, failed and unrun. A partial implementation stays partial.
+## 10. One combined report
 
-Required views: entire Crossing day/dusk; each platform approach; ground
-entry and helix exit; underside/landing join; ring and bridge connection;
-lift car/landing at each served level; Clock Room interior with bell/clocks;
-roof/Clock Room section through wells and shafts; all four clock eyes;
-exterior and interior glazing at grazing light; crown/bell hanger; and a
-close-up of a welded grid junction beside the actual hero. Isolated component
-renders must use the real production builder/materials, not a separate
-perfect showcase mesh. Include a no-graphics/fixed-camera fallback only as
-an explicitly unverified limitation, never rendered proof.
-
-The planning node detail demonstrates the intended continuous construction;
-it does not prove the game build has welded nodes. The final game close-up
-must show no rounded-bead pattern, pinched ends, faceted-cylinder joints,
-floating bars, clipping seals or panes crossing their supporting frame.
-
-Planning verification: `docs/diagnostics/2026-10-20-moy-P7-planning.md` and
-`docs/diagnostics/2026-10-22-moy-P7-planning-revision.md` (clock fitting revision), plus
-`docs/diagnostics/2026-10-22-moy-P7-garden-revision.md` (latest garden/colour revision).
+Follow `moy_p7_p8_p9_build_handoff.md`: one concise P7/P8/P9 diagnostic with the
+starting implementation checkpoint, major coverage, actual functional checks,
+ordinary-resolution useful images and explicit remaining issues. Include dome
+close-up, Clock Room garden and station-to-park transition evidence. No
+spreadsheet certificate or every-surface route matrix. The model is design
+reference, not runtime proof. Mark practical built/dressed separately from L4.
 
 ## 11. Handoff and decisions
 
@@ -404,14 +386,14 @@ Planning verification: `docs/diagnostics/2026-10-20-moy-P7-planning.md` and
 - Local model and reference images are checked in; external artifact
   publication remains pending because this chat has no publisher.
 
-Build prompt: Pull latest main. Implement P7 from this brief and its model,
-covering all 72 parts and 19 joins. Replace the dome's independent-cylinder
-lattice with the checked shared grid and continuous welded junctions. Complete
-all routes, inherited fixes and L4 checks; write the implementation diagnostic,
-commit and push. Report any failed/unverified gate explicitly.
+Build prompt: In the existing P5/P6 implementation checkout, follow
+`moy_p7_p8_p9_build_handoff.md`: preserve inherited work, integrate the latest
+planning source, build P7 first then P8/P9, run focused checks and report.
 
 - 2026-10-22 revision: outer-bezel glazing fit, distinct magenta marker
   silhouettes and four planned interior garden beds requested by the user.
 
 - 2026-10-22 garden revision: midpoint rose-magenta marker #cf4a6b; majority-green
   interior grounds and explicit rooted/trailing vine construction. Schedule72/19.
+
+Current integrated planning verification: `docs/diagnostics/2026-10-22-moy-P7-P8-P9-handoff-planning.md`.

@@ -2,7 +2,7 @@
 
 World metres and heights above Moy datum. Planning data, not runtime geometry.
 """
-import math
+import math, heapq
 from shapely.geometry import Point, Polygon, LineString, box
 from shapely.affinity import scale
 from shapely.ops import unary_union
@@ -28,6 +28,55 @@ def track_safe(pg,q,clear):
     return q.distance(Point(pg['c']))>pg['track'][1]+clear
 
 
+def _dry_garden(park, domain, paths, rain, benches):
+    """Organic gravel lobes and an obstacle-aware, walkable1.8m trail."""
+    zone=box(*park['dry_garden'])
+    rocks=[r for r in park['rocks'] if zone.buffer(2).contains(Point(r['c']))]
+    palms=[t for t in park['trees'] if zone.contains(Point(t['c']))]
+    spine=LineString([(-608,-8),(-597,-17),(-600,-30),(-611,-40)])
+    lobes=[spine.buffer(5.5,quad_segs=16)]
+    lobes += [scale(Point(t['c']).buffer(1,quad_segs=16),5.2,4.4) for t in palms]
+    lobes += [scale(Point(r['c']).buffer(1,quad_segs=16),r['half'][0]+3.0,r['half'][2]+2.7) for r in rocks]
+    gravel=unary_union(lobes).buffer(2).buffer(-2).intersection(domain).difference(paths).difference(rain)
+    rock_shapes=[scale(Point(r['c']).buffer(1,quad_segs=12),r['half'][0],r['half'][2]) for r in rocks]
+    obstacles=unary_union(rock_shapes+[Point(t['c']).buffer(.5) for t in palms]+[Point(b['c']).buffer(1.25) for b in benches])
+    free=gravel.buffer(-.95).difference(obstacles.buffer(.95))
+    components=[free] if free.geom_type=='Polygon' else list(free.geoms)
+    free=max(components,key=lambda q:q.area)
+    step=.5; xmin,zmin,xmax,zmax=free.bounds
+    cells={(i,j) for i in range(math.floor(xmin/step),math.ceil(xmax/step)+1) for j in range(math.floor(zmin/step),math.ceil(zmax/step)+1) if free.contains(Point(i*step,j*step))}
+    assert cells,'dry garden has no walkable clearing'
+    targets=[(-608,-8),(-598,-18),(-592,-29),(-609,-39),(-616,-30),(-608,-8)]
+    nodes=[min(cells,key=lambda q:(q[0]*step-p[0])**2+(q[1]*step-p[1])**2) for p in targets]
+    def route(a,b):
+        todo=[(0.,a)];best={a:0.};parent={}
+        while todo:
+            _,u=heapq.heappop(todo)
+            if u==b:
+                out=[b]
+                while out[-1]!=a:out.append(parent[out[-1]])
+                return list(reversed(out))
+            for di,dj in ((1,0),(-1,0),(0,1),(0,-1),(1,1),(-1,1),(1,-1),(-1,-1)):
+                v=(u[0]+di,u[1]+dj)
+                if v not in cells:continue
+                cost=best[u]+math.hypot(di,dj)
+                if cost>=best.get(v,float('inf')):continue
+                if not free.covers(LineString([(u[0]*step,u[1]*step),(v[0]*step,v[1]*step)])):continue
+                best[v]=cost;parent[v]=u;heapq.heappush(todo,(cost+math.hypot(v[0]-b[0],v[1]-b[1]),v))
+        raise AssertionError('dry trail cannot connect its clearings')
+    points=[targets[0]]
+    for a,b in zip(nodes,nodes[1:]):points.extend([(i*step,j*step) for i,j in route(a,b)])
+    points.append(targets[-1]);trail=LineString(points).buffer(.9,quad_segs=12).intersection(gravel)
+    assert trail.intersection(obstacles).area<1e-6,'dry trail clips trees, rock or seat'
+    assert trail.distance(paths)<.01,'dry trail does not meet park approach'
+    shrubs=[]
+    for centre in ((-595,-18),(-613,-33),(-600,-11)):
+        for i in range(9):
+            a=i*2.4;r=1.5*math.sqrt((i+.5)/9);q=Point(centre[0]+r*math.cos(a),centre[1]+r*math.sin(a))
+            if gravel.buffer(-.4).contains(q) and trail.distance(q)>.7 and obstacles.distance(q)>.7:shrubs.append((round(q.x,3),round(q.y,3)))
+    return dict(footprint=_polys(gravel),trail=_polys(trail),trail_width=1.8,trail_points=points,shrubs=shrubs,shrub_size=(.65,.45,.6),area=round(gravel.area,2),allocation=park['dry_garden'],rule='legacy rectangle is allocation only; build these curved gravel patches, worn trail and planted drifts; grass fingers meet soil without raised kerbs; retain palms/boulders and shaded seat',trail_clear=True)
+
+
 def build_park_kit(park,crossing,buildings):
     P=park;pg=P['playground'];cx,cz=pg['c'];pr=box(*P['rect']);pond=P['pond'];water=scale(Point(pond['c']).buffer(1,quad_segs=48),*pond['r']);bank=scale(Point(pond['c']).buffer(1,quad_segs=48),pond['r'][0]*pond['bank_top'],pond['r'][1]*pond['bank_top'])
     byid={b['n']:b for b in buildings};houses={str(n):dict(rect=byid[n]['r'],height=4.,door=(byid[n]['r'][2],(byid[n]['r'][1]+byid[n]['r'][3])/2),private='rear keeper/service room; existing upper-flat program remains reserved, no new storey in this pass') for n in (9,10)}
@@ -44,7 +93,7 @@ def build_park_kit(park,crossing,buildings):
     # New walking strips may omit low source planting locally; substantial trees stay.
     for t in P['trees']:
         assert paths.distance(Point(t['c']))>.38,('park path at tree trunk',t['c'])
-    benches=[dict(c=c,bearing=a) for c,a in [((-535,-7),0),((-500,-7),0),((-619,-4.8),180),((-590,45),90),((-537,42),0),((-500,16),90)]]
+    benches=[dict(c=c,bearing=a) for c,a in [((-535,-7),0),((-500,-7),0),((-619,-4.8),180),((-590,45),90),((-537,42),0),((-500,16),90),((-611.5,-38.5),0)]]
     chess=[(-609,42),(-599,34.5),(-586,43)]
     for bench in benches:
         q=Point(bench['c']);assert paths.distance(q)>1.25 and track_safe(pg,q,1.25),('bench in path/track',bench)
@@ -54,9 +103,10 @@ def build_park_kit(park,crossing,buildings):
     land=pr.difference(bank).difference(towerholes).difference(unary_union(footprints))
     track=Point(pg['c']).buffer(pg['track'][1],quad_segs=64)
     soil=land.difference(paths).difference(box(*P['lawn'])).difference(track)
-    green=land.difference(paths).difference(box(*P['dry_garden'])).difference(track)
     rain=unary_union([Point(g['c']).buffer(g['r']) for g in crossing.get('rain_gardens',[])])
-    green=green.difference(rain)
+    dry=_dry_garden(P,land.difference(track),paths,rain,benches)
+    dry_shape=unary_union([Polygon(q['outer'],q['holes']) for q in dry['footprint']])
+    green=land.difference(paths).difference(dry_shape).difference(track).difference(rain)
     dry_ground=soil.difference(green)
     A,J,p,j=_schedule()
     for args in [
@@ -115,7 +165,7 @@ def build_park_kit(park,crossing,buildings):
     j('tea_opening','punched',['tea_wall','door_trim','tea_counter'],'east public threshold, rear service partition','one real2 by2.5 opening, clearance2m both sides, no hidden wall collider')
     j('lodge_opening','punched',['lodge_shell','lodge_door'],'locked building10 east service threshold','guard private service, no speculative interior or sign text')
     j('drainage','meet',['drain','pond_bed','path'],'pond shelf and path margins','no open trench across route; splash recirculation separate from pond swimming water')
-    return dict(version=1,datum=-60,parts=A,joins=J,palette=dict(bridge_stone='#aaa99c',stone='#d2c7ac',sand='#cbb790',gravel='#aa9c81',lawn='#94a575',leaf='#788c63',bloom='#b7868d',timber='#b39c75',steel='#78878a',water='#8ab6b2',ochre='#d6b275',terracotta='#b97f68',net='#688f92',slide='#bc8b9c',rubber='#b5b39a',soil='#8e836b'),routes=route_lines,paths=_polys(paths),dry_ground=_polys(dry_ground),lawns=_polys(green),green_area=round(green.area,2),boardwalk=boardwalk,benches=benches,chess=chess,houses=houses,parasol=dict(radius=4.2,underside=4.2,height=.65),excluded_shrubs=[q for q in P['shrubs'] if paths.distance(Point(q))<1.2],checks=dict(paths_connected=True,tree_trunks_clear=True,pond_bank_clearance=round(bank_clearance,3),bridge_max_grade=round(math.degrees(math.atan(math.pi*boardwalk['rise']/36)),2),parts=len(A),joins=len(J)),ownership='P8 park grounds, boardwalk, parasols, furniture and simple public tea house; P9 playground inside pump-track rim; P7 structures unchanged')
+    return dict(version=1,datum=-60,parts=A,joins=J,palette=dict(bridge_stone='#aaa99c',stone='#d2c7ac',sand='#cbb790',gravel='#aa9c81',lawn='#94a575',leaf='#788c63',bloom='#b7868d',timber='#b39c75',steel='#78878a',water='#8ab6b2',ochre='#d6b275',terracotta='#b97f68',net='#688f92',slide='#bc8b9c',rubber='#b5b39a',soil='#8e836b'),routes=route_lines,paths=_polys(paths),dry_ground=_polys(dry_ground),lawns=_polys(green),dry_garden=dry,green_area=round(green.area,2),boardwalk=boardwalk,benches=benches,chess=chess,houses=houses,crossing_authority=dict(owner='P7',brief='docs/architecture/moy_pkg_P7.md',scene='docs/drawings/moy_crossing_scene.js',source='CROSSING.kit',ground_y=crossing['lawn_y'],path_y=.08,rule='P7 owns all station geometry, Clock Room and garden, frame, clocks and public circulation; P8 connects surrounding paths and grades only; no proxy replacement'),parasol=dict(radius=4.2,underside=4.2,height=.65),excluded_shrubs=[q for q in P['shrubs'] if paths.distance(Point(q))<1.2],checks=dict(paths_connected=True,tree_trunks_clear=True,dry_trail_clear=dry['trail_clear'],pond_bank_clearance=round(bank_clearance,3),bridge_max_grade=round(math.degrees(math.atan(math.pi*boardwalk['rise']/36)),2),parts=len(A),joins=len(J)),ownership='P8 park grounds, boardwalk, parasols, furniture and simple public tea house; P9 playground inside pump-track rim; P7 structures unchanged')
 
 
 def build_playground_kit(park,crossing):

@@ -1699,6 +1699,12 @@ platforms, their clearance from both lines' decks, headroom under the head
 beams, the ring's spans, the roof over the trains and over the platforms and
 towers, and everything off the park's walks, pond, playground and buildings.
 
+The northwest dry garden's rectangular plan allocation is not its material
+outline (user refinement2026-10-22): curved gravel lobes and planted drifts
+meet fingers of grass, with a winding trail and seating under the palms.
+The park model now includes the complete detailed Crossing from the shared
+P7 scene; its station geometry remains P7's authority.
+
 The giant playground moved whole to the south-east quarter (7b), beside a
 smaller green and the park lodge. User revision2026-10-22: broad lawns connect the park activity and shade
 areas, with paving limited to circulation and gathering pockets. The northwest

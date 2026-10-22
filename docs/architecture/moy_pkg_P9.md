@@ -1,6 +1,6 @@
 # P9 — The giant playground, built together with P8
 
-2026-10-22. **Ready for one combined P8/P9 implementation pass.**
+2026-10-22. **Ready: park stage of the sequential P7–P9 handoff.**
 
 - Area: the existing southeast playground centred world(-515,31), inside
   its pump-track outer radius15.4 m. Preserve the locked park/station plan.
@@ -177,7 +177,7 @@ geometry, collision, access or visual defects do.
 
 ## Handoff
 
-One chat implements both P8 and P9 from `moy_p8_p9_build_handoff.md`. Do not
+One chat implements both P8 and P9 from `moy_p7_p8_p9_build_handoff.md`. Do not
 parallel-edit their shared files or stop after building only four tower proxies.
 No new lore introduced; this develops the existing approved playground program.
 
@@ -237,3 +237,5 @@ Shapes use the listed exponents; no cap or rounding may close an opening.
 | `perch_bearing` | seated | perch tops12m | same shared bearing plane, no overlapping rounded caps |
 | `hoop_hang` | seated | eight3D centres, source cable anchors | solid rims, open centres; cables end at visible structure, not sky |
 | `swing_anchor` | seated | real Lookout and unchanged P7/high-line structures | reuse shared swing tags; no movement retuning or new power framework |
+
+Current integrated planning verification: `docs/diagnostics/2026-10-22-moy-P7-P8-P9-handoff-planning.md`.

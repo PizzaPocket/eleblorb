@@ -424,7 +424,7 @@ integrated park construction pass requested by the user.
   restrained nets/slides. No printed words, letters, numerals or mechanic signs.
 - Coverage: P8 41 parts/12 joins, P9 30/12 in checked plan data. Practical
   reusable village geometry is preferred over new procedural frameworks.
-- Exclusions: steel wind trees (superseded), new lawns in the dry garden,
+- Exclusions: steel wind trees (superseded), irrigated turf inside the planted dry-gravel lobes,
   opulent fountains, opaque water, floating reeds, unsupported roofs/slides,
   net-shaped solid walls, traffic barriers across the shared park entrance.
 
@@ -433,3 +433,10 @@ village's shallow arch construction and curved rails, limited to this one
 crossing. No roof/pagoda ornament. Maintained lawns now join the shaded
 park spaces; the northwest dry garden and wet reed banks retain their roles.
 The full outer pond shore has a checked2m park-edge buffer.
+
+P7–P9 integration2026-10-22: the full authoritative P7 scene is shared by the
+park and Crossing detail pages. P8 never supplies replacement station forms.
+The northwest dry garden now uses irregular rounded gravel lobes, a worn
+winding trail, planted drifts and grass fingers around retained palms/rocks;
+its old rectangular allocation is not a visible border. Seven park benches
+include a seat under the dry garden palms. Existing palette/species remain.

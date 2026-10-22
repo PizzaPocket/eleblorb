@@ -1,39 +1,11 @@
-# P8 + P9 — one integrated park build
+# P8/P9 handoff — superseded by the integrated P7–P9 handoff
 
-2026-10-22. User requested these together because the playground belongs to
-the park. One implementation owner, one coherent construction pass.
+2026-10-22. The user requested one fresh builder conversation for the Crossing,
+park and playground. Use `moy_p7_p8_p9_build_handoff.md`.
 
-Pull latest main. Read AGENTS.md, CLAUDE.md, current Moy roadmap direction,
-`moy_pkg_P8.md`, `moy_pkg_P9.md` and their shared model
-`docs/drawings/moy_park_playground_3d.html`. Follow checked PARK kit data in
-`tools/moy_park_kit.py` and `city_layout.py`. Do not restart P3/P4 reviews or
-change P5/P6/P7 construction. This handoff covers P8/P9, not the whole city.
+Start in the existing P5/P6 implementation checkout, preserve its local work,
+integrate the latest planning changes, build P7 first and then P8/P9 together.
+The detailed Crossing is authoritative and now present in the combined model.
+Do not use the old simplified station or start from an incomplete clone of main.
 
-Build a coherent playable park at practical Ohio/Snowhio sophistication:
-connected grounds and level thresholds, real inset pond banks/shared water/arched stone bridge,
-dry garden, six shaded tea/chess parasols, simple public tea room, lodge shell,
-broad lawns and tree planting. Replace the playground's four proxy boxes with the
-warm canyon structures, usable ramp/bridges/nets, supported open slides,
-perches/hoops, soft ground/splash pad and smooth pump track. Finish the whole
-area in coherent batches. No new movement, cloth, chess, scoring or water system.
-
-The schedules (P8 41 parts/12 joins; P9 30/12) describe shapes, exponents,
-collision and construction joins. Use them as design guidance. Simplify minor
-details sensibly; never copy model sampling faults, capped mouths, opaque
-nets or unsupported joins. Keep silhouettes, sites, heights and public routes.
-Adjust local slide phases/net cutouts/guard openings to resolve real clashes.
-
-Sequence: ground/pond/paths and common entry → tower/ramp/bridges → nets/slides/
-track → tea/shade/furniture/planting → integrated bake and focused walkthrough.
-Use fast local previews during construction and normal-resolution screenshots.
-Run required checks, verify actual ordinary routes/contact with the hero and
-representative small-rig checks, and report remaining failures honestly. No
-exhaustive parts certificate, all-power route matrix or repeated city-wide
-performance loops. Final L4/global budgets stay tracked separately.
-
-Write `docs/diagnostics/<date>-moy-P8-P9.md`, with useful images, checks actually
-run, completed groups and meaningful follow-ups. Commit/push as the repository
-owner. Stop for a combined park review; do not automatically start P10.
-
-P8 revision2026-10-22: broad lawn patches, a gently humped Chinese-garden
-stone bridge, and a checked2m buffer around the full revised pond bank.
+The individual package briefs and full schedules remain the design references.

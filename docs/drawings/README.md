@@ -70,18 +70,28 @@ P7 garden refinement (2026-10-22): roughly53% green interior grounds with
 paved circulation, lighter muted magenta markers, and explicit rooted climbing
 vines with pendant tips. Model includes garden-plan and vine close-up views.
 
-## P8 + P9 — The park and giant playground
+## P7 + P8 + P9 — Integrated Crossing, park and playground
 
-`moy_park_playground_3d.html` is one integrated model for both packages, drawn
+`moy_park_playground_3d.html` is the integrated model for all three packages, drawn
 from `PARK.kit` (41 parts/12 joins) and `PARK.playground.kit` (30/12).
 Views: overview, ground plan, pond, dry garden, tea terrace, tea-house section,
 playground, pump track, lawn/lodge and net bearings. A net/hoop detail sits
-beside the game-exported hero. Station/neighbours are context toggles.
+beside the game-exported hero. The Crossing is the complete P7 scene; neighbours remain optional context.
 
 Local model and `references/moy_park_playground_*.png` are checked in;
 external artifact publication pending. Preview geometry is design evidence,
 not a runtime collision/route certificate. Briefs: `moy_pkg_P8.md` and
-`moy_pkg_P9.md`; one `moy_p8_p9_build_handoff.md` guides implementation.
+`moy_pkg_P9.md`; `moy_p7_p8_p9_build_handoff.md` guides sequential implementation.
 
 P8 revision2026-10-22: broad lawn patches, a gently humped Chinese-garden
 stone bridge, and a checked2m buffer around the full revised pond bank.
+
+The P7 and park models now embed the same canonical
+`moy_crossing_scene.js`. Run `python3 tools/embed_moy_crossing_scene.py`
+after editing that source; `--check` verifies both HTML copies. Each HTML
+remains a single-file download with the existing Three.js CDN dependencies.
+No low-fidelity Crossing is an implementation reference. The integrated model
+adds Crossing/dome/Clock Room/section views, and its ground plan only hides
+that layer to expose paths. Its organic dry-garden footprints and1.8m trail
+supersede the former rectangular gravel pad. The current builder entry point
+is `docs/architecture/moy_p7_p8_p9_build_handoff.md`.
