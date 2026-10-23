@@ -4314,6 +4314,95 @@ assert _ws['watch_v'][1]<=_ws['outer_plant_v'][0]<_ws['outer_plant_v'][1]<=_ws['
 assert all(197.+_ws['ground_clear']/2 <= math.hypot(x-CX,z) <= 203.-_ws['ground_clear']/2 for x,z in _ws['ground_path'])
 
 
+# P11 revision: architectural study only. Prior rollout/handoff is withdrawn.
+def _wall_architectural_study():
+    import random
+    from shapely.geometry import box as polybox, LineString, Point
+    from shapely.ops import unary_union
+    rng=random.Random(71123)
+    path=[(u, -9.5+.85*math.sin(u*2*math.pi/30+.4)) for u in [(-18+i*.3) for i in range(121)]]
+    domain=polybox(-13.5,-12.5,13.5,-6.5)
+    pavement=LineString(path).buffer(1.6,cap_style=2)
+    aprons=[polybox(c-(1.2 if c else 1.0),-11.8,c+(1.2 if c else 1.0),-6.) for c in (-9,0,9)]
+    pavement=unary_union([pavement]+aprons).intersection(polybox(-13.5,-12.5,13.5,-6))
+    beds=domain.difference(pavement)
+    def polys(q):
+        return [dict(outer=list(v.exterior.coords)[:-1],holes=[list(h.coords)[:-1] for h in v.interiors]) for v in ([q] if q.geom_type=='Polygon' else q.geoms) if v.geom_type=='Polygon' and v.area>.001]
+    plants=[]
+    for _ in range(1000):
+        x=rng.uniform(-13.35,13.35);z=rng.uniform(-12.35,-6.65)
+        if not beds.buffer(-.12).contains(Point(x,z)):continue
+        # Coherent bands: taller grass toward wall, low rosettes at bends/edges.
+        kind='grass' if z>-9.5 or math.sin(x*.45)>.0 else 'rosette'
+        if any((x-a['c'][0])**2+(z-a['c'][1])**2<(.24 if kind=='grass' else .42)**2 for a in plants):continue
+        plants.append(dict(c=(round(x,3),round(z,3)),kind=kind,scale=round(rng.uniform(.8,1.25),3),seed=rng.randrange(100000)))
+    parts=[];joins=[]
+    def p(id,shape,semi,c,col,where,n=5.5,**kw):
+        d=dict(id=id,shape=shape,semi=semi,c=c,col=col,where=where,role='mass')
+        if shape in ('profile','punched','arch'):d['n']=n
+        if shape in ('egg','clipped'):d['eps']=(n,n)
+        if shape=='box':d['reason']='planar load-bearing/floor/cut-plane construction, shared exact seams'
+        d.update(kw);parts.append(d)
+    def j(id,kind,ids,plane,rule):joins.append(dict(id=id,kind=kind,parts=ids,plane=plane,rule=rule))
+    p('retained_vault','arch',(4.5,3.125,2.5),(0,3.125,-3.5),'solid','three9m bays;6.5 span, spring2.25,crown5.5, real5m depth',n=3.4)
+    p('outer_infill','box',(13.5,6,3.5),(0,6,2.5),'solid','outer7m structural fill, not a hollow stage flat')
+    p('upper_bearing','profile',(13.5,.15,2.5),(0,6.2,-3.5),'solid','continuous bearing belt6.05..6.35 over real vaults')
+    p('upper_wall','box',(13.5,2.525,2.5),(0,8.875,-3.5),'solid','upper wall6.35..11.4, deep ceramic/concrete infill')
+    p('pier_plinth','profile',(1.25,.525,.12),(4.5,.525,-6.04),'solid','stone feet at all four pier axes, clipped at study ends, not across doors')
+    p('pier_face','profile',(.32,5.175,.08),(4.5,6.225,-6.04),'solid','same pier axes rise1.05..11.4; applied stone profile expresses existing mass')
+    p('arch_ring','arch',(3.6,2.925,.115),(0,2.925,-6.045),'solid','true.35 stone ring/jambs;12 radial voussoirs and spring stones, same opening as vault',n=3.4)
+    p('spring_block','profile',(.55,.12,.16),(3.8,2.25,-6.04),'solid','bearing block seated on actual pier, not stripe through void')
+    p('ceramic_panel','profile',(3.6,2.18,.045),(0,8.875,-6.005),'solid','recessed upper panel perbay; subtle1.1m horizontal joints, ceramic not flat brown paint')
+    p('cap_reveal','profile',(13.5,.10,.04),(0,11.5,-5.98),'decorative','continuous recessed shadow throat11.4..11.6')
+    p('coping','profile',(13.5,.20,6.08),(0,11.8,0),'landing','weathered cap11.6..12; slight city-side nose within wall-to-Rim gap')
+    p('parapet','profile',(13.5,.53,.29),(0,12.53,5.65),'solid','12..13.06 outer wall; top coping to13.2')
+    p('parapet_coping','profile',(13.5,.07,.35),(0,13.13,5.65),'solid','13.06..13.2, softened edge and underside drip')
+    p('vault_floor','box',(3.25,.10,2.5),(0,-.10,-3.5),'landing','top0; apron/path share walking datum')
+    p('bench_seat','profile',(1.35,.075,.30),(0,.475,-1.95),'solid','timber planks on two brackets, two occupied bays; overall seat2.7x.6')
+    p('bench_back','profile',(1.35,.27,.055),(0,.88,-1.69),'solid','back fixed to brackets, against rear masonry')
+    p('bench_leg','profile',(.065,.20,.23),(.95,.20,-1.95),'solid','two steel brackets with grounded feet')
+    p('service_door','profile',(1.2,1.35,.07),(0,1.35,-4.85),'solid','middle bay recessed2.4x2.7 double leaf; superellipse head, fixed side panels')
+    p('service_surround','punched',(1.29,1.44,.10),(0,1.44,-4.83),'solid','ring around actual leaf opening, not fake second arch',floor=True)
+    p('path','profile',(13.5,.025,1.6),(0,-.025,-9.5),'landing','width3.2 on shared curved footprint with2.4m seat aprons')
+    p('garden_edge','profile',(1,.08,.045),(0,.08,0),'solid','low stone/metal edge follows shared bed boundary; no raised threshold across path')
+    p('grass_leaf','profile',(.035,.40,.008),(0,.4,0),'decorative','curved tapered blades in dense irregular drifts, 8-12 per clump',n=2.)
+    p('rosette_leaf','profile',(.09,.22,.015),(0,.22,0),'decorative','broad blue-green agave/aloe leaves in layered low rosettes',n=2.)
+    p('climber_trellis','profile',(.015,1.6,.015),(-2.65,1.8,-2.1),'decorative','supported wire from actual niche bed; stems/leaves/muted blooms, no green panel')
+    p('bastion_base','box',(10,6,5),(0,6,11),'solid','retained20x10 footprint, ground to12, related plinth/piers/coping')
+    p('bastion_raised_roof','box',(10,1,2),(0,13,14),'landing','outer terrace14, notched inner zone for ramp')
+    p('bastion_corner','profile',(.35,6.45,.10),(9.65,6.95,16.03),'solid','same stone pier grammar from plinth to crown')
+    p('ramp','profile',(1.2,.10,5),(0,0,0),'landing','two10m1:10 flights12→13→14, endpoints from post_access')
+    p('landing','box',(.9,.10,2.5),(5.9,12.9,9.5),'landing','1.8m end landing at13; connected lower/upper throats')
+    p('guard','profile',(.035,.035,1),(0,0,0),'solid','continuous swept n5.5 rail over glass/steel infill,1.1m above paths')
+    p('roof_bed','profile',(1.5,.3,.5),(-2,14.3,15.1),'solid','outer strip14.6..15.6, path stays12..14.4')
+    p('canopy_post','profile',(.15,1.35,.125),(2.1,15.35,15.0),'solid','two at u2.1/7.2, base14; anchor into structural body, not plant soil')
+    p('canopy_base','profile',(.24,.08,.22),(2.1,14.08,15.0),'solid','recessed four-bolt shoe over real roof bearing')
+    p('canopy_beam','profile',(.13,.10,1.9),(2.1,16.8,13.4),'solid','cantilever roof beam to16.7 underside, real bearing atop post')
+    p('canopy_slat','profile',(.065,.075,1.9),(0,16.975,13.4),'solid','warm timber blade field between u1.8..7.6, top17.05, seated on crossbeams')
+    p('searchlight','egg',(.5,.35,.4),(-8,15.2,15.1),'solid','anchored opposite corner, lens/beam outward; existing night function',n=3.)
+    p('niche_light','profile',(.6,.025,.035),(0,3.3,-1.2),'decorative','warm concealed light near rear seat, not repeated neon on every bay')
+    j('vault_piers','meet',['retained_vault','pier_plinth','pier_face','arch_ring','spring_block'],[0,0,1,-6],'same opening profile, shared spring plane and pier bearing; no independent silhouettes')
+    j('upper_bearing','seated',['retained_vault','upper_bearing','upper_wall','ceramic_panel'],[0,1,0,6.35],'upper mass bears on belt above5.5 crown; recessed panels are cladding, not structure')
+    j('cap','seated',['upper_wall','cap_reveal','coping','parapet','parapet_coping'],[0,1,0,12],'coordinated top section; drain away from openings, no floating frieze')
+    j('threshold','meet',['vault_floor','path','garden_edge'],[0,1,0,0],'shared path/apron/bed boundary; no unpaved grass sliver into seat niche')
+    j('seat','seated',['bench_seat','bench_back','bench_leg','vault_floor'],[0,1,0,0],'planks on physical brackets; real standing space in front')
+    j('door','punched',['service_door','service_surround','retained_vault'],[0,0,1,-4.85],'recessed closure inside larger structural arch, not a filled wall at its mouth')
+    j('bastion_notch','punched',['bastion_base','bastion_raised_roof','ramp','landing','guard'],[0,1,0,14],'real open roof notch and shared ramp/guard throats; no slab overhead')
+    j('shade','seated',['canopy_post','canopy_base','canopy_beam','canopy_slat','bastion_raised_roof'],[0,1,0,14],'support bases into bastion; columns end at beams16.7; timber blades on beams, top17.05')
+    j('garden','meet',['roof_bed','guard','bastion_raised_roof','searchlight'],[0,1,0,14],'path12..14.4 clear; raised beds14.6..15.6, housing opposite canopy')
+    return dict(status='design review; build handoff withdrawn',scope='straightened27m three-bay detail and one20x10 bastion; not a site rearrangement',
+      length=27.,bay_centres=(-9.,0.,9.),wall_height=12.,wall_thickness=12.,arch=dict(span=6.5,spring=2.25,crown=5.5,depth=5.,n=3.4,ring=.35),
+      elevation=dict(plinth=(0.,1.05),belt=(6.05,6.35),upper=(6.35,11.4),reveal=(11.4,11.6),coping=(11.6,12.),parapet=(12.,13.2)),
+      palette=dict(stone='#bfb49d',brick='#987763',ceramic='#ddd2b8',steel='#36504d',timber='#99724e',paving='#b8ae99',soil='#766d55',grass='#82916a',silver='#829d8c',flower='#b77c99'),
+      ground=dict(path=polys(pavement),beds=polys(beds),plants=plants,path_centres=path,path_width=3.2,planted_area=round(beds.area,2),paved_area=round(pavement.area,2)),
+      canopy=dict(u=(1.8,7.6),v=(11.5,15.3),underside=16.7,top=17.05,posts=[(2.1,15.),(7.2,15.)],status='proposed, not approved for7-post rollout'),parts=parts,joins=joins)
+WALL['kit']['status']='withdrawn first draft; see study, not build ready'
+WALL['kit']['study']=_wall_architectural_study()
+parts_checks('Wall architectural study',WALL['kit']['study']['parts'],WALL['kit']['study']['joins'])
+assert WALL['kit']['study']['canopy']['underside']-14.>=2.4
+assert len(WALL['kit']['study']['ground']['plants'])>100
+
+
 if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
     problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))
 

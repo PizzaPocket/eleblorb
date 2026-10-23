@@ -1,4 +1,11 @@
-# P11 wall/garden planning — 2026-10-23
+# P11 initial planning — WITHDRAWN design readiness
+
+The user rejected this model/readiness claim later on2026-10-23. Keep the
+checks below as historical technical evidence only. Active architecture:
+`moy_p11_architectural_study.md`; revised evidence:
+`2026-10-23-moy-P11-architectural-revision.md`. No build handoff is active.
+
+# Historical P11 wall/garden planning — 2026-10-23
 
 Design readiness, not a runtime acceptance claim. Base main c830eac. Preserve
 the local built city checkout and its source/bake recovery checkpoints; this

@@ -1,7 +1,13 @@
 # P11 — the wall, gates and linear gardens
 
-2026-10-23. **Ready for a practical L3 build after P10's rail interface is
-settled.** Preserve the existing implementation checkout and earlier packages.
+2026-10-23. **Architectural development — NOT BUILD READY.**
+The user rejected the first model as crude and the architectural design as
+underdeveloped. The active design is `moy_p11_architectural_study.md`: one
+representative wall section and one complete bastion, for design review.
+This supersedes readiness and rollout claims below; the old39-part schedule
+is a withdrawn draft. Gates/full-circuit authoring wait for this review.
+
+Historical scope/constraints follow. Preserve the existing implementation checkout and earlier packages.
 This is a design brief, not certification that the wall is built.
 
 ## 1. Read first and ownership

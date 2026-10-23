@@ -107,7 +107,7 @@ alternative P7 station design. External hosting remains pending; GitHub HTML
 source links are not a hosted viewer. Download the HTML and open in a browser
 with network access for the existing Three.js CDN dependencies.
 
-## P11 wall and linear gardens — 2026-10-23
+## P11 initial wall model — withdrawn historical design
 
 `moy_wall_gardens_3d.html`: full wall circuit, High Line-inspired planted Rim
 path, real vault/seat niches, clear watch promenade, seven bastion gardens
@@ -115,3 +115,17 @@ and ramp sections, inherited gates, night searchlights. WALL.kit drives the
 39-part/15-join schedule, ground path, section and post access. Actual exported
 game hero; site context and technical sections clearly identified. Brief:
 `../architecture/moy_pkg_P11.md`. Downloadable HTML, external hosting pending.
+
+## P11 architectural revision — active model, 2026-10-23
+
+The initial P11 full-circuit model and build-readiness claim were rejected by
+the user and withdrawn. The same `moy_wall_gardens_3d.html` now shows the active
+**27m/three-bay architectural study plus one20×10m bastion**, not a complete
+city-edge proposal. Masonry vault/ring/pier/base/bearing/cap construction,
+ceramic infill, timber seats, planted path, ramp notch and supported shade are
+coordinated across eye views, elevations, plans and sections. Design review
+only; proposed canopy, gate adaptation and rollout remain unapproved.
+
+Current references: `references/moy_wall_study_*.png`. Older
+`references/moy_wall_*.png` without `study` are withdrawn historical images,
+not builder references. Active brief: `../architecture/moy_p11_architectural_study.md`.

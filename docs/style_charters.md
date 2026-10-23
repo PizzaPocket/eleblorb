@@ -440,3 +440,39 @@ The northwest dry garden now uses irregular rounded gravel lobes, a worn
 winding trail, planted drifts and grass fingers around retained palms/rocks;
 its old rectangular allocation is not a visible border. Seven park benches
 include a seat under the dry garden palms. Existing palette/species remain.
+
+## Moy: railway wall and bastions — P11 proposed charter
+
+2026-10-23. **Draft for architectural review. Not approved for rollout.**
+The rejected first P11 model/39-part draft do not establish this design.
+Active brief: `architecture/moy_p11_architectural_study.md`.
+
+- **Primary75%:** adapted masonry railway viaduct: deep vaulted bays, broad
+  load-bearing piers, stone arch rings, durable plinths, continuous bearing
+  belt and simple weathered coping. The structure explains the original railway.
+- **Secondary20%:** Moy's ceramic/steel civic language, confined to recessed
+  upper infill, service doors, guards and a supported flat shade canopy.
+- **Accent5%:** warm timber seats/blades, restrained bronze/mauve detail.
+  High Line informs paths, planting and occupation; it is not a facade style.
+- **Module:**9m bays,6.5m span, spring2.25/crown5.5,5m vault depth. Stone
+  plinth to1.05, bearing belt6.05..6.35, upper field to11.4, reveal/cap to12,
+  outer parapet to13.2. Same datums/materials on related bastion, roof14.
+- **Materials60/30/10:** light structural/ceramic surface; retained warm
+  masonry and stone depth; dark grey-green steel/timber/plant accents.
+  One coherent palette in WALL.kit.study.palette, not a flat brown coating.
+- **Openings:** n3.4 superellipse vault and matching real ring; modest n5.5
+  framed service leaf inside one larger bay. Recesses are real volumes.
+- **Roofs:** flat masonry cap and thin steel/timber shade, with visible beams,
+  supports and drainage. Proposed canopy top17.05, underside16.7; subject to
+  review before applying to7 bastions. Existing gate massing/roof types retained.
+- **Variation:** seat garden / maintenance / open seat bay, changing depth and
+  occupation within identical structural grammar. Bastions use the same base,
+  pier rhythm and crown, with a framed viewing place rather than a bare box.
+- **Landscape:** massed grasses, low agave/aloe, supported climbers, planted
+  fingers and connected flush aprons. No new tree sites or deep soil on caps.
+- **Exclusions:** crenellations, classical pediments, timber pagoda eaves,
+  token planter rows, green rods, false shops, random facade graphics, printed
+  words/numerals, unsupported caps or shelters, filled collision behind vaults.
+
+The representative must earn visual acceptance at eye height. Gates, terrain
+placement, complete circuit and production schedule remain later development.

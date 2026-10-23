@@ -800,6 +800,13 @@ Data: `WALL` and `CROSS` in `tools/city_layout.py`, written to
 `CityPlan.WALL` and `CityPlan.CROSS`, drawn on `moy_plan.html` and
 `moy_city_3d.html`.
 
+**P11 design status revised2026-10-23:** the user rejected the initial model
+and readiness claim. `moy_p11_architectural_study.md` and WALL.kit.study now
+develop one representative wall section/bastion for review, with a proposed
+charter in style_charters.md. The previous full-circuit handoff is withdrawn.
+Existing sites, rail/route constraints and history below remain inputs;
+they are not evidence that the architecture has been approved.
+
 **P11 coordination,2026-10-23:** `moy_pkg_P11.md` and WALL.kit govern the
 wall's construction and connected landscapes. The user specifically prefers
 the High Line's interesting paths and integrated planting: use a woven ground
