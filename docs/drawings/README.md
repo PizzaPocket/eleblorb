@@ -106,3 +106,12 @@ Neighbour massing and network platforms are technical context, never an
 alternative P7 station design. External hosting remains pending; GitHub HTML
 source links are not a hosted viewer. Download the HTML and open in a browser
 with network access for the existing Three.js CDN dependencies.
+
+## P11 wall and linear gardens — 2026-10-23
+
+`moy_wall_gardens_3d.html`: full wall circuit, High Line-inspired planted Rim
+path, real vault/seat niches, clear watch promenade, seven bastion gardens
+and ramp sections, inherited gates, night searchlights. WALL.kit drives the
+39-part/15-join schedule, ground path, section and post access. Actual exported
+game hero; site context and technical sections clearly identified. Brief:
+`../architecture/moy_pkg_P11.md`. Downloadable HTML, external hosting pending.

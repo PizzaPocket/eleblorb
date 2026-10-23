@@ -4226,6 +4226,94 @@ assert 2*(TRAIN['doors']['at']+.7+TRAIN['kit']['cabin']['door_slide'])<TRAIN['ca
 assert 2+1.4*(1-(.75/1.325)**5.5)**(1/5.5)-.08 >= TRAIN['floor']+2.3
 assert TRAIN['car'][1]/2+.025 <= PLATFORMS['edge']-.05+1e-8
 
+
+# P11 wall and linear gardens. Local u tangent, v outward from wall centreline.
+def _wall_kit():
+    W=WALL; parts=[];joins=[]
+    def p(id,shape,semi,c,col,where,**kw):
+        q=dict(id=id,shape=shape,semi=semi,c=c,col=col,where=where,role='mass')
+        if shape in ('egg','clipped'):q['eps']=(5.5,5.5)
+        if shape in ('profile','punched','arch'):q['n']=5.5
+        if shape=='box':q['reason']='continuous filled wall/floor or cut-plane bearing, without rounded seams'
+        q.update(kw);parts.append(q)
+    def j(id,kind,ids,plane,rule):joins.append(dict(id=id,kind=kind,parts=ids,plane=plane,rule=rule))
+    p('wall_fill','box',(4.5,6,3.5),(0,6,2.5),'solid','outer7m infilled concrete/earth; full12m wall where no arch; shared radial end cuts')
+    p('arch_bay','arch',(4.5,6,2.5),(0,6,-3.5),'solid','inner5m real vaulted recess; arch span6.5/crown5.5/spring2.25; old viaduct piers9m rhythm',n=3.4)
+    p('arch_floor','box',(3.25,.12,2.5),(0,-.12,-3.5),'landing','flush0, same opening boundary; no step from Rim Walk')
+    p('arch_back','profile',(3.25,2.75,.09),(0,2.75,-.91),'solid','closed structural back wall at5m recess depth; no false through-door')
+    p('arch_surround','arch',(3.45,2.95,.12),(0,2.75,-6.02),'decorative','continuous pale arch rim following actual opening, not a painted rectangle',n=3.4)
+    p('arch_shutter','profile',(3.1,2.65,.06),(0,2.65,-5.92),'solid','closed storage/venue fronts only; no printed signs or invented vendors')
+    p('wall_cap','profile',(4.5,.12,6),(0,11.88,0),'landing','cut-to-cut cap, top12; no whole wall egg intruding into vaults')
+    p('outer_parapet','profile',(4.5,.6,.35),(0,12.6,5.65),'solid','continuous1.2m outer guard; cap drain outward, shared radial joints')
+    p('inner_rail','profile',(4.5,.035,.035),(0,13.1,-5.7),'solid','city-side railway guard,1.1m above wall top; poles at3m rhythm')
+    p('track_barrier','profile',(4.5,.035,.035),(0,13.1,1.125),'solid','watch-walk rail-side guard; no crossing of live tracks')
+    p('guard_posts','profile',(.035,.55,.035),(0,12.55,1.125),'solid','shared posts below continuous rails,3m bays')
+    p('watch_paving','box',(4.5,.08,1.8),(0,11.92,3.025),'landing','top12, clear v1.225..4.825; platform approach narrows to2.4m')
+    p('upper_trough','profile',(3,.225,.225),(0,12.225,5.075),'solid','v4.85..5.3; grasses/low succulents, no trees on narrow cap')
+    p('upper_grass','profile',(2.8,.25,.18),(0,12.7,5.075),'decorative','small individual blades/clumps rooted in trough; no green sausage')
+    p('climber_wire','profile',(.015,.015,1.5),(0,5.7,-6.1),'decorative','small planted runs over selected recesses, rooted inside trough')
+    p('ground_bed','profile',(3,.16,.7),(0,.16,-7),'solid','variable curved strips inside existing Rim Walk197..203m annulus, flush walking edges')
+    p('garden_clumps','profile',(.30,.40,.30),(0,.4,0),'decorative','desert grasses/agave/aloe drifts; never scattering lone random flowers')
+    p('niche_bench','egg',(.90,.225,.28),(0,.225,-3.0),'solid','in open arch niche; wall-backed seat off clear Rim route')
+    p('bench_back','profile',(.90,.32,.045),(0,.85,-2.65),'solid','back fixed to bench subframe, seats look toward city')
+    p('niche_light','profile',(.6,.035,.035),(0,3.8,-5.7),'decorative','warm underside light; no bare bright neon bands')
+    p('post_base','box',(10,7,5),(0,7,11),'solid','20m along by10m outward from wall face; roof14, ramp notch cut in inner part')
+    p('post_roof','profile',(10,.15,5),(0,13.85,11),'landing','top14, shared ramp opening; no complete slab over ramp')
+    p('post_ramp','profile',(1.2,.12,5),(0,0,0),'landing','two10m 1:10 flights,12→13→14;2.4m clear, two1.8m end landings; exact notch/collision from same sweep')
+    p('post_landing','box',(.9,.12,2.5),(0,0,0),'landing','folded-flight end landings and watch-walk throat; no closed guard across arrivals')
+    p('post_parapet','profile',(10,.55,.18),(0,14.55,15.82),'solid','1.1m roof guard on all exposed edges, open only at actual ramp')
+    p('post_planter','profile',(1.5,.30,.5),(-2,14.3,15.1),'solid','outer viewing terrace garden pockets away from ramp/light sweep')
+    p('post_bench','egg',(.9,.225,.28),(1,14.225,14.75),'solid','seated in garden pause, retaining2.4m route')
+    p('light_plinth','profile',(.5,.4,.5),(-8,14.4,15.1),'solid','searchlight pedestal; fixed outside viewing route')
+    p('searchlight','egg',(.5,.35,.4),(-8,15.2,15.1),'solid','gimballed housing, real outward-facing lens, no weapon silhouette',eps=(3,3))
+    p('lens','profile',(.35,.25,.035),(-8,15.2,15.52),'decorative','outward lens; beam is nonphysical and night-only')
+    p('gate_pier','profile',(8.5,6,12),(0,6,6),'solid','North/South two side masses cut around10x8 clear passage; never full box across gate')
+    p('gate_head','arch',(5,2,12),(0,10,6),'solid','bridge above8m clear road arch, to wall datum12; shared cut with side piers',n=5.5)
+    p('gate_tier','profile',(3.5,1.45,3.5),(0,0,0),'solid','three7/5.6/4.2m corner tiers,3.2m tier pitch, base14.5; no timber pagoda eaves')
+    p('tier_roof','profile',(4,.15,4),(0,0,0),'solid','thin flat steel tier roofs, shared bearing, no floating ornamental caps')
+    p('gate_bell','profile',(.35,.5,.35),(0,0,0),'solid','small hollow bronze gate bell under first-tier roof; fixed clapper support')
+    p('gate_approach','profile',(1.2,.12,11),(0,0,0),'landing','watch route12→14.2 at1:10 over22m before40m platform, width2.4, no track crossing')
+    p('hall_panel','punched',(1,1,.12),(0,0,0),'solid','City Hall/West Gate exact existing footprint, train hall arcs and access openings; dimensions from ARCH/WEST_GATE, no solid proxy',floor=True)
+    p('diagrid','profile',(.16,.16,1),(0,0,0),'solid','ceramic-clad diagonal frame segments cut at actual hall openings; shared nodes, no beam across access')
+    p('garden_edge','profile',(2,.3,.5),(0,0,0),'solid','existing West Gate community roof beds; keep station/lift landing clear')
+    j('wall_radial','meet',['wall_fill','wall_cap','outer_parapet'],[1,0,0,4.5],'adjacent bays share radial end planes; no overlapped slabs or visible gaps')
+    j('vault','punched',['wall_fill','arch_bay','arch_floor','arch_surround','arch_back'],[0,0,1,-6],'real5m recess, full-height structural back; no black decal hiding solid wall')
+    j('cap_bearing','seated',['wall_cap','arch_bay','wall_fill','watch_paving'],[0,1,0,12],'cap bears above vault, sole walking surface top12')
+    j('guard_chain','chain',['outer_parapet','inner_rail','track_barrier','guard_posts'],[1,0,0,4.5],'continuous swept guards, shared vertices; openings only at real paths')
+    j('rooted','seated',['upper_trough','upper_grass','climber_wire'],[0,1,0,12],'soil roots inside trough, drainage to wall service line; foliage stays out of train envelope')
+    j('rim_garden','meet',['ground_bed','garden_clumps','arch_floor'],[0,1,0,0],'curved planted paving edge, level thresholds; maintain3.2m clear weaving route')
+    j('seat_niche','seated',['niche_bench','bench_back','arch_floor'],[0,1,0,0],'seat inside recess, not in Rim Walk; planting and luminaire off standing zone')
+    j('post_notch','punched',['post_base','post_roof','post_ramp','post_landing'],[0,1,0,14],'remove mass/roof above swept ramp corridor; full2.4m headroom, guarded void')
+    j('post_garden','seated',['post_planter','post_bench','post_roof','post_parapet'],[0,1,0,14],'wider High-Line-like viewing pocket, paths flow around real beds, no blocked throat')
+    j('light_mount','seated',['light_plinth','searchlight','lens','post_roof'],[0,1,0,14],'bracket housing to pedestal; lens and beam rotate together outward')
+    j('gate_arch','meet',['gate_pier','gate_head','wall_cap'],[0,1,0,8],'10x8 passage kept through real structure; legs outside street; no shadow box')
+    j('tier_stack','seated',['gate_tier','tier_roof','gate_bell'],[0,1,0,14.5],'three tiers align supports/roof planes; bell under roof, no extra floating fourth mass')
+    j('station_join','meet',['gate_approach','watch_paving','track_barrier'],[0,1,0,14.2],'watch route meets outer platform behind boarding strip; no1.9m-headroom underpass or track crossing')
+    j('existing_halls','punched',['hall_panel','diagrid'],[0,1,0,12],'exact existing curved train halls12..21 and routes remain open; retain P1 outer-platform wall opening')
+    j('roof_garden','seated',['garden_edge','hall_panel'],[0,1,0,42],'West Gate existing bridge roof garden only, never fill high-line train hall')
+    r=W['r']; L=W['length']; positions=[]
+    # Ground route with grass/stone fingers, all within the locked six-metre annulus.
+    for i in range(361):
+        a=2*math.pi*i/360; rad=200+.6*math.sin(9*a)
+        positions.append((round(CX+rad*math.cos(a),3),round(rad*math.sin(a),3)))
+    lanes=[W['track_axis']-W['track_spacing']/2,W['track_axis']+W['track_spacing']/2]
+    return dict(parts=parts,joins=joins,palette=dict(tile='#ded8ca',earth='#a69a84',steel='#69767a',brick='#99866d',paving='#b7b4a7',grass='#899775',flower='#b7728c'),
+      section=dict(ground_radii=(197.,203.),ground_path=positions,ground_clear=3.2,watch_y=12.,watch_v=(1.225,4.825),watch_clear=3.6,rail_barrier_v=1.125,track_centres=lanes,train_half=1.325,outer_plant_v=(4.85,5.3),parapet_v=(5.3,6.)),
+      post_access=dict(flights=[dict(u=(-5.,5.),v=8.2,y=(12.,13.)),dict(u=(5.,-5.),v=10.8,y=(13.,14.))],width=2.4,landing=1.8,notch_u=(-6.8,6.8),notch_v=(6.,12.),terrace_route_v=(12.,14.4),planter_v=(14.6,15.6)),
+      gate_access=dict(rise=2.2,run=22.,width=2.4,platform_y=14.2,platform_half=20.,start_from_gate=42.),
+      planting=dict(ground='High Line: winding mineral paths, planted fingers and arch seating; dry grasses/agave/aloe, no new tree sites',upper='narrow troughs on connecting watch walk; broad garden pockets on7 bastions and existing gate terraces',max_ground_height=.8),
+      authority=dict(P10='all rail vehicles, tracks, platforms, timetable and station operation',P11='wall shell, gates, guards, watch route and Rim landscape',P18='venue interior/night program; keep five bay shells and shutters only'))
+WALL['kit']=_wall_kit()
+parts_checks('Wall',WALL['kit']['parts'],WALL['kit']['joins'])
+_ws=WALL['kit']['section'];_centres=_ws['track_centres']
+assert abs(_centres[1]-_centres[0]-WALL['track_spacing'])<1e-6
+assert _centres[0]-_ws['train_half']>-WALL['thick']/2+.25
+assert _centres[1]+_ws['train_half']+.25<=_ws['rail_barrier_v']
+assert abs(_ws['watch_v'][1]-_ws['watch_v'][0]-_ws['watch_clear'])<1e-6
+assert _ws['watch_v'][1]<=_ws['outer_plant_v'][0]<_ws['outer_plant_v'][1]<=_ws['parapet_v'][0]
+assert all(197.+_ws['ground_clear']/2 <= math.hypot(x-CX,z) <= 203.-_ws['ground_clear']/2 for x,z in _ws['ground_path'])
+
+
 if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
     problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))
 

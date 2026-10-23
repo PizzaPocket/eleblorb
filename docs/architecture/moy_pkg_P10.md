@@ -96,6 +96,10 @@ Car-floor and platform tops:14.2 at Wall/Spine,37 at Meridian. Rail heads13.2
 and36. No .4m added car offset. Set **consist midpoint** on the station stop
 reference so all doors fit within the platform; do not put the leading car
 centre there. Use each track's real platform-side geometry.
+For the Wall Line, WALL.track_axis is the two-track midpoint: lane centres
+are track_axis±track_spacing/2 (−3.9/−0.5), as coordinated in P11 section3.
+The older runtime treats track_axis as lane0, shifting both lanes1.7m outward;
+correct rails, car paths and platform radii together, preserving the watch walk.
 
 Finish one car and one boarding stop first, then the fleet. Doors open only
 when stopped at a served platform and only on its platform side. Opening and

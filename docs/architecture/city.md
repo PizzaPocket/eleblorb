@@ -800,6 +800,15 @@ Data: `WALL` and `CROSS` in `tools/city_layout.py`, written to
 `CityPlan.WALL` and `CityPlan.CROSS`, drawn on `moy_plan.html` and
 `moy_city_3d.html`.
 
+**P11 coordination,2026-10-23:** `moy_pkg_P11.md` and WALL.kit govern the
+wall's construction and connected landscapes. The user specifically prefers
+the High Line's interesting paths and integrated planting: use a woven ground
+Rim path and broader bastion gardens, not decorative pots in a clear corridor.
+The upper watch walk stays at12; ramps rise to14.2 at stations, instead of
+an unsafe under-platform route. Track_axis is the two-track midpoint. Keep
+the existing gates, real arch recesses and P1 outer-platform opening. P10 owns
+rail/platform operation and Line House; P18 owns the five-bay venue interior.
+
 **Why now.** The NMEs are on the rise because of the Demon King (eighth
 revision). They come up to the city but never enter; Moy watches them, and
 the wall is how a city of 45 named people shows it is afraid. Most of them
