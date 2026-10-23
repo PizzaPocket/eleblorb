@@ -95,3 +95,14 @@ adds Crossing/dome/Clock Room/section views, and its ground plan only hides
 that layer to expose paths. Its organic dry-garden footprints and1.8m trail
 supersede the former rectangular gravel pad. The current builder entry point
 is `docs/architecture/moy_p7_p8_p9_build_handoff.md`.
+
+## P10 rail design — 2026-10-23
+
+`moy_train_3d.html` is the current true-scale rolling-stock and service study.
+Fleet, one car, level boarding, interior section, actual-site Line House and
+locked network views; actual exported game hero, door controls, complete
+TRAIN.kit parts/joins tables. Brief: `../architecture/moy_pkg_P10.md`.
+Neighbour massing and network platforms are technical context, never an
+alternative P7 station design. External hosting remains pending; GitHub HTML
+source links are not a hosted viewer. Download the HTML and open in a browser
+with network access for the existing Three.js CDN dependencies.

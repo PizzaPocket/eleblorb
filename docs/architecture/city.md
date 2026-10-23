@@ -1045,6 +1045,17 @@ towers and the gatehouse canopies.
 as well as the Deck; Omar Haddad's battery works power the lines. The Wall
 Watch and the lines' controller are not yet in the census (Open).
 
+**P10 coordination,2026-10-23:** `moy_pkg_P10.md` and `TRAIN.kit` now govern
+hollow car construction, level boarding, door operation and service. The
+older solid silhouette and3.4m overall-height description below are historical;
+the current car envelope is3.6m. There is no Spine/Wall railway connection.
+Disconnected shuttles lay over on their own routes; the Line House is maintenance,
+not a physical depot for the entire fleet. Night Watch service keeps one normal
+ochre Wall set each direction on its180-second circuit. Terminal crossover fit
+inside the locked guideways is an explicit early P10 build task. P7 remains the
+sole authority for Crossing architecture. See the brief for safe occupied-train
+transitions rather than abruptly toggling service at midnight.
+
 ### 6e. The Moy car (proposed 2026-10-17, at the user's direction)
 
 **Direction (user):** the train cars are built of SuperEggs, relatively
@@ -1079,7 +1090,7 @@ short, two or three to a train.
 | Line | Cars | Length | Platform | Why |
 |---|---|---|---|---|
 | **Wall Line** | 3 | 30.4 m | 40 m | the ring is the commute, round the whole city |
-| **Spine Line** | 2 | 20.0 m | 30 m | short runs on the Deck and separate +20 m gate flyovers |
+| **Spine Line** | 2 | 20.0 m | 30 m | short runs over the Deck; level gate interchanges |
 | **Meridian Line** | 2 | 20.0 m | 30 m | the high line: few stops, a ride for the view |
 
 **Why short cars.** The 9.6 m car is compact for the station platforms and
@@ -1186,7 +1197,8 @@ model runs its trains to it and shows a departure board.
   in real time they are 8 and 12 seconds, enough to step aboard.
 - **Hours:** 5:00 to midnight. Through the night the Wall Line keeps one
   **Watch train** each way, the city's vigilance going round the wall;
-  the others stand in the Line House.
+  the other sets leave passenger service safely; disconnected shuttles lay over
+  on their own routes (P10 coordination above).
 - **Timed changes:** the Spine's southbound and the Meridian's westbound
   trains stand together at the Crossing on the hour; the Wall Line's trains
   in both directions stand at the North Gate in the middle of the Spine's

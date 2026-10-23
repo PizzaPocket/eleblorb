@@ -4154,6 +4154,78 @@ PARK['playground']['kit']=build_playground_kit(PARK,CROSSING)
 parts_checks('Park',PARK['kit']['parts'],PARK['kit']['joins'])
 parts_checks('Playground',PARK['playground']['kit']['parts'],PARK['playground']['kit']['joins'])
 parts_checks('Crossing',CROSSING['kit']['parts'],CROSSING['kit']['joins'])
+
+# P10: detailed construction schedule; original TRAIN.parts remains legacy
+# silhouette data until the implementation owner replaces the solid car builder.
+def _rail_kit():
+    parts=[]; joins=[]
+    def p(id,shape,semi,c,col,where,**kw):
+        q=dict(id=id,shape=shape,semi=semi,c=c,col=col,where=where,role='mass')
+        if shape in ('egg','clipped'):q['eps']=(5.5,5.5)
+        if shape in ('profile','punched'):q['n']=5.5
+        if shape=='box':q['reason']='shared flush structural bearing or planar interior floor; rounded seams would open gaps'
+        q.update(kw);parts.append(q)
+    def j(id,kind,ids,plane,rule):joins.append(dict(id=id,kind=kind,parts=ids,plane=plane,rule=rule))
+    p('car_shell','profile',(4.8,1.4,1.325),(0,2,0),'solid','constant n5.5 cross-section centre, n3.4 rounded shoulders and flat panoramic end panes; hollow .08 shell, all four door apertures punched; no filled egg',n=5.5)
+    p('car_floor','box',(4.3,.10,1.2),(0,.9,0),'landing','inside floor top exactly rail+1.0')
+    p('roof','profile',(4.3,.70,1.325),(0,2.7,0),'landing','upper shell from spring y2.7 to crown3.4; n5.5 swept profile, inner ceiling clear3.3 across central1.5m aisle')
+    p('side_glass','profile',(4.3,.42,.035),(0,2.50,1.29),'solid','both sides; same shell outline, cut at doors; transparent panes, no filled glass box')
+    p('end_glass','profile',(.035,.46,1.08),(4.43,2.5,0),'solid','both rounded ends; sectional panoramic glass fitted inside shell apertures')
+    p('door_opening','punched',(.70,1.05,.10),(2.4,2.05,1.325),'open','x=+-2.4, both sides; flat sill1.0, head3.1; modest .08 corner fillet; matching collision void',floor=True)
+    p('door_leaf','profile',(.35,1.05,.035),(2.05,2.05,1.32),'solid','two leaves each doorway, repeated four times; slide each .72 along x into exterior pocket')
+    p('door_pocket','profile',(.39,1.09,.025),(1.31,2.05,1.335),'decorative','two exterior pockets per opening; max lateral envelope1.35, retain7.5cm nominal platform gap')
+    p('sill','box',(.7,.035,.075),(2.4,.965,1.275),'landing','four flush thresholds, no raised lip or deployable boarding step')
+    p('livery','profile',(4.3,.12,.012),(0,1.36,1.326),'decorative','both sides, cut at door leaves; follows shell, muted line colour')
+    p('battery','egg',(1.8,.16,.8),(0,3.44,0),'solid','roof pod; structural seated mounting, total height3.6')
+    p('battery_feet','profile',(.14,.10,.12),(1.25,3.30,.55),'solid','four mounts entering shell subframe')
+    p('bogie','egg',(1,.3,1.05),(3.2,.35,0),'solid','two at x+-3.2; no wheels beyond body width')
+    p('wheels','egg',(.28,.28,.10),(3.65,.28,.72),'decorative','two axles per bogie; round profile exponent2',eps=(2,2))
+    p('lamp','egg',(.14,.14,.14),(4.6,1.15,.7),'decorative','paired at exposed consist ends only, white leading/red trailing',eps=(2,2))
+    p('seat','egg',(.60,.18,.175),(0,1.38,1.025),'solid','two short longitudinal seats, side bays between doors; centre aisle1.7')
+    p('seat_back','profile',(.60,.37,.045),(0,1.85,1.19),'solid','two backs fixed to side subframe; leave four door zones empty')
+    p('grab_rail','profile',(.70,.025,.025),(0,2.98,.85),'decorative','two continuous rails over seats, no post in aisle')
+    p('interior_light','profile',(2.8,.025,.06),(0,3.28,0),'decorative','recessed warm ceiling strip')
+    p('coupler','profile',(.40,.12,.16),(5.2,.52,0),'solid','articulated link between cars; independent car path samples')
+    p('bellows','profile',(.40,1.10,1.0),(5.2,2.1,0),'solid','dark continuous folded sleeve; sealed car ends, no public inter-car passage')
+    p('platform_edge','profile',(15,.10,.10),(0,14.10,0),'landing','30m cross or40m wall edge; top14.2/37; actual track centre offset1.4')
+    p('canopy','profile',(15,.09,1.5),(0,17.49,0),'solid','30m/40m platform shade; underside3.2 above platform; omit where existing P7 roof shades')
+    p('canopy_post','profile',(.10,1.6,.10),(0,15.8,0),'solid','back edge only, every6m; no post in1.5m boarding strip')
+    p('bench','egg',(.9,.22,.28),(0,14.65,0),'solid','back edge every12m, away from doors, stairs and lifts')
+    p('guard','profile',(.035,.035,3),(0,15.3,0),'solid','continuous1.1m rear/end guards, open at access; never across boarding edge')
+    p('line_motif','profile',(.18,.18,.015),(0,15.6,0),'decorative','ochre circle, teal longitudinal bar, violet diamond; unlettered, no arrows required')
+    p('house_floor','box',(30,.18,8),(0,14.02,0),'landing','Line House local x tangent,z outward; upper floor14.2, service rail13.2')
+    p('house_frame','profile',(.18,2.15,.18),(0,16.35,0),'solid','upper shed posts,6m bays, clear central rolling-stock display')
+    p('house_roof','profile',(30,.16,8),(0,18.66,0),'solid','flat planted-edge service roof, top18.82; supported by transverse beams')
+    p('house_wall','punched',(30,2.15,.10),(0,16.35,8),'solid','pale tile outer wall with glazed bays; service door2x2.4 to protected internal landing',floor=True)
+    p('workshop_bench','box',(2,.4,.45),(0,.4,0),'solid','lower workshop at street datum; counter backed to wall, no NPC invented')
+    p('house_stair','profile',(.9,.15,2.6),(0,1.625,0),'landing','switchback maintenance ramp flights32deg, successive3.25m rises and final1.2m rise to14.2; internal only')
+    j('shell_openings','punched',['car_shell','door_opening','side_glass','end_glass'],[0,0,1,1.325],'same aperture loops in mesh and collision; flat floor cuts, no opaque glazing behind door')
+    j('roof_seam','meet',['car_shell','roof'],[0,1,0,2.7],'shared spring curve; no overlaying complete eggs')
+    j('floor_seat','seated',['car_shell','car_floor','sill'],[0,1,0,1.0],'all walking tops exactly1.0 above rail; end caps not counted as usable floor')
+    j('door_split','meet',['door_leaf','door_opening','door_pocket'],[1,0,0,2.4],'two meeting leaves centre on doorway; .72 travel each; close collision only after clear')
+    j('trim_cut','punched',['livery','door_leaf','door_opening'],[0,0,1,1.325],'stripe breaks at openings and continues on closed leaves')
+    j('battery_seat','seated',['battery','battery_feet','roof'],[0,1,0,3.4],'feet penetrate subframe only; roof remains weather closed')
+    j('bogie_seat','seated',['bogie','wheels','car_floor'],[0,1,0,.6],'bogies support underframe, no collision through cabin')
+    j('coupling','chain',['bellows','coupler','car_shell'],[1,0,0,4.8],'car pitch10.4; sample each car independently, deform sleeve at curves, solid sealed ends')
+    j('seat_mount','seated',['seat','seat_back','car_floor'],[0,1,0,1.0],'visible brackets, clear doorway standing bays')
+    j('boarding','meet',['platform_edge','sill'],[0,1,0,14.2],'rail13.2+floor1 =14.2; high line36+1=37; no .4m offset; platform gap.075')
+    j('shade','seated',['canopy','canopy_post'],[0,1,0,17.4],'underside platform+3.2, posts back from train envelope')
+    j('house_bearings','seated',['house_floor','house_frame','house_roof','house_wall'],[0,1,0,14.2],'60x16m existing shed envelope; no invented rail link between disconnected services')
+    j('house_access','punched',['house_floor','house_stair','house_wall'],[0,1,0,14.2],'matching guarded stair void; route street workshop to upper landing; maintenance door stays closed')
+    return dict(parts=parts,joins=joins,palette=dict(cream='#e4d4b4',glass='#78959e',metal='#79858a',ochre='#b7833d',teal='#438c8a',violet='#79588d'),
+      cabin=dict(floor=1.,clear_height=2.3,clear_width=2.4,aisle=1.7,usable_half_length=4.3,shell=.08,door_slide=.72,roof_profile=5.5),
+      service=dict(night_headway=180,transition='finish occupied trips at a platform; never remove or teleport occupied cars',storage='logical out-of-service fleet, no physical all-fleet depot claim; disconnected shuttles lay over at own termini'),
+      house=dict(at=WALL['shed']['at'],along=60.,out=16.,rail=13.2,floor=14.2,roof=18.82,program='street workshop and retained private Watch guardroom below; maintenance shed above; no public depot railway connection'))
+TRAIN['kit']=_rail_kit()
+parts_checks('Rail',TRAIN['kit']['parts'],TRAIN['kit']['joins'])
+assert TRAIN['floor']==1.0 and TRAIN['doors']['w']==1.4
+assert 2*TRAIN['kit']['cabin']['usable_half_length']>2*TRAIN['doors']['at']+TRAIN['doors']['w']
+assert TRAIN['kit']['cabin']['clear_width']-4*.175==TRAIN['kit']['cabin']['aisle']
+assert 2*(TRAIN['doors']['at']+.7+TRAIN['kit']['cabin']['door_slide'])<TRAIN['car'][0]
+# Full standing-height aisle fits the hollow cross-section, not just its bounds.
+assert 2+1.4*(1-(.75/1.325)**5.5)**(1/5.5)-.08 >= TRAIN['floor']+2.3
+assert TRAIN['car'][1]/2+.025 <= PLATFORMS['edge']-.05+1e-8
+
 if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
     problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))
 
