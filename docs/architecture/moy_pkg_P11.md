@@ -1,11 +1,11 @@
 # P11 — the wall, gates and linear gardens
 
-2026-10-23. **Architectural development — NOT BUILD READY.**
-The user rejected the first model as crude and the architectural design as
-underdeveloped. The active design is `moy_p11_architectural_study.md`: one
-representative wall section and one complete bastion, for design review.
-This supersedes readiness and rollout claims below; the old39-part schedule
-is a withdrawn draft. Gates/full-circuit authoring wait for this review.
+2026-10-24. **Design accepted; build brief not yet written. NOT BUILD READY.**
+Start at `moy_p11_planning_handoff_2026-10-24.md`. Active design:
+`moy_p11_architectural_study.md` (wall and bastion), `WALL.kit.circuit`
+(the whole ring's bay programme) and `moy_p11_gates_study.md` (gates).
+Sections 2 to 9 below are the withdrawn first draft, kept for history;
+the old 39-part schedule is not approved.
 
 Historical scope/constraints follow. Preserve the existing implementation checkout and earlier packages.
 This is a design brief, not certification that the wall is built.
