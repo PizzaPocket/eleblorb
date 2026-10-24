@@ -1,6 +1,6 @@
 # P11 gates — design study
 
-2026-10-24. **Design study for review.** Follows the accepted wall study
+2026-10-24. **Design accepted 2026-10-24** (open court, bell position, plain North court). Follows the accepted wall study
 (`moy_p11_architectural_study.md`) and the whole-circuit programme
 (`WALL.kit.circuit`). Data: `WALL.kit.gates` in `tools/city_layout.py`.
 Model: `docs/drawings/moy_wall_gates_3d.html` (https://claude.ai/artifact/QqXwjfVDt6XD6bKQBPVVEv).
@@ -68,9 +68,10 @@ starts at the outer platform's edge and runs outward.
   - tier 3, a lantern lookout.
   - Each tier: ceramic walls between stone corner piers, stone coping, thin
     steel roof plate with a 0.45 m overhang.
-- **The bell:** one hollow bronze bell on a steel beam between two piers,
-  under the first-tier roof of the tower on the Watch's side, rope to the
-  loggia floor. The other tower's loggia has a bench and the view.
+- **The bell:** one hollow bronze bell under the first-tier roof of the tower
+  on the Watch's side. Two steel beams span corner pier to corner pier along
+  the loggia's faces; a cross beam sits on them; the bell hangs from it on a
+  short yoke, rope to the loggia floor. The other tower's loggia has a bench and the view.
 
 **Elevations.** The wall's datums carry round the gatehouse:
 - stone plinth 0 to 1.05, broken at the arches;
@@ -118,15 +119,12 @@ hand.
 - West roof beds keep the tower doors' arrival clear; the middle walk is wide
   enough.
 
-## Open questions for review
-
-1. The open court is new. It changes the inherited solid gatehouse into a
-   barbican with daylight. Keep it, or return to a solid 24 m passage?
-2. Is the bell on the Watch's side right, or should the bell sit over the
-   passage on the gallery?
-3. Should the North Gate's working court get any planting at all?
-
 ## Decisions
+
+- 2026-10-24 (user): open court kept; bell stays in the Watch-side tower; the
+  North court stays plain. Fixed after review: the bell frame now bears on the
+  corner piers; the city-face belt stops at the passage ring instead of
+  crossing the opening.
 
 - 2026-10-24: user asked to design the gates next, after accepting the wall
   study and seeing the whole-circuit model.

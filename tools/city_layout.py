@@ -4487,7 +4487,7 @@ def _wall_gates():
       towers=dict(c=(round(half-GT['base']/2,2),round(front-GT['base']/2,2)),base_y=H+2.5,tier=GT['tier'],sizes=[round(GT['base']-k*1.4,2) for k in range(GT['tiers'])],
         roles=['open loggia (bell on the Watch side, a seat on the station side)','lookout room, a superellipse window each face','lantern lookout'],
         roof='thin steel plate, .45 m overhang, stone coping under it; no eaves, no timber pagoda roof'),
-      bell=dict(side=1,tier=0,d=.9,h=1.0,what='one hollow bronze bell hung from a beam under the first-tier roof, rope to the loggia floor'),
+      bell=dict(side=1,tier=0,d=.9,h=1.0,what='one hollow bronze bell on a yoke from a steel cross beam, which sits on two face beams spanning corner pier to corner pier under the first-tier roof; rope to the loggia floor'),
       canopy=dict(u=(-20.,20.),v=(-8.6,4.6),y=20.4,what='station shade: steel posts on the platforms, three beams, open timber blades'))
     variants={'South Gate':dict(court='garden court: two planted beds and timber benches on the side aprons; the market gate, toward the Arches and Market Square',mirror=1),
               'North Gate':dict(court='working court: plain stone, the ASAN service track\'s kerb line through it, a Watch bench by the gate room',mirror=-1)}
@@ -4525,7 +4525,7 @@ def _wall_gates():
     p('tower_roof','profile',(3.95,.08,3.95),(18.5,17.7,14.5),'landing','thin steel roof plate with .45 m overhang over each tier',n=8.)
     p('tower_window','punched',(.6,.8,.2),(18.5,19.3,17.3),'open','one superellipse window each face of tiers two and three',n=4.)
     p('bell','egg',(.45,.5,.45),(18.5,16.6,14.5),'decorative','hollow bronze bell under the first-tier roof, on its beam',eps=(2.,2.))
-    p('bell_beam','profile',(3.,.12,.12),(18.5,17.25,14.5),'solid','steel beam pier to pier that carries the bell')
+    p('bell_beam','profile',(3.4,.17,.15),(18.5,17.23,14.5),'solid','bell frame: two steel beams pier to pier along the loggia faces, a cross beam between them on short stools, the bell on a yoke below it')
     p('canopy_post','profile',(.14,3.,.14),(0,17.2,-8.4),'solid','station shade posts on the platforms, 6 m centres')
     p('canopy_blade','profile',(.08,.06,6.8),(0,20.58,-2.05),'decorative','open timber blades over three steel beams')
     p('terminal_pier','profile',(1.25,H/2,6.),(0,H/2,0),'solid','East and West: stone pier closing the wall\'s last bay against the gate building')
@@ -4538,7 +4538,7 @@ def _wall_gates():
     j('wing_wall','meet',['wing','outer_gate','corner_pier','field'],[1,0,0,9],'wings and outer gate meet on the court\'s corner piers; fields recess between piers')
     j('deck_platform','meet',['deck','parapet'],[0,0,1,3.9],'the outer platform floor and the gatehouse deck meet flush at one level, +14.2')
     j('tiers','seated',['tower_tier','tower_pier','tower_roof','tower_window'],[0,1,0,GT['base']+H+2.5-7],'each tier bears on the one below; roof plates seat on stone coping; no fourth mass')
-    j('bell_hang','seated',['bell','bell_beam','tower_pier'],[0,1,0,17.25],'the beam bears on two piers, the bell hangs from it; nothing floats')
+    j('bell_hang','seated',['bell','bell_beam','tower_pier'],[0,1,0,17.25],'the two face beams bear on the corner piers, the cross beam on the face beams, the bell on its yoke from the cross beam; nothing floats')
     j('canopy','seated',['canopy_post','canopy_blade'],[0,1,0,20.4],'posts stand on the platforms clear of the boarding edge; blades on the beams')
     j('terminal','meet',['terminal_pier','plinth','belt'],[0,0,1,0],'the wall ends on the pier; plinth and belt continue round the building\'s base')
     j('mouth','punched',['mouth_surround'],[0,1,0,12],'surround follows the hall mouth\'s own opening; tracks and platforms pass clear')
