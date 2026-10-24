@@ -476,3 +476,11 @@ Active brief: `architecture/moy_p11_architectural_study.md`.
 
 The representative must earn visual acceptance at eye height. Gates, terrain
 placement, complete circuit and production schedule remain later development.
+
+- **Accepted 2026-10-24** (user): the representative study. Whole-ring programme
+  in `WALL.kit.circuit`.
+- **Gates (proposed 2026-10-24):** the wall's datums carry round each
+  gatehouse (plinth, belt, ceramic fields between stone piers, coping under the
+  deck). Arch rings in stone, n5.5. Towers: ceramic between stone corner
+  piers, stone coping, thin steel roof plates, no eaves. One bronze bell per
+  gate. Excluded: shut gate leaves, painted names or numerals.

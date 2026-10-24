@@ -135,6 +135,13 @@ Views per gate and place, a walk along the Rim Walk and along the top, a night
 mode, and a ring map of the programme. Published:
 https://claude.ai/artifact/EAvZDeDsyAkmTf22nWjEgs
 
+**Gates, 2026-10-24:** `moy_wall_gates_3d.html` shows the North and South
+gatehouse (passage under the railway, open court, outer arch, U-shaped station
+deck, the two towers and the bell), the wall's terminal piers and train-hall
+mouth surrounds at East and West, and the West Gate's bridge-roof garden, with
+a section cut, a section drawing and a ground plan. Data: `WALL.kit.gates`.
+Published: https://claude.ai/artifact/QqXwjfVDt6XD6bKQBPVVEv
+
 Current references: `references/moy_wall_study_*.png`. Older
 `references/moy_wall_*.png` without `study` are withdrawn historical images,
 not builder references. Active brief: `../architecture/moy_p11_architectural_study.md`.

@@ -4461,6 +4461,105 @@ def _wall_circuit():
         canopy='the study\'s bastion shade proposed at all seven bastions'))
 WALL['kit']['circuit']=_wall_circuit()
 
+# P11 gates (user, 2026-10-24). North and South share one gatehouse, in the accepted wall's construction: a vaulted
+# passage under the railway, an open barbican court in the outward projection (after the wengcheng of Xi'an's gates),
+# an outer arch with a gallery over it, and a U-shaped station deck at +14.2 round the court, which carries the two
+# three-tier corner towers. Nothing of the gatehouse stands above the wall's top inside the track envelope: the old
+# full-height side masses ran through the railway. Local frame as the study: u along the wall, v outward from the
+# centreline (city face -6, desert face +6, gatehouse front +18), y up from the street. East and West keep their own
+# buildings; P11 gives them terminal piers where the wall meets them, framed train-hall mouths and, at West, the roof
+# garden on the bridge.
+def _wall_gates():
+    W_=WALL; H=W_['height']; GH=W_['gatehouse']; GT=W_['gate_tower']; A=W_['arches']
+    half=GH['along']/2; front=W_['thick']/2+GH['out']; deck=W_['kit']['gate_access']['platform_y']
+    open_w,open_h=[g for g in W_['gates'] if g['name']=='South Gate'][0]['arch']
+    tc=W_['kit']['section']['track_centres']; P=PLATFORMS
+    outer_pf=(round(tc[1]+P['edge'],3),round(tc[1]+P['edge']+P['width'],3))
+    court=dict(u=(-9.,9.),v=(6.,15.)) # 18 x 9: deep enough to light the passage from a 14 m high court
+    gh=dict(along=GH['along'],u=(-half,half),v=(-W_['thick']/2,front),opening=(open_w,open_h),open_n=5.5,ring=.6,
+      passage=dict(u=(-open_w/2,open_w/2),v=(-6.,6.),soffit=open_h,what='vaulted passage under the railway; the deck above carries both tracks'),
+      court=dict(court,what='open to the sky: the Watch\'s court between the two wings, light and air into the passage'),
+      outer_gate=dict(v=(court['v'][1],front),what='the outer arch, its gallery at the deck level above it'),
+      wings=[dict(side=-1,u=(-half,court['u'][0]),v=(6.,front),ground='station core (P10): lift 2.6 m and moving-ramp scissor to the outer platform; opens on the court by a 6 m arcade'),
+             dict(side=1,u=(court['u'][1],half),v=(6.,front),ground='the Watch\'s gate room on the court, its own stair up to the bell tower')],
+      deck=dict(y=deck,v=(outer_pf[0],front),hole='court',guard=1.1,what='U-shaped station deck: outer platform, wing roofs and the outer gallery; guarded round the court'),
+      datums=dict(plinth=(0.,1.05),belt=(6.05,6.35),upper=(6.35,deck-.6),coping=(deck-.6,deck),parapet=(deck,deck+1.1)),
+      towers=dict(c=(round(half-GT['base']/2,2),round(front-GT['base']/2,2)),base_y=H+2.5,tier=GT['tier'],sizes=[round(GT['base']-k*1.4,2) for k in range(GT['tiers'])],
+        roles=['open loggia (bell on the Watch side, a seat on the station side)','lookout room, a superellipse window each face','lantern lookout'],
+        roof='thin steel plate, .45 m overhang, stone coping under it; no eaves, no timber pagoda roof'),
+      bell=dict(side=1,tier=0,d=.9,h=1.0,what='one hollow bronze bell hung from a beam under the first-tier roof, rope to the loggia floor'),
+      canopy=dict(u=(-20.,20.),v=(-8.6,4.6),y=20.4,what='station shade: steel posts on the platforms, three beams, open timber blades'))
+    variants={'South Gate':dict(court='garden court: two planted beds and timber benches on the side aprons; the market gate, toward the Arches and Market Square',mirror=1),
+              'North Gate':dict(court='working court: plain stone, the ASAN service track\'s kerb line through it, a Watch bench by the gate room',mirror=-1)}
+    # East and West: where the wall meets a building it ends on a stone terminal pier; the train hall's mouth gets a
+    # stone surround; West's bridge roof becomes the community garden it was planned as
+    ends=dict(pier=dict(along=2.5,height=H,cap=W_['parapet']+.0,what='full-height stone pier closing the wall\'s last bay against the gate building, its plinth and belt run on round the building\'s base'),
+      mouth=dict(ring=.6,what='stone surround round each train hall mouth where the tracks enter, its head at the hall soffit'))
+    WGt=WEST_GATE; t0,t1=WGt['towers']
+    roof=dict(x=(t0[0],t0[2]),z=(t0[3],t1[1]),y=WGt['bridge'][1],guard=1.1,
+      beds=[dict(x=(t0[0]+.6,t0[0]+4.2),z=(t0[3]+3.0,t1[1]-3.0)),dict(x=(t0[2]-4.2,t0[2]-.6),z=(t0[3]+3.0,t1[1]-3.0)),dict(x=((t0[0]+t0[2])/2-1.6,(t0[0]+t0[2])/2+1.6),z=(t0[3]+4.0,t1[1]-4.0))],
+      walk=3.2,benches=4,arrival_clear=3.0,edges='deep beds along the open x edges against the guards and a long bed down the middle, two walks between them; the tower faces (z) keep 3 m clear for the doors',what='community garden on the bridge: deep beds against the guards and down the middle, benches along the two walks, 3 m clear at the tower doors')
+    parts=[];joins=[]
+    def p(id,shape,semi,c,col,where,n=5.5,**kw):
+        d=dict(id=id,shape=shape,semi=semi,c=c,col=col,where=where,role='mass')
+        if shape in ('profile','punched','arch'):d['n']=n
+        if shape=='box':d['reason']='planar wall, floor or deck sharing exact seams with its neighbours'
+        d.update(kw);parts.append(d)
+    def j(id,kind,ids,plane,rule):joins.append(dict(id=id,kind=kind,parts=ids,plane=plane,rule=rule))
+    p('passage_vault','arch',(open_w/2,open_h/2,6.),(0,open_h/2,0),'solid','10x8 street passage through the wall, n5.5 head, real 12 m soffit')
+    p('passage_ring','arch',(open_w/2+.6,open_h/2+.6,.12),(0,open_h/2,-6.06),'decorative','stone ring on the city face, .6 m deep, same curve as the opening')
+    p('wing','box',(6.5,deck/2,6.),(15.5,deck/2,12.),'solid','two wings u 9..22, v 6..18, up to the deck; ground rooms behind punched openings')
+    p('wing_arcade','punched',(3.,2.4,.3),(15.,2.4,6.),'open','6 m arcade from the station core onto the court; the Watch wing has a 1.2 m door',n=5.5)
+    p('outer_gate','box',(9.,deck/2,1.5),(0,deck/2,16.5),'solid','outer gate wall between the wings, v 15..18, cut by the outer arch')
+    p('outer_arch','arch',(open_w/2,open_h/2,1.5),(0,open_h/2,16.5),'open','outer street arch, same curve as the passage',n=5.5)
+    p('outer_ring','arch',(open_w/2+.6,open_h/2+.6,.12),(0,open_h/2,18.06),'decorative','stone ring on the desert face')
+    p('plinth','profile',(22.,.525,.2),(0,.525,18.04),'solid','stone plinth 0..1.05 round all exposed faces, broken at the arches')
+    p('belt','profile',(22.,.15,.18),(0,6.2,18.03),'decorative','bearing belt 6.05..6.35, the wall\'s, run on round the gatehouse')
+    p('corner_pier','profile',(.45,deck/2,.2),(21.6,deck/2,18.04),'decorative','stone piers at the wing corners and the court\'s outer corners')
+    p('field','box',(7.,3.6,.08),(15.,10.,18.),'decorative','recessed ceramic upper field between piers, as the wall')
+    p('deck','box',(22.,.15,8.4),(0,deck-.15,9.6),'landing','U-shaped deck at +14.2, the court hole cut from it; the outer platform\'s floor carries on onto it')
+    p('court_guard','profile',(9.,.55,.05),(0,deck+.55,6.),'solid','1.1 m guard round the court hole, steel posts and rail, glass infill')
+    p('parapet','profile',(22.,.55,.2),(0,deck+.55,17.9),'solid','1.1 m parapet on the desert edge of the deck, stone coping')
+    p('tower_tier','profile',(3.5,1.45,3.5),(18.5,0,14.5),'solid','three tiers 7/5.6/4.2 m at 14.5, pitch 3.2')
+    p('tower_pier','profile',(.6,1.45,.6),(15.6,16.,11.6),'solid','first tier: four corner piers, open loggia between them')
+    p('tower_roof','profile',(3.95,.08,3.95),(18.5,17.7,14.5),'landing','thin steel roof plate with .45 m overhang over each tier',n=8.)
+    p('tower_window','punched',(.6,.8,.2),(18.5,19.3,17.3),'open','one superellipse window each face of tiers two and three',n=4.)
+    p('bell','egg',(.45,.5,.45),(18.5,16.6,14.5),'decorative','hollow bronze bell under the first-tier roof, on its beam',eps=(2.,2.))
+    p('bell_beam','profile',(3.,.12,.12),(18.5,17.25,14.5),'solid','steel beam pier to pier that carries the bell')
+    p('canopy_post','profile',(.14,3.,.14),(0,17.2,-8.4),'solid','station shade posts on the platforms, 6 m centres')
+    p('canopy_blade','profile',(.08,.06,6.8),(0,20.58,-2.05),'decorative','open timber blades over three steel beams')
+    p('terminal_pier','profile',(1.25,H/2,6.),(0,H/2,0),'solid','East and West: stone pier closing the wall\'s last bay against the gate building')
+    p('mouth_surround','arch',(7.25,4.5,.3),(0,16.5,0),'decorative','stone surround on each train-hall mouth, East and West',n=8.)
+    p('garden_bed','profile',(11.,.35,1.1),(0,42.35,0),'solid','West Gate bridge roof beds against the guards, soil .1 below the rim')
+    p('garden_bench','profile',(.9,.23,.25),(0,42.45,0),'solid','timber benches facing the beds, clear of the tower doors')
+    j('passage','punched',['passage_vault','passage_ring','plinth','belt'],[0,0,1,-6],'the passage is cut once through wall and deck support; ring and plinth stop at its jambs')
+    j('court_hole','punched',['deck','court_guard'],[0,1,0,deck],'one boundary for the deck hole, the guard and the collision')
+    j('outer_arch','punched',['outer_gate','outer_arch','outer_ring','plinth','belt'],[0,0,1,18],'same curve as the passage; the belt breaks round the ring')
+    j('wing_wall','meet',['wing','outer_gate','corner_pier','field'],[1,0,0,9],'wings and outer gate meet on the court\'s corner piers; fields recess between piers')
+    j('deck_platform','meet',['deck','parapet'],[0,0,1,3.9],'the outer platform floor and the gatehouse deck meet flush at one level, +14.2')
+    j('tiers','seated',['tower_tier','tower_pier','tower_roof','tower_window'],[0,1,0,GT['base']+H+2.5-7],'each tier bears on the one below; roof plates seat on stone coping; no fourth mass')
+    j('bell_hang','seated',['bell','bell_beam','tower_pier'],[0,1,0,17.25],'the beam bears on two piers, the bell hangs from it; nothing floats')
+    j('canopy','seated',['canopy_post','canopy_blade'],[0,1,0,20.4],'posts stand on the platforms clear of the boarding edge; blades on the beams')
+    j('terminal','meet',['terminal_pier','plinth','belt'],[0,0,1,0],'the wall ends on the pier; plinth and belt continue round the building\'s base')
+    j('mouth','punched',['mouth_surround'],[0,1,0,12],'surround follows the hall mouth\'s own opening; tracks and platforms pass clear')
+    j('roof_garden','seated',['garden_bed','garden_bench'],[0,1,0,42],'beds against the guards, the middle walk and the tower doors kept clear')
+    # checks: the street passes, the court is open to the sky, the deck clears the train, the towers sit on the deck
+    if gh['court']['u'][1]-gh['court']['u'][0]<open_w+4: problems.append(('gates: the court leaves no side aprons',))
+    if gh['deck']['y']-W_['rail']<P['floor']-1e-6: problems.append(('gates: the deck below the platform floor',))
+    if open_h+2.>gh['deck']['y']-1e-6: problems.append(('gates: no structure between the passage and the deck',))
+    tw=gh['towers']
+    if tw['c'][0]+tw['sizes'][0]/2>half+1e-6 or tw['c'][1]+tw['sizes'][0]/2>front+1e-6: problems.append(('gates: a tower overhangs the gatehouse',))
+    if tw['c'][1]-tw['sizes'][0]/2<gh['court']['v'][1]-1e-6 and tw['c'][0]-tw['sizes'][0]/2<gh['court']['u'][1]: problems.append(('gates: a tower over the court',))
+    if tw['c'][1]-tw['sizes'][0]/2<outer_pf[1]: problems.append(('gates: a tower on the platform',))
+    if gh['canopy']['y']-deck<2.4+3.6: problems.append(('gates: the station shade too low over a train',))
+    for b_ in roof['beds']:
+        if b_['z'][0]-roof['z'][0]<roof['arrival_clear']-1e-6 or roof['z'][1]-b_['z'][1]<roof['arrival_clear']-1e-6: problems.append(('gates: a West roof bed in a tower door\'s arrival',))
+    bx=sorted(b_['x'] for b_ in roof['beds'])
+    if any(b2[0]-b1[1]<roof['walk']+1.6 for b1,b2 in zip(bx,bx[1:])): problems.append(('gates: a West roof garden walk too narrow for its benches',))
+    return dict(status='proposed for review 2026-10-24',gatehouse=gh,variants=variants,ends=ends,west_roof=roof,parts=parts,joins=joins)
+WALL['kit']['gates']=_wall_gates()
+parts_checks('Wall gates',WALL['kit']['gates']['parts'],WALL['kit']['gates']['joins'])
+
 
 if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
     problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))

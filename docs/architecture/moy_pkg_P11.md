@@ -278,6 +278,14 @@ Stop for review before P12. Don't report planning preview as runtime evidence.
 
 ## Decisions
 
+- 2026-10-24: gates designed (`moy_p11_gates_study.md`, `WALL.kit.gates`):
+  North and South share one gatehouse with a passage under the railway, an
+  open 18 × 9 m court, an outer arch and a U-shaped station deck at +14.2
+  carrying the towers; nothing stands in the track envelope. The bell hangs in
+  the first tier of the Watch-side tower. South has a garden court, North a
+  working court. East and West: terminal piers, train-hall mouth surrounds and
+  West's bridge-roof garden. Section 7 above is superseded where it differs.
+
 - 2026-10-24: user accepted the architectural study ("I like it a lot") and
   asked for a whole-wall model. `WALL.kit.circuit` assigns all 146 bay slots a
   programme: the Arches' five shuttered bays; a service door behind each of
