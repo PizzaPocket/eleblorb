@@ -35,16 +35,13 @@ matters is in the files listed in section 6.
 
 ## 2. How we work
 
-**Current handoff,2026-10-22:** a fresh builder conversation in the same
-P5/P6 implementation checkout handles P7 first, then P8/P9 together. Use
-`moy_p7_p8_p9_build_handoff.md`. Preserve the local built P3–P6 source/bake;
-main is a planning integration base, not a replacement for that working tree.
-P5 has an accepted practical L2 review. The user reports P6 built; its local
-completion source/report must be recorded at handoff (not found on published
-main during the planner check). Old review/fix automation stays paused.
-P6 local report is available at `docs/diagnostics/2026-10-22-moy-P6.md`;
-its known hotel-side ingress blocker remains open. The latest local415-pack
-bake and final superellipse-deck correction are preserved in a verified snapshot.
+**Current work,2026-10-24:** P7–P9 accepted at the practical L2/L3
+built-and-dressed milestone after one combined review.475-pack bake current;
+streaming/performance and named longer routes remain unverified. P10 trains
+is the next ready local Luna build, authorized by the user after this review.
+P11 planning remains a separate local Sol task; do not race shared authoring.
+Review/dispatch state: `moy_p7_p8_p9_review_2026-10-24.md`. P3–P9 source/bake
+remain protected local implementation; P6 hotel ingress remains open.
 
 ## Latest user direction — 2026-10-21: playable city, Ohio/Snowhio detail
 
@@ -96,21 +93,23 @@ surface. Keep construction and route acceptance separate. Prior blanket
 house076 access blockers are superseded by this decision. Current task:
 `moy_p3_boom_construction_finish.md`; no movement investigation or retuning.
 
-**Where the work happens (user, 2026-10-24).** Cloud Claude Code sessions
-do planning only, from main. Builds run in the user's local implementation
-checkout, which holds built source, bakes and diagnostics that may not be on
-main. Planning never assumes, recreates or overwrites that local state, and
-reviews a build only once its diagnostic is pushed.
+**Where the work happens (user, 2026-10-24).** Local Sol chats plan and
+review; local Luna chats build. Cloud planning remains optional. Builds run
+in the existing local implementation checkout, which holds source, bakes and
+diagnostics that may not be on main. A local reviewer may inspect a stable
+stopped submission directly; a cloud reviewer needs its diagnostic/evidence
+published first. Neither assumes, recreates or overwrites unavailable state.
+See `moy_local_workflow.md` for handoffs and shared-file coordination.
 
 **Two roles.**
-- **Planning (Claude Code, cloud):**
+- **Planning (local Sol; cloud planning optional):**
   - designs and decides;
   - keeps the plan data and its checks (`tools/city_layout.py` →
     `scripts/city_plan.gd`);
   - draws the models (`docs/drawings/`);
   - writes each package's brief;
   - reviews each build's diagnostic and screenshots.
-- **Building (the implementation chat, local checkout):**
+- **Building (local Luna implementation chat):**
   - builds a package from its brief in Godot;
   - runs the checks;
   - writes a diagnostic with the standard screenshots.
@@ -189,10 +188,10 @@ diagnostic replaces this column.
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | partial proxy pass | L2 | **built — practical milestone** (user approved moving on2026-10-22;386-pack integrated bake current; remaining cold-start checks/polish carried forward, not certified all-green; `moy_P3_P4_checkpoint_2026-10-22.md`) | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L2 | L2 | **accepted — practical L2** (sense-check2026-10-22; recognizable district and public circulation, independent12/12 civic/276 landing checks; cold activation remains follow-up; `moy_P5_review_2026-10-22.md`) | `moy_pkg_P5.md` |
 | P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L2 | L2 | **built — review; hotel connection blocked** (2026-10-22; ten sites/three tower exteriors; unchanged hotel wing obstructs ingress; `docs/diagnostics/2026-10-22-moy-P6.md`) | `moy_pkg_P6.md` |
-| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L3 build; L4 final | **ready — first in P7–P9 handoff** (72 parts/19 joins; detailed scene shared by both models; focused practical construction checks) | `moy_pkg_P7.md` |
-| P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready after P7, with P9** (2026-10-22: one integrated build;41 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
-| P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **ready after P7, with P8** (2026-10-22:30 parts/12 joins; shared park entry and model; practical play build) | `moy_pkg_P9.md` |
-| P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L3 build; L4 final | **ready after P7–P9** (2026-10-23: hollow cars, doors, service/turnback/streaming, station finish; full schedule and revised model) | `moy_pkg_P10.md` |
+| P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L3 build; L4 final | **accepted — practical L2/L3** (2026-10-24; combined source/image/physics review;475-pack bake current; L4/streaming limits retained; `moy_p7_p8_p9_review_2026-10-24.md`) | `moy_pkg_P7.md` |
+| P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **accepted — practical L2/L3** (2026-10-24; combined source/image/physics review;475-pack bake current; L4/streaming limits retained; `moy_p7_p8_p9_review_2026-10-24.md`) | `moy_pkg_P8.md` |
+| P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **accepted — practical L2/L3** (2026-10-24; combined source/image/physics review;475-pack bake current; L4/streaming limits retained; `moy_p7_p8_p9_review_2026-10-24.md`) | `moy_pkg_P9.md` |
+| P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L3 build; L4 final | **build authorized** (2026-10-24 after accepted P7–P9; local Luna next; hollow cars/boarding, continuous service and stations; `moy_p10_build_handoff.md`) | `moy_pkg_P10.md` |
 | P11 | The wall and the gates: the Wall Line, the East Gate (City Hall's arch) and the West Gate, watch posts, the Rim Corridor, the Rim Walk | edge | L2 | L3 | **design accepted; build brief next** (2026-10-24: start at `moy_p11_planning_handoff_2026-10-24.md`; user accepted the open court, bell and plain North court; study accepted; whole-ring programme `WALL.kit.circuit`; gates study `moy_p11_gates_study.md`, `WALL.kit.gates`, model `moy_wall_gates_3d.html`; the build brief next) | `moy_pkg_P11.md` |
 | P12 | Streets and the Deck: paving, street furniture, picture signs, lighting, the Deck's gardens | everywhere | L1 to L2 | L3 | planned | |
 | P13 | Enterable interiors, one sub-package each (below) | landmarks | L0 to L2 | L3 | planned | |

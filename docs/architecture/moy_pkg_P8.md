@@ -1,5 +1,13 @@
 # P8 — The park, built together with P9
 
+**Review 2026-10-24: accepted practical L2/L3 milestone; L4 remains open.** See
+`docs/diagnostics/2026-10-24-moy-P7-P8-P9.md`. Source/bake remain local;
+this is the practical milestone, not L4 acceptance. Historical readiness and
+certification wording below is superseded by the current handoff.
+The cloud programme revision dated 2026-10-24 keeps Old Fu’s tea house
+closed; it supersedes the enterable tea-room instructions below.
+
+
 2026-10-22. **Ready: park stage of the sequential P7–P9 handoff.**
 
 - Area: the locked park rect world(-625,-50) to(-495,50), its four quarters,
@@ -286,3 +294,19 @@ Half-sizes in metres; symbolic sizes resolve from the checked patch/path.
 | `drainage` | meet | pond shelf and path margins | no open trench across route; splash recirculation separate from pond swimming water |
 
 Current integrated planning verification: `docs/diagnostics/2026-10-22-moy-P7-P8-P9-handoff-planning.md`.
+
+## Combined practical review — 2026-10-24
+
+Accepted at the practical built-and-dressed L2/L3 milestone. See
+`moy_p7_p8_p9_review_2026-10-24.md`: source/bake hashes match,475-pack
+freshness passes, actual GPU images inspected, independently rerun pond
+crossing with both characters plus16 lift aprons and clock/bell checks pass.
+Independent frame topology is one closed consistently connected component.
+The supplied56 saved-pack checks and GPU Clock Room walk are credited with
+explicit limits, not presented as independently rerun or full-city evidence.
+
+Whole-city streaming/performance, complete station-transfer circuit, full
+spiral/tube descents and optional upper powers remain unverified; fine trim,
+training wires and small props are polish. These do not block the current
+practical acceptance. Final L4 is not claimed. P10 may proceed; preserve the
+closed tea-house decision and separate P6 hotel-ingress debt.

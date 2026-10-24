@@ -70,13 +70,15 @@ The user's shorthand for starting a planning session on the city of Moy.
 - **Finish every turn** by updating the package's row in the roadmap, then
   commit as the repository owner with no AI credit or co-author line, and
   push to main (fetch and rebase if rejected).
-- **Cloud sessions plan; builds live locally** (user, 2026-10-24). Builds
-  are done by the implementation chat in the user's local checkout, not
-  here, unless the user asks otherwise. That checkout holds built source,
-  bakes and diagnostics that may not be on main. Work only from what main
-  holds; never assume, recreate or overwrite local build state, and review a
-  build only once its diagnostic is pushed. Give the user the build prompt
-  from the roadmap's quick start, filled in with the package id.
+- **Local Sol plans/reviews; local Luna builds** (user, 2026-10-24).
+  Cloud planning remains optional. Use `docs/architecture/moy_local_workflow.md`.
+  The implementation checkout holds built source, bakes and diagnostics that
+  may not be on main. Local review may inspect a stable stopped submission;
+  cloud review needs published evidence. Never assume, recreate or overwrite
+  unavailable build state. While a builder is active, planning stays with
+  separate briefs/models and does not rewrite shared authoring, generated
+  CityPlan or bake files. Give the package handoff from the roadmap when ready;
+  dispatch another chat only with the user's authorization.
 - **Practical standard** (user, 2026-10-21): briefs and reviews aim at a
   visually solid, playable district at Ohio/Snowhio quality, per the
   roadmap's "Latest user direction". Minor polish is a follow-up list, not
