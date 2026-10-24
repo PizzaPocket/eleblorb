@@ -219,13 +219,13 @@ diagnostic replaces this column.
 | P13a | the Grand Hotel (its public interior is already L2 from pass 3; detailed model: `moy_grand_hotel_3d.html`) |
 | P13b | the library's Great Hall and heritage room |
 | P13c | City Hall's Hall of the City and the mayor's open door |
-| P13d | the Clock Room (finish only; it is built in P1) |
-| P13e | the wet market |
+| P13d | (moved into P7) the Clock Room: designed with the clock dome in the Crossing |
+| P13e | (dropped, user 2026-10-24) the wet market: its building stays, not entered |
 | P13f | the hawker centre |
-| P13g | Old Fu's tea house |
+| P13g | (dropped, user 2026-10-24) Old Fu's tea house: its building stays, not entered |
 | P13h | the Reese–Miller house |
 | P13i | (moved into P17) Pinestein's laboratory, sealed in the BLOCK tower's base; his Old Moy flat is not entered |
-| P13j | Hiro's all-night store |
+| P13j | (dropped, user 2026-10-24) Hiro's all-night store: its building stays, not entered |
 | P13k | the Helmsmith (his walk-in shop floor and the move off Civic Plaza are in P3; P13k finishes the shop and the workshop) |
 
 **P17, the BLOCK tower.** One build, handed off whole so it can be played
