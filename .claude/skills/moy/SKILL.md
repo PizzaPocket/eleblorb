@@ -58,8 +58,10 @@ The user's shorthand for starting a planning session on the city of Moy.
   wall with punched openings, or a box with its reason), its half-sizes and
   exponents, its collision; and every join's kind (split, meet, chain,
   seated, punched) with its planes, under the architecture skill's section
-  1a. Check it in `city_layout.py`; draw the model from it; make it binding in
-  the brief; ask for it part by part in the diagnostic, and review it so.
+  1a. Check it in `city_layout.py` and draw the model from it. It is a design
+  reference for the builder, not a manufacturing certificate: do not ask for
+  it part by part in the diagnostic or review against it so (user,
+  2026-10-21).
 - **Briefs** follow `moy_pkg_P0.md` and `moy_pkg_P3.md`: area, target level,
   depends on, read first, what to build, collision, checks, viewpoints,
   report, decisions log. Short lines and bullets; no in-game text.
@@ -68,9 +70,17 @@ The user's shorthand for starting a planning session on the city of Moy.
 - **Finish every turn** by updating the package's row in the roadmap, then
   commit as the repository owner with no AI credit or co-author line, and
   push to main (fetch and rebase if rejected).
-- Builds are done by the implementation chat (Luna), not here, unless the
-  user asks otherwise. Give the user the build prompt from the roadmap's
-  quick start, filled in with the package id.
+- **Cloud sessions plan; builds live locally** (user, 2026-10-24). Builds
+  are done by the implementation chat in the user's local checkout, not
+  here, unless the user asks otherwise. That checkout holds built source,
+  bakes and diagnostics that may not be on main. Work only from what main
+  holds; never assume, recreate or overwrite local build state, and review a
+  build only once its diagnostic is pushed. Give the user the build prompt
+  from the roadmap's quick start, filled in with the package id.
+- **Practical standard** (user, 2026-10-21): briefs and reviews aim at a
+  visually solid, playable district at Ohio/Snowhio quality, per the
+  roadmap's "Latest user direction". Minor polish is a follow-up list, not
+  a gate; no millimetre fit, every-surface reachability or capture batches.
 
 ## Reply
 

@@ -96,15 +96,21 @@ surface. Keep construction and route acceptance separate. Prior blanket
 house076 access blockers are superseded by this decision. Current task:
 `moy_p3_boom_construction_finish.md`; no movement investigation or retuning.
 
+**Where the work happens (user, 2026-10-24).** Cloud Claude Code sessions
+do planning only, from main. Builds run in the user's local implementation
+checkout, which holds built source, bakes and diagnostics that may not be on
+main. Planning never assumes, recreates or overwrites that local state, and
+reviews a build only once its diagnostic is pushed.
+
 **Two roles.**
-- **Planning (Claude Code):**
+- **Planning (Claude Code, cloud):**
   - designs and decides;
   - keeps the plan data and its checks (`tools/city_layout.py` →
     `scripts/city_plan.gd`);
   - draws the models (`docs/drawings/`);
   - writes each package's brief;
   - reviews each build's diagnostic and screenshots.
-- **Building (the implementation chat):**
+- **Building (the implementation chat, local checkout):**
   - builds a package from its brief in Godot;
   - runs the checks;
   - writes a diagnostic with the standard screenshots.
@@ -135,7 +141,8 @@ house076 access blockers are superseded by this decision. Current task:
 **The plan decides the parts** (user, 2026-10-18). Every kit carries a
 parts and joins schedule in the plan data: each visible piece's SuperEgg
 shape and sizes, and how each pair of pieces is cut where they meet. The
-build follows it; the diagnostic reports it part by part.
+build uses it as its design reference; since 2026-10-21 the diagnostic does
+not report it part by part and reviews do not certify fit against it.
 
 **The checks do the walking** (package P0). Every bug of the prototype passes
 could have been caught by a machine:
@@ -146,8 +153,10 @@ could have been caught by a machine:
 - railings with no opening;
 - spaces the player could get into but shouldn't.
 
-Once P0 is done, every build runs the suite and a package is not done until
-it passes.
+Every build runs the repository's required checks. Since 2026-10-21 a
+package is done at the practical finish line above: major gameplay or
+visual defects block it; residual suite findings that are minor polish go
+on a follow-up list.
 
 ## 3. Levels of finish
 
@@ -159,7 +168,7 @@ shippable helices next to rough platforms, gets finished without rework.
 |---|---|---|
 | L0 | absent | not in the game |
 | L1 | massing | the plan's volumes, solid, at the right heights; plain materials |
-| L2 | built | its real form: kit or bespoke structure, openings, every way in and out walkable, collision as it looks |
+| L2 | built | its real form: kit or bespoke structure, openings, usable circulation and authored routes walkable, collision as it looks |
 | L3 | dressed | materials, signs, planting, lighting, props, animation; reads as the place in the screenshots |
 | L4 | shippable | passes the check suite and its screenshots; within the performance budget; you have walked it |
 
