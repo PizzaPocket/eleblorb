@@ -163,6 +163,12 @@ instances, elevation datums, canopy/support dimensions and study palette.
 The previous39-part full-circuit draft is withdrawn. These study parts must
 be reviewed visually, not counted as evidence that the entire package is ready.
 
+## Review outcome and whole circuit — 2026-10-24
+
+The user accepted the study. The repetition question below is answered by a
+programme, not a pattern: `WALL.kit.circuit` and the whole-ring model
+`docs/drawings/moy_wall_circuit_3d.html`. Gate architecture remains open.
+
 ## Questions reserved for visual review
 
 The locked12m wall leaves a tall upper field above5.5m vault crowns. The

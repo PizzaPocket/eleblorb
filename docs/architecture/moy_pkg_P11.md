@@ -278,6 +278,15 @@ Stop for review before P12. Don't report planning preview as runtime evidence.
 
 ## Decisions
 
+- 2026-10-24: user accepted the architectural study ("I like it a lot") and
+  asked for a whole-wall model. `WALL.kit.circuit` assigns all 146 bay slots a
+  programme: the Arches' five shuttered bays; a service door behind each of
+  the seven bastions and at both ends of the Line House; a threshold seat
+  facing each street that ends at the Rim Walk; garden and seat alternating
+  in between, restarting after each fixed bay; blind bays at gatehouse flanks.
+  The study's bastion shade is proposed at all seven bastions. Model:
+  `docs/drawings/moy_wall_circuit_3d.html`. Gate detail is still open.
+
 - 2026-10-23: user requested P11 next; explicitly reaffirmed High Line pathways
   and integrated park landscaping as a preferred reference.
 - Keep all locked sites/levels. Richer planting is concentrated on ground

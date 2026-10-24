@@ -4402,6 +4402,65 @@ parts_checks('Wall architectural study',WALL['kit']['study']['parts'],WALL['kit'
 assert WALL['kit']['study']['canopy']['underside']-14.>=2.4
 assert len(WALL['kit']['study']['ground']['plants'])>100
 
+# P11 whole circuit (user, 2026-10-24): the accepted study bay repeated round the real ring, with a programme that says
+# which arch room is which. Every one of the 146 slots (one per 9 m bay) is an arch, a blind bay or part of a gate or
+# the Line House; the arch rooms take their kind from what stands near them, not from a pasted pattern.
+def _wall_circuit():
+    from shapely.geometry import Point, box as sbox
+    W_=WALL; L=W_['length']; A=W_['arches']; n_a=int(L//A['bay']); slot=L/n_a
+    s_of=lambda x,z:round((math.atan2(z,x-CX)%(2*math.pi))/(2*math.pi)*L,1)
+    ring=lambda s,d:min(abs(s-d),L-abs(s-d))
+    posts=[s_of(*q) for q in W_['watch_posts']]
+    sp=W_['shed_poly'][:4]; shed_s=s_of(sum(p[0] for p in sp)/4,sum(p[1] for p in sp)/4)
+    # where a street that stops at the Rim Walk meets it: one threshold bay faces its end
+    band=Point(CX,0).buffer(W_['r']+W_['thick']/2,256).difference(Point(CX,0).buffer(197,256))
+    ends=[]
+    for st in STREETS:
+        if st[0] not in W_['clipped']: continue
+        hit=sbox(*st[2:]).intersection(band)
+        for g in getattr(hit,'geoms',[hit]):
+            if g.area>1: ends.append(dict(street=st[0],s=s_of(g.centroid.x,g.centroid.y)))
+    arches=W_['arch_s']; venue=set(W_['venue']['bays']); kinds={}
+    near=lambda s:min(arches,key=lambda a_:ring(a_,s))
+    for a_ in venue: kinds[a_]='venue'
+    for p_ in posts: kinds.setdefault(near(p_),'service')            # the door behind each bastion: its stores and stair
+    for side in (-1,1):                                               # the Line House's flanks: its back doors
+        kinds.setdefault(min((a_ for a_ in arches if (a_-shed_s)*side>0),key=lambda a_:ring(a_,shed_s)),'service')
+    for e in ends:
+        a_=near(e['s'])
+        if ring(a_,e['s'])<A['bay']: kinds.setdefault(a_,'threshold')
+    # the rest alternate garden and seat, restarting with a garden after every fixed bay, so no two runs read the same
+    k=0
+    for a_ in arches:
+        if a_ in kinds: k=0; continue
+        kinds[a_]='garden' if k%2==0 else 'seat'; k+=1
+    bays=[]
+    for i in range(n_a):
+        s_=round((i+0.5)*slot,1); a_=near(s_)
+        if ring(a_,s_)<slot/2: bays.append(dict(s=a_,kind=kinds[a_])); continue
+        gate=next((g['name'] for g in W_['gates'] if ring(g['s'],s_)+A['bay']/2<=g.get('along',W_['gatehouse']['along'])/2+1),None)
+        if gate: bays.append(dict(s=s_,kind='gate',gate=gate)); continue
+        bays.append(dict(s=s_,kind='line_house' if ring(shed_s,s_)<W_['shed']['along']/2+A['bay'] else 'blind'))
+    counts={}
+    for b_ in bays: counts[b_['kind']]=counts.get(b_['kind'],0)+1
+    for p_ in posts:
+        if kinds[near(p_)]!='service' or ring(near(p_),p_)>A['bay']: problems.append(('wall circuit: a bastion with no service bay behind it',p_))
+    if counts.get('venue',0)!=len(venue): problems.append(('wall circuit: the Arches lost a bay',counts.get('venue')))
+    if any(b_['kind']=='gate' and not any(ring(g['s'],b_['s'])<60 for g in W_['gates']) for b_ in bays): problems.append(('wall circuit: a gate bay away from its gate',))
+    run=0
+    for b_ in bays:
+        run=run+1 if b_['kind'] in ('blind',) else 0
+        if run>4: problems.append(('wall circuit: more than four blind bays in a row',b_['s']))
+    return dict(status='proposed for review 2026-10-24; study bay accepted by the user',slot=round(slot,3),bays=bays,counts=counts,
+      posts_s=posts,shed_s=shed_s,street_ends=ends,
+      rules=dict(venue='the Arches: five shuttered bays (P18 keeps their shells and shutters)',
+        service='the arch nearest each bastion and the two flanking the Line House: recessed double service door, no sign',
+        threshold='the arch facing a street that stops at the Rim Walk: shaded seat, lamp and a wider apron onto the street end',
+        garden_seat='every other arch: garden belvedere and shaded seat alternating, restarting with a garden after each fixed bay',
+        blind='solid wall where no arch room fits (gatehouse flanks): the same plinth, piers, belt, field and cap with a blind recessed arch',
+        canopy='the study\'s bastion shade proposed at all seven bastions'))
+WALL['kit']['circuit']=_wall_circuit()
+
 
 if any(l['stops']!=CROSSING['kit']['lift_stops'] for l in CROSSING['kit']['lift_serving']):
     problems.append(('P7: lift stop lists differ from authoritative Clock Room routes',))

@@ -126,6 +126,15 @@ ceramic infill, timber seats, planted path, ramp notch and supported shade are
 coordinated across eye views, elevations, plans and sections. Design review
 only; proposed canopy, gate adaptation and rollout remain unapproved.
 
+**Whole circuit, 2026-10-24:** `moy_wall_circuit_3d.html` repeats the accepted
+study bay round the real 1.3 km ring at medium detail, every arch room at its
+plan slot with its programme from `WALL.kit.circuit` (garden, seat, street-end
+threshold, service, the Arches, blind), the four gates in their locked
+silhouettes, seven bastions, the Line House, the Rim Walk and the city's edge.
+Views per gate and place, a walk along the Rim Walk and along the top, a night
+mode, and a ring map of the programme. Published:
+https://claude.ai/artifact/EAvZDeDsyAkmTf22nWjEgs
+
 Current references: `references/moy_wall_study_*.png`. Older
 `references/moy_wall_*.png` without `study` are withdrawn historical images,
 not builder references. Active brief: `../architecture/moy_p11_architectural_study.md`.

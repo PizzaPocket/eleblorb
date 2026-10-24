@@ -193,7 +193,7 @@ diagnostic replaces this column.
 | P8 | **The park**: four quarters, dry garden, reed pond/arched bridge, tea/chess parasols, lawn/lodge and real shade trees | park | L2 | L3 build; L4 final | **ready after P7, with P9** (2026-10-22: one integrated build;41 parts/12 joins; connected grounds and shared model) | `moy_pkg_P8.md` |
 | P9 | **The giant playground**: canyon towers, nets, slides, perches, hoops and pump track | park, south-east | L1 | L3 build; L4 final | **ready after P7, with P8** (2026-10-22:30 parts/12 joins; shared park entry and model; practical play build) | `moy_pkg_P9.md` |
 | P10 | **The trains**: cars, boarding, stations' finish, the timetable, the line house, the Watch train | all lines | L2 | L3 build; L4 final | **ready after P7–P9** (2026-10-23: hollow cars, doors, service/turnback/streaming, station finish; full schedule and revised model) | `moy_pkg_P10.md` |
-| P11 | The wall and the gates: the Wall Line, the East Gate (City Hall's arch) and the West Gate, watch posts, the Rim Corridor, the Rim Walk | edge | L2 | L3 | **architectural development — handoff withdrawn** (2026-10-23: user rejected the model; resolve representative wall/bastion before rollout) | `moy_pkg_P11.md` |
+| P11 | The wall and the gates: the Wall Line, the East Gate (City Hall's arch) and the West Gate, watch posts, the Rim Corridor, the Rim Walk | edge | L2 | L3 | **whole-circuit planning** (2026-10-24: user accepted the representative study; whole-ring programme `WALL.kit.circuit` and model `moy_wall_circuit_3d.html` for review; gate detail and the build brief next) | `moy_pkg_P11.md` |
 | P12 | Streets and the Deck: paving, street furniture, picture signs, lighting, the Deck's gardens | everywhere | L1 to L2 | L3 | planned | |
 | P13 | Enterable interiors, one sub-package each (below) | landmarks | L0 to L2 | L3 | planned | |
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
@@ -275,6 +275,7 @@ Each interior gets an architecture and interior brief (the `architecture` and
 | What | Where |
 |---|---|
 | P11 wall/garden model | `docs/drawings/moy_wall_gardens_3d.html` (revised 27m architectural study + bastion; design review; published https://claude.ai/artifact/BzLXjYVgfFBb94ssQavX7a) |
+| P11 whole-wall model | `docs/drawings/moy_wall_circuit_3d.html` (whole ring at medium detail, bay programme from `WALL.kit.circuit`; published https://claude.ai/artifact/EAvZDeDsyAkmTf22nWjEgs) |
 | P11 implementation hold | `docs/architecture/moy_p11_build_handoff.md` |
 | P10 rail model | `docs/drawings/moy_train_3d.html` (revised fleet/boarding/cabin/Line House/network; local, external publication pending) |
 | P10 builder handoff | `docs/architecture/moy_p10_build_handoff.md` |
