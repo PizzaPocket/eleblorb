@@ -274,7 +274,7 @@ Each interior gets an architecture and interior brief (the `architecture` and
 
 | What | Where |
 |---|---|
-| P11 wall/garden model | `docs/drawings/moy_wall_gardens_3d.html` (revised27m architectural study + bastion; design review, hosting pending) |
+| P11 wall/garden model | `docs/drawings/moy_wall_gardens_3d.html` (revised 27m architectural study + bastion; design review; published https://claude.ai/artifact/BzLXjYVgfFBb94ssQavX7a) |
 | P11 implementation hold | `docs/architecture/moy_p11_build_handoff.md` |
 | P10 rail model | `docs/drawings/moy_train_3d.html` (revised fleet/boarding/cabin/Line House/network; local, external publication pending) |
 | P10 builder handoff | `docs/architecture/moy_p10_build_handoff.md` |
